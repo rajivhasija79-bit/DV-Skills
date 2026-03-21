@@ -1,0 +1,149 @@
+{
+  "skill_name": "dv-verif-plan",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I need to create a verification plan for an APB UART IP. I have the S1 spec summary JSON at /tmp/apb_uart_spec_data.json and the S2 testplan Excel at /tmp/apb_uart_testplan.xlsx. The IP has: 4 interfaces (APB slave, UART TX, UART RX, interrupt), 16 registers, one 50MHz clock, active-low async reset. Features: programmable baud rate (1200–921600), 8-bit data, 1/2 stop bits, optional parity, 16-byte TX/RX FIFOs, interrupt on FIFO threshold/overflow/frame error. Output to: /tmp/apb_uart_vp/. Use VCS as simulator, git clone from https://github.com/mycompany/apb-uart-dv as checkout. DV-I target: 2024-02-15, DV-C: 2024-04-30, DV-F: 2024-06-28.",
+      "expected_output": "Complete verification plan PDF at /tmp/apb_uart_vp/dv_verif_plan.pdf with all 14 sections plus traceability matrix, TB architecture PNG, DUT block diagram PNG, and Gantt chart PNG. JSON data file at /tmp/apb_uart_vp/dv_verif_plan_data.json. All sections populated: DUT description, testplan summary, full covergroups, checker plan with component assignments, TB architecture diagram, compilation flow with VCS commands, directory structure, DV resources, debug guidelines, 100% signoff criteria, Gantt chart with 3 milestones, team info placeholders, risks, collateral list.",
+      "assertions": [
+        {
+          "id": "pdf_generated",
+          "name": "PDF file is generated",
+          "type": "file_exists",
+          "check": "File /tmp/apb_uart_vp/dv_verif_plan.pdf exists and has size > 50KB"
+        },
+        {
+          "id": "data_json_generated",
+          "name": "JSON data file is generated",
+          "type": "file_exists",
+          "check": "File /tmp/apb_uart_vp/dv_verif_plan_data.json exists and contains all 14 required top-level keys"
+        },
+        {
+          "id": "tb_diagram_generated",
+          "name": "TB architecture PNG is generated",
+          "type": "file_exists",
+          "check": "File /tmp/apb_uart_vp/tb_architecture.png exists"
+        },
+        {
+          "id": "gantt_generated",
+          "name": "Gantt chart PNG is generated",
+          "type": "file_exists",
+          "check": "File /tmp/apb_uart_vp/gantt_schedule.png exists with DV-I, DV-C, DV-F milestones"
+        },
+        {
+          "id": "all_sections_present",
+          "name": "All 14 sections + traceability matrix covered",
+          "type": "content_check",
+          "check": "JSON data file contains non-empty values for: dut, testplan_summary, coverage_plan, checker_plan, tb_architecture, compilation_flow, directory_structure, dv_resources, debug_guidelines, signoff_criteria, schedule, team_info, risks, collateral, traceability_matrix"
+        },
+        {
+          "id": "signoff_100_percent",
+          "name": "Sign-off criteria specifies 100% coverage targets",
+          "type": "content_check",
+          "check": "signoff_criteria in JSON contains 100% for functional coverage, line coverage, branch coverage"
+        },
+        {
+          "id": "checker_components_assigned",
+          "name": "Checker plan assigns components (scoreboard/testcase/interface/etc.)",
+          "type": "content_check",
+          "check": "checker_plan entries each have a 'component' field with a valid value from: scoreboard, testcase, interface, coverage, monitor"
+        },
+        {
+          "id": "milestones_correct",
+          "name": "Schedule has DV-I, DV-C, DV-F milestones with correct dates",
+          "type": "content_check",
+          "check": "schedule.milestones contains entries for DV-I (end ~2024-02-15), DV-C (end ~2024-04-30), DV-F (end ~2024-06-28)"
+        }
+      ],
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Create a DV verification plan for an AXI4 DMA controller IP. No S1 or S2 outputs are available — work from this raw spec:\n\nIP: AXI4_DMA — Multi-channel DMA controller\nInterfaces: AXI4 Master (512-bit data bus), AXI4-Lite Slave (config), interrupt\nFeatures: 8 independent channels, each channel configurable source/dest address, burst length 1-256, fixed/incrementing/wrapping burst types, interrupt per-channel on completion or error, scatter-gather descriptor support, FIFO depth 256 entries per channel\nClocks: axi_clk (200MHz), cfg_clk (100MHz), async clock-domain crossing logic\nResets: axi_rst_n (active-low, sync to axi_clk), cfg_rst_n (sync to cfg_clk)\nRegisters: 64 registers (8 per channel + global control/status)\nKnown limitation: Power management features not included in this DV phase\n\nUse Xcelium simulator. Output to /tmp/axi_dma_vp/. I'll fill team info and resources manually later.",
+      "expected_output": "Complete verification plan PDF at /tmp/axi_dma_vp/dv_verif_plan.pdf generated from raw spec (no S1/S2 inputs). Skill asks clarifying questions about missing information (team info, URLs, milestone dates, simulator commands, debug tips). Coverage plan expands raw spec features into covergroups. TB architecture includes AXI4 master agent, AXI4-Lite slave agent, interrupt monitor, scoreboard, coverage collector, reg model. Checker plan covers: DMA transfer completion checks, address alignment checks, burst type checks, interrupt assertion checks, CDC path checks. All sections use placeholders <TBD> for team/resource info not provided.",
+      "assertions": [
+        {
+          "id": "pdf_from_raw_spec",
+          "name": "PDF generated from raw spec (no S1/S2 inputs)",
+          "type": "file_exists",
+          "check": "File /tmp/axi_dma_vp/dv_verif_plan.pdf exists"
+        },
+        {
+          "id": "skill_asks_for_missing_info",
+          "name": "Skill prompts user for missing team/resource/milestone info",
+          "type": "behavior_check",
+          "check": "Transcript shows the skill asked questions about: milestone dates, team info, simulator commands, debug guidelines, DV resource URLs"
+        },
+        {
+          "id": "axi_agents_in_tb_arch",
+          "name": "TB architecture includes AXI4 master and AXI4-Lite agents",
+          "type": "content_check",
+          "check": "tb_architecture.components includes entries for AXI4 master agent and AXI4-Lite (config) agent"
+        },
+        {
+          "id": "cdc_risk_present",
+          "name": "CDC (clock domain crossing) risk listed in risks section",
+          "type": "content_check",
+          "check": "risks section contains an entry mentioning CDC or clock domain crossing"
+        },
+        {
+          "id": "tbd_placeholders_used",
+          "name": "TBD placeholders for unspecified info rather than invented data",
+          "type": "content_check",
+          "check": "dv_resources fields contain <TBD> placeholders for URLs not provided; team_info contains <TBD> for unspecified names"
+        },
+        {
+          "id": "coverage_plan_has_channel_coverage",
+          "name": "Coverage plan covers DMA channel features",
+          "type": "content_check",
+          "check": "coverage_plan contains covergroups covering: channel selection (8 channels), burst type, burst length, address alignment"
+        }
+      ],
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Generate a verification plan for an I2C Master IP. The S1 JSON is available at /tmp/i2c_spec_data.json. No testplan yet. Team: DV Lead is Priya Sharma (priya@acme.com), DV Engineer: James Liu (james@acme.com, responsible for TB infrastructure), Design Owner: Chen Wei (chenwei@acme.com). Simulator: Questa. DV-I: 2024-03-01, DV-C: 2024-05-15, DV-F: 2024-07-31. JIRA project: I2C-DV. DV repo: https://github.com/acme/i2c-dv. RTL repo: https://github.com/acme/i2c-rtl. Debug tip: 'Watch i2c_scl_stretch signal — known glitch at startup, filter in first 100ns'. Sign-off: accept defaults except toggle coverage threshold is 95% (not 100% due to unused pads).",
+      "expected_output": "Verification plan PDF with team info fully populated (Priya Sharma as DV Lead, James Liu as DV engineer with TB infrastructure responsibility, Chen Wei as design owner). Schedule Gantt chart shows DV-I on 2024-03-01, DV-C on 2024-05-15, DV-F on 2024-07-31. DV Resources section has JIRA and repo links populated (not TBD). Debug guidelines include the scl_stretch glitch tip. Sign-off criteria has toggle coverage at 95% (not 100%). No testplan section has warning about missing S2 testplan. Coverage plan derived from spec features. Checkers derived from spec (start/stop condition, ACK/NACK, clock stretching, arbitration loss).",
+      "assertions": [
+        {
+          "id": "team_info_correct",
+          "name": "Team info populated correctly from user input",
+          "type": "content_check",
+          "check": "team_info has dv_lead.name='Priya Sharma', engineer James Liu with responsibility 'TB infrastructure', design_owner.name='Chen Wei'"
+        },
+        {
+          "id": "schedule_dates_correct",
+          "name": "Schedule milestones match provided dates",
+          "type": "content_check",
+          "check": "schedule milestones include DV-I end ~2024-03-01, DV-C end ~2024-05-15, DV-F end ~2024-07-31"
+        },
+        {
+          "id": "resources_populated",
+          "name": "DV resources have actual URLs not TBD",
+          "type": "content_check",
+          "check": "dv_resources contains jira_url with I2C-DV, dv_repo_url with acme/i2c-dv, rtl_repo_url with acme/i2c-rtl"
+        },
+        {
+          "id": "debug_tip_scl_stretch",
+          "name": "Custom debug tip about scl_stretch included",
+          "type": "content_check",
+          "check": "debug_guidelines contains entry mentioning i2c_scl_stretch or scl_stretch signal"
+        },
+        {
+          "id": "toggle_coverage_95_percent",
+          "name": "Toggle coverage signoff target is 95% not 100%",
+          "type": "content_check",
+          "check": "signoff_criteria.coverage.toggle equals '95%'"
+        },
+        {
+          "id": "no_testplan_warning",
+          "name": "Missing S2 testplan flagged with warning",
+          "type": "content_check",
+          "check": "testplan_summary.note contains warning about missing/preliminary testplan"
+        }
+      ],
+      "files": []
+    }
+  ]
+}

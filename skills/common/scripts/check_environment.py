@@ -27,8 +27,12 @@ DEPS = {
         ("pathlib",   None,       "stdlib"),
     ],
     "s3": [
-        ("docx",      "python-docx", "pip"),
-        ("openpyxl",  "openpyxl",    "pip"),
+        ("openpyxl",   "openpyxl",   "pip"),   # read S2 testplan
+        ("graphviz",   "graphviz",   "pip"),   # TB architecture diagram
+        ("matplotlib", "matplotlib", "pip"),   # Gantt + coverage charts
+        ("PIL",        "Pillow",     "pip"),   # image handling
+        # PDF: weasyprint or reportlab as pandoc fallback
+        # pandoc is a system tool — checked separately below
     ],
 }
 
@@ -83,6 +87,19 @@ def main():
             if not ok:
                 all_ok = False
                 missing.append(install_name)
+
+    # ── System tool checks (for s3) ───────────────────────────────────────────
+    if args.skill in ("s3", "all"):
+        print("\n  [S3] System tools:")
+        for tool, desc in [("pandoc", "PDF generation (primary)"),
+                            ("dot",   "Graphviz binary (diagrams)")]:
+            result = subprocess.run(["which", tool], capture_output=True)
+            found = result.returncode == 0
+            status = "✓" if found else "⚠"
+            note   = "found" if found else f"NOT FOUND — install via: brew install {tool}"
+            print(f"    {status}  {tool:<18} {note}  ({desc})")
+            if not found and tool == "pandoc":
+                print("       Fallback: weasyprint or reportlab will be used automatically")
 
     print()
     if all_ok:

@@ -1,0 +1,206 @@
+{
+  "project_name": "axi_dma",
+  "source_spec": "/Users/apple/Documents/DV-Skills/skills/dv-spec-parse/evals/test_specs/axi_dma_spec.md",
+  "generated_by": "dv-spec-parse",
+  "date": "2026-03-22",
+  "block_overview": "The AXI_DMA is a single-channel Direct Memory Access controller designed for memory-to-memory data transfers. It exposes an AXI4 master interface for performing source and destination memory accesses, and an APB slave interface for software configuration and status readback. The block supports configurable transfer sizes (1–65535 bytes), INCR-type burst transfers of up to 16 beats, and generates interrupts on transfer completion or AXI error. Scatter-gather is explicitly not supported in this version (v0.9 Draft). The block is positioned as a simple, single-outstanding-transaction DMA engine suitable for use in SoC subsystems requiring lightweight memory-copy acceleration.",
+  "features": [
+    {
+      "id": 1,
+      "name": "AXI4 Master Interface",
+      "description": "AXI4 master port used for both source (read) and destination (write) memory access",
+      "subfeatures": [
+        { "id": "1.1", "name": "Write Channel", "description": "Supports AW, W, and B AXI4 channels for memory write operations" },
+        { "id": "1.2", "name": "Read Channel", "description": "Supports AR and R AXI4 channels for memory read operations" }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "APB Slave Interface",
+      "description": "APB slave port for register-based configuration and status",
+      "subfeatures": []
+    },
+    {
+      "id": 3,
+      "name": "Configurable Transfer Size",
+      "description": "Transfer length is programmable from 1 to 65535 bytes",
+      "subfeatures": [
+        { "id": "3.1", "name": "Byte Granularity", "description": "Transfer size specified in bytes, range 1–65535" }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "Burst Transfers",
+      "description": "Supports INCR burst type with configurable burst length of 1–16 beats",
+      "subfeatures": [
+        { "id": "4.1", "name": "INCR Burst Type", "description": "Only INCR (incrementing address) burst type is supported" },
+        { "id": "4.2", "name": "Max Burst Length", "description": "Maximum burst length configurable via MAX_BURST parameter, default 16 beats" }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Transfer Complete Interrupt",
+      "description": "Generates an interrupt (dma_done) when a DMA transfer finishes successfully",
+      "subfeatures": []
+    },
+    {
+      "id": 6,
+      "name": "Error Interrupt",
+      "description": "Generates an interrupt (dma_err) when an AXI slave error response is received",
+      "subfeatures": [
+        { "id": "6.1", "name": "Software Clear Required", "description": "Error state must be cleared by software before new transfers can proceed" }
+      ]
+    },
+    {
+      "id": 7,
+      "name": "No Scatter-Gather",
+      "description": "Scatter-gather mode is not supported in this version",
+      "subfeatures": []
+    }
+  ],
+  "interfaces": [
+    {
+      "name": "AXI4 Master",
+      "type": "Master",
+      "protocol": "AXI4",
+      "width": "32-bit data, 32-bit address",
+      "direction": "Output (master)",
+      "signals": [
+        { "name": "aclk",    "direction": "Input",  "width": "1",  "description": "AXI clock" },
+        { "name": "aresetn", "direction": "Input",  "width": "1",  "description": "AXI active-low reset" },
+        { "name": "awaddr",  "direction": "Output", "width": "32", "description": "Write address" },
+        { "name": "awlen",   "direction": "Output", "width": "8",  "description": "Burst length" },
+        { "name": "awvalid", "direction": "Output", "width": "1",  "description": "Write address valid" },
+        { "name": "awready", "direction": "Input",  "width": "1",  "description": "Write address ready" },
+        { "name": "wdata",   "direction": "Output", "width": "32", "description": "Write data" },
+        { "name": "wstrb",   "direction": "Output", "width": "4",  "description": "Write strobes" },
+        { "name": "wlast",   "direction": "Output", "width": "1",  "description": "Last write beat" },
+        { "name": "wvalid",  "direction": "Output", "width": "1",  "description": "Write data valid" },
+        { "name": "wready",  "direction": "Input",  "width": "1",  "description": "Write data ready" },
+        { "name": "bresp",   "direction": "Input",  "width": "2",  "description": "Write response" },
+        { "name": "bvalid",  "direction": "Input",  "width": "1",  "description": "Write response valid" },
+        { "name": "bready",  "direction": "Output", "width": "1",  "description": "Write response ready" },
+        { "name": "araddr",  "direction": "Output", "width": "32", "description": "Read address" },
+        { "name": "arlen",   "direction": "Output", "width": "8",  "description": "Read burst length" },
+        { "name": "arvalid", "direction": "Output", "width": "1",  "description": "Read address valid" },
+        { "name": "arready", "direction": "Input",  "width": "1",  "description": "Read address ready" },
+        { "name": "rdata",   "direction": "Input",  "width": "32", "description": "Read data" },
+        { "name": "rresp",   "direction": "Input",  "width": "2",  "description": "Read response" },
+        { "name": "rlast",   "direction": "Input",  "width": "1",  "description": "Last read beat" },
+        { "name": "rvalid",  "direction": "Input",  "width": "1",  "description": "Read data valid" },
+        { "name": "rready",  "direction": "Output", "width": "1",  "description": "Read data ready" }
+      ]
+    },
+    {
+      "name": "APB Slave",
+      "type": "Slave",
+      "protocol": "APB v2.0",
+      "width": "32-bit data, 8-bit address",
+      "direction": "Input (slave)",
+      "signals": [
+        { "name": "pclk",    "direction": "Input",  "width": "1",  "description": "APB clock" },
+        { "name": "presetn", "direction": "Input",  "width": "1",  "description": "APB reset active-low" },
+        { "name": "psel",    "direction": "Input",  "width": "1",  "description": "Chip select" },
+        { "name": "penable", "direction": "Input",  "width": "1",  "description": "Enable" },
+        { "name": "pwrite",  "direction": "Input",  "width": "1",  "description": "Write enable" },
+        { "name": "paddr",   "direction": "Input",  "width": "8",  "description": "Address" },
+        { "name": "pwdata",  "direction": "Input",  "width": "32", "description": "Write data" },
+        { "name": "prdata",  "direction": "Output", "width": "32", "description": "Read data" },
+        { "name": "pready",  "direction": "Output", "width": "1",  "description": "Ready" }
+      ]
+    },
+    {
+      "name": "Interrupt",
+      "type": "Output",
+      "protocol": "N/A (wire)",
+      "width": "1-bit per signal",
+      "direction": "Output",
+      "signals": [
+        { "name": "dma_done", "direction": "Output", "width": "1", "description": "Transfer complete interrupt" },
+        { "name": "dma_err",  "direction": "Output", "width": "1", "description": "AXI error interrupt" }
+      ]
+    }
+  ],
+  "parameters": [
+    { "name": "DATA_WIDTH", "default": "32", "description": "AXI data bus width in bits" },
+    { "name": "ADDR_WIDTH", "default": "32", "description": "AXI address bus width in bits" },
+    { "name": "MAX_BURST",  "default": "16", "description": "Maximum AXI burst length in beats" }
+  ],
+  "clock_domains": [
+    {
+      "name": "aclk",
+      "source": "External (AXI subsystem)",
+      "frequency": "100–200 MHz",
+      "affected_logic": "AXI4 master interface, DMA datapath, transfer engine"
+    },
+    {
+      "name": "pclk",
+      "source": "External (APB bus)",
+      "frequency": "50–100 MHz",
+      "affected_logic": "APB slave interface, register file, configuration logic"
+    }
+  ],
+  "reset_strategy": [
+    {
+      "name": "aresetn",
+      "type": "Asynchronous assert, synchronous de-assert",
+      "polarity": "Active-low",
+      "affected_domains": "AXI4 master interface, DMA datapath"
+    },
+    {
+      "name": "presetn",
+      "type": "Synchronous",
+      "polarity": "Active-low",
+      "affected_domains": "APB slave interface, register file"
+    }
+  ],
+  "operating_modes": [
+    {
+      "name": "Idle",
+      "description": "No transfer in progress; DMA awaiting a new transfer request",
+      "configuration": "Default state after reset; entered after transfer completion or error clear"
+    },
+    {
+      "name": "Active Transfer",
+      "description": "DMA is actively moving data from source address to destination address via AXI4",
+      "configuration": "Initiated by software programming source/destination addresses and transfer length, then asserting start"
+    },
+    {
+      "name": "Error State",
+      "description": "An AXI slave error response was received; DMA halted",
+      "configuration": "Entered automatically on AXI error; exit requires software clear via register write"
+    }
+  ],
+  "compliance_standards": [
+    {
+      "standard": "AXI4",
+      "version": "AMBA AXI and ACE Protocol Specification ARM IHI0022",
+      "notes": "Master interface only; INCR burst type; single outstanding transaction"
+    },
+    {
+      "standard": "APB",
+      "version": "v2.0",
+      "notes": "Slave interface for register access"
+    }
+  ],
+  "known_constraints": [
+    "Only memory-to-memory transfers are supported; peripheral-to-memory and memory-to-peripheral are not supported",
+    "Only a single outstanding AXI transaction is permitted at a time; no transaction pipelining",
+    "Source and destination addresses must be word-aligned (32-bit / 4-byte aligned)",
+    "Scatter-gather mode is not supported in this version",
+    "Maximum transfer size is 65535 bytes",
+    "Maximum burst length is 16 beats (INCR type only)",
+    "Error state requires explicit software clear before a new transfer can be initiated"
+  ],
+  "needs_review": [
+    "Register Map: The spec does not define the APB register map (addresses, register names, bitfields for start, source address, destination address, transfer length, status, interrupt enable/clear). This is critical for DV and must be defined.",
+    "AXI ID signals (awid, arid, bid, rid): Not listed in the signal table. It is unclear whether the DUT uses a fixed ID or if these signals are present.",
+    "AXI Size signals (awsize, arsize): Not listed. It is unclear whether these are fixed to the full data width or configurable.",
+    "AXI Burst type signals (awburst, arburst): Not listed explicitly, though the spec states INCR type is used. Presence in the port list should be confirmed.",
+    "AXI Protection/Cache/Lock signals (awprot, arprot, awcache, arcache, awlock, arlock): Not listed. Their presence or absence should be confirmed.",
+    "Clock domain crossing (CDC): The spec defines two separate clock domains (aclk and pclk) but does not describe any CDC mechanism between them. The synchronization strategy for register writes from pclk domain to aclk domain needs clarification.",
+    "Interrupt clear mechanism: dma_done and dma_err interrupt outputs are described but the clear mechanism (pulse vs. level, write-1-to-clear, etc.) is not specified.",
+    "Operating mode start mechanism: The Active Transfer mode mentions software programming registers, but the exact trigger mechanism (e.g., a START bit in a control register) is not specified.",
+    "AXI WSTRB behavior: The wstrb signal is listed but its behavior for sub-word or unaligned transfers is not described."
+  ]
+}

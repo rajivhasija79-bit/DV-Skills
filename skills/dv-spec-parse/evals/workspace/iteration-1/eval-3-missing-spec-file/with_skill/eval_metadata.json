@@ -1,0 +1,10 @@
+{
+  "eval_id": 3,
+  "eval_name": "missing-spec-file-input-handling",
+  "prompt": "dv-spec-parse — but I haven't told you which spec file to use yet. Project name is i2c_master.",
+  "assertions": [
+    { "text": "Skill asks for the missing SPEC_FILE before proceeding", "passed": true, "evidence": "Skill correctly halted at Step 1, identified SPEC_FILE as missing, and asked user for the path" },
+    { "text": "Skill does NOT generate any output files without the spec", "passed": true, "evidence": "No output files created; only response.txt with the question to user" },
+    { "text": "Skill recognises project name was already provided and does not ask again", "passed": true, "evidence": "Response asked only for SPEC_FILE; did not ask for PROJECT_NAME which was already given" }
+  ]
+}

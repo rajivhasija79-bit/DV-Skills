@@ -1,0 +1,9 @@
+{
+  "expectations": [
+    { "text": "Skill asks for the missing SPEC_FILE before proceeding", "passed": true, "evidence": "Baseline searched filesystem first then asked for a file path" },
+    { "text": "Skill does NOT generate any output files without the spec", "passed": true, "evidence": "No output files generated" },
+    { "text": "Skill recognises project name was provided and does not ask again", "passed": true, "evidence": "Response did not ask for project name again" }
+  ],
+  "summary": { "passed": 3, "failed": 0, "total": 3, "pass_rate": 1.0 },
+  "timing": { "executor_duration_seconds": 26.8 }
+}

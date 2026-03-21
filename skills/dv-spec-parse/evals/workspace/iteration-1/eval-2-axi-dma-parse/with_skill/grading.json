@@ -1,0 +1,12 @@
+{
+  "expectations": [
+    { "text": "dv_spec_summary.md and dv_spec_summary.json are both created", "passed": true, "evidence": "Both files written to with_skill/outputs/" },
+    { "text": "Both clock domains (aclk and pclk) captured", "passed": true, "evidence": "2 clock domains: aclk 100-200 MHz, pclk 50-100 MHz" },
+    { "text": "Both interfaces (AXI4 Master and APB Slave) listed with signals", "passed": true, "evidence": "3 interfaces, 34 signals total: AXI4 Master (23), APB Slave (9), Interrupt (2)" },
+    { "text": "AXI4 compliance standard captured", "passed": true, "evidence": "AXI4 ARM IHI0022 and APB v2.0 both listed" },
+    { "text": "Known constraints include word-alignment and single-outstanding-transaction", "passed": true, "evidence": "7 known constraints listed; both target constraints present" },
+    { "text": "JSON is valid and matches defined schema structure", "passed": true, "evidence": "Valid JSON with all required keys; 9 NEEDS_REVIEW items correctly flagged (register map missing, CDC undefined, interrupt clear unspecified)" }
+  ],
+  "summary": { "passed": 6, "failed": 0, "total": 6, "pass_rate": 1.0 },
+  "timing": { "executor_duration_seconds": 99.7 }
+}

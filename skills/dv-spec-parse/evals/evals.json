@@ -1,0 +1,97 @@
+{
+  "skill_name": "dv-spec-parse",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I want to start DV on my APB UART block. The spec is at /Users/apple/Documents/DV-Skills/skills/dv-spec-parse/evals/test_specs/apb_uart_spec.md and the project name is apb_uart. Save outputs to /Users/apple/Documents/DV-Skills/skills/dv-spec-parse/evals/outputs/eval1/",
+      "expected_output": "dv_spec_summary.md and dv_spec_summary.json saved to the output directory. The markdown must contain all 11 sections (block overview, feature list, sub-features, interface list, signal list, parameters, clock domains, reset strategy, operating modes, compliance standards, known constraints) with accurate data from the spec. JSON must be valid and match the defined schema. Terminal summary printed with counts.",
+      "files": [
+        "/Users/apple/Documents/DV-Skills/skills/dv-spec-parse/evals/test_specs/apb_uart_spec.md"
+      ],
+      "assertions": [
+        {
+          "text": "dv_spec_summary.md is created in the output directory",
+          "type": "file_exists"
+        },
+        {
+          "text": "dv_spec_summary.json is created in the output directory",
+          "type": "file_exists"
+        },
+        {
+          "text": "Markdown contains all 11 required sections (Block Overview, Feature List, Sub-features, Interface List, Signal List, Parameters, Clock Domains, Reset Strategy, Operating Modes, Compliance Standards, Known Constraints)",
+          "type": "content_check"
+        },
+        {
+          "text": "JSON file is valid JSON with project_name, features, interfaces, parameters, clock_domains, reset_strategy fields populated",
+          "type": "content_check"
+        },
+        {
+          "text": "At least 5 features extracted from the spec (APB interface, TX, RX, baud rate generator, flow control, interrupts)",
+          "type": "content_check"
+        },
+        {
+          "text": "APB interface signals correctly listed: pclk, presetn, psel, penable, pwrite, paddr, pwdata, prdata, pready, pslverr",
+          "type": "content_check"
+        },
+        {
+          "text": "Terminal summary printed with item counts",
+          "type": "content_check"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Parse the AXI DMA spec and give me a structured DV summary. Spec file: /Users/apple/Documents/DV-Skills/skills/dv-spec-parse/evals/test_specs/axi_dma_spec.md. Project: axi_dma. Output to /Users/apple/Documents/DV-Skills/skills/dv-spec-parse/evals/outputs/eval2/",
+      "expected_output": "dv_spec_summary.md and dv_spec_summary.json created. The DMA spec has two clock domains (aclk and pclk) and two interfaces (AXI4 master and APB slave) — both must be correctly identified. The draft nature of the spec (v0.9) should not prevent extraction. JSON must be valid.",
+      "files": [
+        "/Users/apple/Documents/DV-Skills/skills/dv-spec-parse/evals/test_specs/axi_dma_spec.md"
+      ],
+      "assertions": [
+        {
+          "text": "dv_spec_summary.md and dv_spec_summary.json are both created",
+          "type": "file_exists"
+        },
+        {
+          "text": "Both clock domains (aclk and pclk) are captured in the output",
+          "type": "content_check"
+        },
+        {
+          "text": "Both interfaces (AXI4 Master and APB Slave) are listed with their signals",
+          "type": "content_check"
+        },
+        {
+          "text": "AXI4 compliance standard is captured",
+          "type": "content_check"
+        },
+        {
+          "text": "Known constraints section lists at least the word-alignment and single-outstanding-transaction constraints",
+          "type": "content_check"
+        },
+        {
+          "text": "JSON is valid and matches the defined schema structure",
+          "type": "content_check"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "dv-spec-parse — but I haven't told you which spec file to use yet. Project name is i2c_master.",
+      "expected_output": "Skill must detect that SPEC_FILE is missing and ask the user for the path to the spec file before proceeding. It should NOT attempt to generate outputs or make assumptions about the file path. It should ask for the missing input in a single clear message.",
+      "files": [],
+      "assertions": [
+        {
+          "text": "Skill asks the user to provide the missing spec file path before proceeding",
+          "type": "behavior_check"
+        },
+        {
+          "text": "Skill does NOT attempt to generate any output files without the spec file",
+          "type": "behavior_check"
+        },
+        {
+          "text": "Skill correctly identifies the project name (i2c_master) was already provided and does not ask for it again",
+          "type": "behavior_check"
+        }
+      ]
+    }
+  ]
+}

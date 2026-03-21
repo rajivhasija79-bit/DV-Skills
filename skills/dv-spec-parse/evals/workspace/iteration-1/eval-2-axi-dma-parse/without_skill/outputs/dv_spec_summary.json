@@ -1,0 +1,168 @@
+{
+  "project": "axi_dma",
+  "block": "AXI_DMA",
+  "version": "0.9 (Draft)",
+  "overview": "Single-channel Direct Memory Access controller with an AXI4 master interface for memory transfers and an APB slave interface for configuration and status. Supports memory-to-memory transfers, configurable burst length, and interrupt on transfer completion.",
+  "features": [
+    "AXI4 master for source and destination memory access",
+    "APB slave for register configuration",
+    "Configurable transfer size: 1 to 65535 bytes",
+    "Burst transfers: INCR type, length 1-16 beats",
+    "Transfer complete interrupt",
+    "Error interrupt on AXI slave error response",
+    "Scatter-gather NOT supported in this version"
+  ],
+  "interfaces": {
+    "axi4_master": {
+      "description": "AXI4 master interface for source and destination memory access",
+      "signals": [
+        { "name": "aclk",    "direction": "input",  "width": 1,  "description": "AXI clock" },
+        { "name": "aresetn", "direction": "input",  "width": 1,  "description": "AXI active-low reset" },
+        { "name": "awaddr",  "direction": "output", "width": 32, "description": "Write address" },
+        { "name": "awlen",   "direction": "output", "width": 8,  "description": "Burst length" },
+        { "name": "awvalid", "direction": "output", "width": 1,  "description": "Write address valid" },
+        { "name": "awready", "direction": "input",  "width": 1,  "description": "Write address ready" },
+        { "name": "wdata",   "direction": "output", "width": 32, "description": "Write data" },
+        { "name": "wstrb",   "direction": "output", "width": 4,  "description": "Write strobes" },
+        { "name": "wlast",   "direction": "output", "width": 1,  "description": "Last write beat" },
+        { "name": "wvalid",  "direction": "output", "width": 1,  "description": "Write data valid" },
+        { "name": "wready",  "direction": "input",  "width": 1,  "description": "Write data ready" },
+        { "name": "bresp",   "direction": "input",  "width": 2,  "description": "Write response" },
+        { "name": "bvalid",  "direction": "input",  "width": 1,  "description": "Write response valid" },
+        { "name": "bready",  "direction": "output", "width": 1,  "description": "Write response ready" },
+        { "name": "araddr",  "direction": "output", "width": 32, "description": "Read address" },
+        { "name": "arlen",   "direction": "output", "width": 8,  "description": "Read burst length" },
+        { "name": "arvalid", "direction": "output", "width": 1,  "description": "Read address valid" },
+        { "name": "arready", "direction": "input",  "width": 1,  "description": "Read address ready" },
+        { "name": "rdata",   "direction": "input",  "width": 32, "description": "Read data" },
+        { "name": "rresp",   "direction": "input",  "width": 2,  "description": "Read response" },
+        { "name": "rlast",   "direction": "input",  "width": 1,  "description": "Last read beat" },
+        { "name": "rvalid",  "direction": "input",  "width": 1,  "description": "Read data valid" },
+        { "name": "rready",  "direction": "output", "width": 1,  "description": "Read data ready" }
+      ]
+    },
+    "apb_slave": {
+      "description": "APB slave interface for register configuration and status",
+      "signals": [
+        { "name": "pclk",    "direction": "input",  "width": 1,  "description": "APB clock" },
+        { "name": "presetn", "direction": "input",  "width": 1,  "description": "APB reset active-low" },
+        { "name": "psel",    "direction": "input",  "width": 1,  "description": "Chip select" },
+        { "name": "penable", "direction": "input",  "width": 1,  "description": "Enable" },
+        { "name": "pwrite",  "direction": "input",  "width": 1,  "description": "Write enable" },
+        { "name": "paddr",   "direction": "input",  "width": 8,  "description": "Address" },
+        { "name": "pwdata",  "direction": "input",  "width": 32, "description": "Write data" },
+        { "name": "prdata",  "direction": "output", "width": 32, "description": "Read data" },
+        { "name": "pready",  "direction": "output", "width": 1,  "description": "Ready" }
+      ]
+    },
+    "interrupt": {
+      "description": "Interrupt outputs to system interrupt controller",
+      "signals": [
+        { "name": "dma_done", "direction": "output", "width": 1, "description": "Transfer complete interrupt" },
+        { "name": "dma_err",  "direction": "output", "width": 1, "description": "AXI error interrupt" }
+      ]
+    }
+  },
+  "parameters": [
+    { "name": "DATA_WIDTH", "default": 32, "description": "AXI data width" },
+    { "name": "ADDR_WIDTH", "default": 32, "description": "AXI address width" },
+    { "name": "MAX_BURST",  "default": 16, "description": "Max AXI burst length" }
+  ],
+  "clocks_and_resets": [
+    {
+      "name": "aclk",
+      "type": "clock",
+      "frequency_mhz": { "min": 100, "max": 200 },
+      "domain": "AXI",
+      "notes": "Primary AXI clock"
+    },
+    {
+      "name": "pclk",
+      "type": "clock",
+      "frequency_mhz": { "min": 50, "max": 100 },
+      "domain": "APB",
+      "notes": "APB configuration clock"
+    },
+    {
+      "name": "aresetn",
+      "type": "reset",
+      "polarity": "active_low",
+      "assertion": "asynchronous",
+      "deassertion": "synchronous_to_aclk",
+      "domain": "AXI"
+    },
+    {
+      "name": "presetn",
+      "type": "reset",
+      "polarity": "active_low",
+      "assertion": "synchronous",
+      "deassertion": "synchronous_to_pclk",
+      "domain": "APB"
+    }
+  ],
+  "operating_modes": [
+    {
+      "name": "Idle",
+      "description": "No transfer in progress"
+    },
+    {
+      "name": "Active Transfer",
+      "description": "DMA moving data from source to destination"
+    },
+    {
+      "name": "Error State",
+      "description": "AXI error received; requires software clear to recover"
+    }
+  ],
+  "compliance": [
+    "AXI4 — AMBA AXI and ACE Protocol Specification, ARM IHI0022",
+    "APB v2.0"
+  ],
+  "constraints": [
+    "Only memory-to-memory transfers supported",
+    "Single outstanding transaction at a time",
+    "Source and destination addresses must be word-aligned"
+  ],
+  "dv_notes": {
+    "transfer_size": {
+      "min_bytes": 1,
+      "max_bytes": 65535,
+      "dv_note": "Boundary values (1, 65535) and representative mid-range values must be covered"
+    },
+    "burst": {
+      "type": "INCR",
+      "min_beats": 1,
+      "max_beats": 16,
+      "dv_note": "Test min (1), max (16), and intermediate burst lengths; no WRAP or FIXED burst types"
+    },
+    "scatter_gather": {
+      "supported": false,
+      "dv_note": "Out of scope for this version"
+    },
+    "outstanding_transactions": {
+      "max": 1,
+      "dv_note": "Verify that a second transaction cannot be issued while one is in-flight"
+    },
+    "address_alignment": {
+      "requirement": "word_aligned",
+      "dv_note": "Test unaligned addresses to verify correct error handling"
+    },
+    "interrupts": {
+      "signals": ["dma_done", "dma_err"],
+      "dv_note": "Both interrupts must be stimulated and checked for correct assertion and de-assertion"
+    },
+    "error_recovery": {
+      "mechanism": "software_clear",
+      "dv_note": "Verify transition from Error State back to Idle after software clear"
+    },
+    "clock_domains": {
+      "domains": ["aclk", "pclk"],
+      "dv_note": "Independent clock domains; CDC paths must be identified and constrained"
+    },
+    "reset_sequences": {
+      "aresetn_behavior": "async assert, sync de-assert relative to aclk",
+      "presetn_behavior": "fully synchronous to pclk",
+      "dv_note": "Both async and sync reset sequences must be tested including mid-transfer reset"
+    }
+  }
+}

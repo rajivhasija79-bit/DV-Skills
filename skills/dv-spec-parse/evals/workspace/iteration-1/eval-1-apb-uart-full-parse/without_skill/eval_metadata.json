@@ -1,0 +1,14 @@
+{
+  "eval_id": 1,
+  "eval_name": "apb-uart-full-parse",
+  "prompt": "I want to start DV on my APB UART block. The spec is at /Users/apple/Documents/DV-Skills/skills/dv-spec-parse/evals/test_specs/apb_uart_spec.md and the project name is apb_uart. Save outputs to the output directory.",
+  "assertions": [
+    { "text": "dv_spec_summary.md is created in output directory", "passed": true, "evidence": "File exists at without_skill/outputs/dv_spec_summary.md" },
+    { "text": "dv_spec_summary.json is created in output directory", "passed": true, "evidence": "File exists at without_skill/outputs/dv_spec_summary.json" },
+    { "text": "Markdown contains all 11 required sections", "passed": false, "evidence": "Baseline used 9 sections (no dedicated Sub-features section or NEEDS_REVIEW summary section); structure was self-determined, not standardized" },
+    { "text": "JSON file is valid with all required fields populated", "passed": false, "evidence": "Baseline JSON used custom schema without needs_review, compliance_standards, or reset_strategy as top-level fields; schema is not compatible with downstream DV skills" },
+    { "text": "At least 5 features extracted", "passed": true, "evidence": "6 features extracted correctly" },
+    { "text": "APB interface signals correctly listed", "passed": true, "evidence": "All 18 signals including 10 APB signals confirmed" },
+    { "text": "Terminal summary printed with item counts", "passed": false, "evidence": "No terminal summary printed; agent returned plain text result without the structured summary block" }
+  ]
+}

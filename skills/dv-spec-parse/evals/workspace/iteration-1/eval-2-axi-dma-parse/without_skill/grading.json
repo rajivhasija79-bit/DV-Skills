@@ -1,0 +1,12 @@
+{
+  "expectations": [
+    { "text": "dv_spec_summary.md and dv_spec_summary.json are both created", "passed": true, "evidence": "Both files written to without_skill/outputs/" },
+    { "text": "Both clock domains (aclk and pclk) captured", "passed": true, "evidence": "Both captured with min/max frequency as numeric fields" },
+    { "text": "Both interfaces (AXI4 Master and APB Slave) listed with signals", "passed": true, "evidence": "All 3 interfaces with 34 signals captured" },
+    { "text": "AXI4 compliance standard captured", "passed": true, "evidence": "AXI4 and APB compliance listed" },
+    { "text": "Known constraints include word-alignment and single-outstanding-transaction", "passed": true, "evidence": "All 3 constraints listed" },
+    { "text": "JSON is valid and matches defined schema structure", "passed": false, "evidence": "Custom dv_notes object added with structured DV analysis; while useful, schema diverges from standard downstream-compatible schema; not interoperable with S2/S3/S4 skills" }
+  ],
+  "summary": { "passed": 5, "failed": 1, "total": 6, "pass_rate": 0.833 },
+  "timing": { "executor_duration_seconds": 73.1 }
+}

@@ -1,0 +1,109 @@
+{
+  "project_name": "apb_uart",
+  "block_name": "APB_UART",
+  "version": "1.0",
+  "date": "2026-01-10",
+  "overview": "The APB_UART is a Universal Asynchronous Receiver/Transmitter (UART) block with an APB slave interface for register access. It provides a serial communication channel in SoC designs supporting full-duplex UART communication, programmable baud rate, configurable data frame format, and hardware flow control. Target applications include GPS modules, Bluetooth chips, and debug consoles.",
+  "features": {
+    "apb_slave_interface": [
+      "Compliant with AMBA APB Protocol Specification v2.0",
+      "32-bit data bus",
+      "Supports read and write register access",
+      "No wait states on register reads"
+    ],
+    "uart_transmitter": [
+      "8-entry deep TX FIFO",
+      "Configurable data bits: 5, 6, 7, or 8",
+      "Configurable stop bits: 1 or 2",
+      "Optional parity: even, odd, or none",
+      "TX interrupt on FIFO empty or threshold"
+    ],
+    "uart_receiver": [
+      "8-entry deep RX FIFO",
+      "Overrun, framing, and parity error detection",
+      "RX interrupt on FIFO full or threshold",
+      "Break condition detection"
+    ],
+    "baud_rate_generator": [
+      "Programmable baud rate via 16-bit divisor register",
+      "Supported standard baud rates: 9600, 19200, 38400, 57600, 115200",
+      "Clock source: system clock (pclk)"
+    ],
+    "hardware_flow_control": [
+      "RTS (Request to Send) output",
+      "CTS (Clear to Send) input",
+      "Auto-RTS/CTS mode supported"
+    ],
+    "interrupts": [
+      "TX FIFO empty interrupt",
+      "RX FIFO threshold interrupt",
+      "Error interrupt (framing, parity, overrun)",
+      "Combined interrupt output (OR of all interrupts)"
+    ]
+  },
+  "interfaces": {
+    "apb_slave": [
+      { "signal": "pclk",    "direction": "Input",  "width": 1,  "description": "APB clock" },
+      { "signal": "presetn", "direction": "Input",  "width": 1,  "description": "Active-low synchronous reset" },
+      { "signal": "psel",    "direction": "Input",  "width": 1,  "description": "Peripheral select" },
+      { "signal": "penable", "direction": "Input",  "width": 1,  "description": "Enable strobe" },
+      { "signal": "pwrite",  "direction": "Input",  "width": 1,  "description": "Write/Read select (1=write)" },
+      { "signal": "paddr",   "direction": "Input",  "width": 8,  "description": "Register address" },
+      { "signal": "pwdata",  "direction": "Input",  "width": 32, "description": "Write data" },
+      { "signal": "prdata",  "direction": "Output", "width": 32, "description": "Read data" },
+      { "signal": "pready",  "direction": "Output", "width": 1,  "description": "Transfer ready" },
+      { "signal": "pslverr", "direction": "Output", "width": 1,  "description": "Slave error response" }
+    ],
+    "uart": [
+      { "signal": "uart_txd", "direction": "Output", "width": 1, "description": "UART transmit data" },
+      { "signal": "uart_rxd", "direction": "Input",  "width": 1, "description": "UART receive data" },
+      { "signal": "uart_rts", "direction": "Output", "width": 1, "description": "Request to send (active-low)" },
+      { "signal": "uart_cts", "direction": "Input",  "width": 1, "description": "Clear to send (active-low)" }
+    ],
+    "interrupt": [
+      { "signal": "uart_intr", "direction": "Output", "width": 1, "description": "Combined interrupt output" },
+      { "signal": "tx_intr",   "direction": "Output", "width": 1, "description": "TX FIFO interrupt" },
+      { "signal": "rx_intr",   "direction": "Output", "width": 1, "description": "RX FIFO interrupt" },
+      { "signal": "err_intr",  "direction": "Output", "width": 1, "description": "Error interrupt" }
+    ]
+  },
+  "parameters": [
+    { "name": "DATA_WIDTH",     "default": 32, "description": "APB data bus width" },
+    { "name": "ADDR_WIDTH",     "default": 8,  "description": "APB address bus width" },
+    { "name": "FIFO_DEPTH",     "default": 8,  "description": "TX and RX FIFO depth (number of entries)" },
+    { "name": "BAUD_DIVISOR_W", "default": 16, "description": "Width of baud rate divisor register" }
+  ],
+  "clocks": [
+    {
+      "name": "pclk",
+      "source": "SoC APB bus",
+      "frequency": "50-100 MHz",
+      "affected_logic": "All logic (single domain)"
+    }
+  ],
+  "resets": [
+    {
+      "name": "presetn",
+      "type": "Synchronous",
+      "polarity": "Active-low",
+      "affected_domains": "All logic"
+    }
+  ],
+  "operating_modes": [
+    { "mode": "Normal Mode",       "description": "Full-duplex UART TX and RX with FIFO" },
+    { "mode": "Loopback Mode",     "description": "Internal loopback — TX connected to RX internally" },
+    { "mode": "Flow Control Mode", "description": "Hardware RTS/CTS handshaking enabled" },
+    { "mode": "Interrupt Mode",    "description": "Interrupts enabled, CPU notified on TX/RX events" },
+    { "mode": "Polling Mode",      "description": "Interrupts disabled, software polls status registers" }
+  ],
+  "compliance_standards": [
+    "AMBA APB Protocol Specification v2.0 (ARM IHI0024)",
+    "RS-232 serial communication standard (framing, baud rates)"
+  ],
+  "known_constraints": [
+    "Maximum supported baud rate is 115200 bps when pclk = 50 MHz",
+    "TX and RX FIFOs share the same depth parameter (FIFO_DEPTH)",
+    "No DMA interface supported in this version",
+    "pslverr is always driven low (no error response in v1.0)"
+  ]
+}

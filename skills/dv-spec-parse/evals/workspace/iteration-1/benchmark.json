@@ -1,0 +1,182 @@
+{
+  "metadata": {
+    "skill_name": "dv-spec-parse",
+    "skill_path": "/Users/apple/Documents/DV-Skills/skills/dv-spec-parse",
+    "executor_model": "claude-sonnet-4-6",
+    "timestamp": "2026-03-22T00:00:00Z",
+    "evals_run": ["apb-uart-full-parse", "axi-dma-parse", "missing-spec-file-input-handling"],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 1,
+      "eval_name": "apb-uart-full-parse",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 7,
+        "failed": 0,
+        "total": 7,
+        "time_seconds": 91.5,
+        "tokens": 35529,
+        "tool_calls": 5,
+        "errors": 0
+      },
+      "expectations": [
+        { "text": "dv_spec_summary.md created", "passed": true, "evidence": "File exists at with_skill/outputs/dv_spec_summary.md" },
+        { "text": "dv_spec_summary.json created", "passed": true, "evidence": "File exists at with_skill/outputs/dv_spec_summary.json" },
+        { "text": "Markdown contains all 11 required sections", "passed": true, "evidence": "6 features, 21 sub-features, 3 interfaces, 18 signals, 4 params, 1 clock, 5 modes, 2 compliance stds; NEEDS_REVIEW section present" },
+        { "text": "JSON valid with all required fields and downstream-compatible schema", "passed": true, "evidence": "Valid JSON with project_name, features, interfaces, parameters, clock_domains, reset_strategy, needs_review" },
+        { "text": "At least 5 features extracted", "passed": true, "evidence": "6 features: APB, TX, RX, baud rate, flow control, interrupts" },
+        { "text": "APB interface signals correctly listed", "passed": true, "evidence": "All 10 APB signals confirmed; 18 total signals across 3 interfaces" },
+        { "text": "Terminal summary printed with counts and next-step hint", "passed": true, "evidence": "Full structured terminal summary with /dv-testplan hint" }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "apb-uart-full-parse",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.571,
+        "passed": 4,
+        "failed": 3,
+        "total": 7,
+        "time_seconds": 47.4,
+        "tokens": 29719,
+        "tool_calls": 4,
+        "errors": 0
+      },
+      "expectations": [
+        { "text": "dv_spec_summary.md created", "passed": true, "evidence": "File exists" },
+        { "text": "dv_spec_summary.json created", "passed": true, "evidence": "File exists" },
+        { "text": "Markdown contains all 11 required sections", "passed": false, "evidence": "9 custom sections; no Sub-features section, no NEEDS_REVIEW summary" },
+        { "text": "JSON valid with all required fields and downstream-compatible schema", "passed": false, "evidence": "Custom schema; missing needs_review, compliance_standards, reset_strategy top-level fields" },
+        { "text": "At least 5 features extracted", "passed": true, "evidence": "6 features extracted" },
+        { "text": "APB interface signals correctly listed", "passed": true, "evidence": "All 18 signals correct" },
+        { "text": "Terminal summary printed with counts and next-step hint", "passed": false, "evidence": "No terminal summary block; prose description only" }
+      ],
+      "notes": ["Good content but self-determined structure breaks downstream skill compatibility"]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "axi-dma-parse",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6,
+        "time_seconds": 99.7,
+        "tokens": 35348,
+        "tool_calls": 5,
+        "errors": 0
+      },
+      "expectations": [
+        { "text": "Both output files created", "passed": true, "evidence": "dv_spec_summary.md and .json both written" },
+        { "text": "Both clock domains captured (aclk, pclk)", "passed": true, "evidence": "aclk 100-200 MHz, pclk 50-100 MHz" },
+        { "text": "Both interfaces with signals listed", "passed": true, "evidence": "3 interfaces, 34 signals" },
+        { "text": "AXI4 compliance captured", "passed": true, "evidence": "AXI4 ARM IHI0022 and APB v2.0" },
+        { "text": "Known constraints include alignment and single-outstanding", "passed": true, "evidence": "7 constraints listed" },
+        { "text": "JSON valid and matches defined schema", "passed": true, "evidence": "Valid JSON; 9 NEEDS_REVIEW items flagged for spec gaps" }
+      ],
+      "notes": ["9 NEEDS_REVIEW flags correctly identify real gaps: missing register map, undefined CDC, unspecified interrupt clear"]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "axi-dma-parse",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.833,
+        "passed": 5,
+        "failed": 1,
+        "total": 6,
+        "time_seconds": 73.1,
+        "tokens": 30185,
+        "tool_calls": 4,
+        "errors": 0
+      },
+      "expectations": [
+        { "text": "Both output files created", "passed": true, "evidence": "Both files written" },
+        { "text": "Both clock domains captured (aclk, pclk)", "passed": true, "evidence": "Both captured with numeric min/max" },
+        { "text": "Both interfaces with signals listed", "passed": true, "evidence": "All 34 signals" },
+        { "text": "AXI4 compliance captured", "passed": true, "evidence": "Listed" },
+        { "text": "Known constraints include alignment and single-outstanding", "passed": true, "evidence": "All 3 listed" },
+        { "text": "JSON valid and matches defined schema", "passed": false, "evidence": "Custom dv_notes added; schema not interoperable with downstream skills" }
+      ],
+      "notes": ["Useful extra dv_notes field but at cost of schema compatibility"]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "missing-spec-file-input-handling",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 3,
+        "failed": 0,
+        "total": 3,
+        "time_seconds": 21.4,
+        "tokens": 27381,
+        "tool_calls": 3,
+        "errors": 0
+      },
+      "expectations": [
+        { "text": "Asks for missing SPEC_FILE before proceeding", "passed": true, "evidence": "Halted at Step 1 and asked for path" },
+        { "text": "No output files generated without spec", "passed": true, "evidence": "Only response.txt written" },
+        { "text": "Does not re-ask for already-provided PROJECT_NAME", "passed": true, "evidence": "Only SPEC_FILE requested" }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "missing-spec-file-input-handling",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 3,
+        "failed": 0,
+        "total": 3,
+        "time_seconds": 26.8,
+        "tokens": 24646,
+        "tool_calls": 6,
+        "errors": 0
+      },
+      "expectations": [
+        { "text": "Asks for missing SPEC_FILE before proceeding", "passed": true, "evidence": "Searched filesystem first then asked" },
+        { "text": "No output files generated without spec", "passed": true, "evidence": "No output files" },
+        { "text": "Does not re-ask for PROJECT_NAME", "passed": true, "evidence": "Not re-asked" }
+      ],
+      "notes": ["Searched filesystem unnecessarily before asking — 6 tool calls vs 3 with skill"]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {"mean": 1.0, "stddev": 0.0, "min": 1.0, "max": 1.0},
+      "time_seconds": {"mean": 70.9, "stddev": 34.2, "min": 21.4, "max": 99.7},
+      "tokens": {"mean": 32753, "stddev": 4299, "min": 27381, "max": 35529}
+    },
+    "without_skill": {
+      "pass_rate": {"mean": 0.801, "stddev": 0.196, "min": 0.571, "max": 1.0},
+      "time_seconds": {"mean": 49.1, "stddev": 20.8, "min": 26.8, "max": 73.1},
+      "tokens": {"mean": 28183, "stddev": 2892, "min": 24646, "max": 30185}
+    },
+    "delta": {
+      "pass_rate": "+0.199",
+      "time_seconds": "+21.8s",
+      "tokens": "+4570"
+    }
+  },
+  "notes": [
+    "Eval 3 (missing input) passes 100% in both configs — correct safety behaviour but non-discriminating; consider replacing with a harder input-handling test",
+    "Skill's primary value is schema consistency: without-skill runs used custom JSON incompatible with downstream S2/S3/S4 skills",
+    "NEEDS_REVIEW flagging is a clear skill win — 5 spec gaps in UART and 9 in AXI DMA were surfaced that would have been silent omissions without the skill",
+    "Skill adds ~22s and ~4570 tokens — cost of the 5-step structured process; justified by downstream interoperability",
+    "Without-skill outputs are content-rich but structurally unpredictable; skill enforces the exact 11-section format every time"
+  ]
+}

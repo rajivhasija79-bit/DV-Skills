@@ -1,0 +1,13 @@
+{
+  "eval_id": 2,
+  "eval_name": "axi-dma-parse",
+  "prompt": "Parse the AXI DMA spec and give me a structured DV summary. Spec file: axi_dma_spec.md. Project: axi_dma.",
+  "assertions": [
+    { "text": "dv_spec_summary.md and dv_spec_summary.json are both created", "passed": true, "evidence": "Both files written to with_skill/outputs/" },
+    { "text": "Both clock domains (aclk and pclk) captured", "passed": true, "evidence": "2 clock domains extracted: aclk 100-200 MHz and pclk 50-100 MHz" },
+    { "text": "Both interfaces (AXI4 Master and APB Slave) listed with signals", "passed": true, "evidence": "3 interfaces with 34 total signals: AXI4 Master (23), APB Slave (9), Interrupt (2)" },
+    { "text": "AXI4 compliance standard captured", "passed": true, "evidence": "AXI4 ARM IHI0022 and APB v2.0 both listed" },
+    { "text": "Known constraints include word-alignment and single-outstanding-transaction", "passed": true, "evidence": "7 known constraints listed; both constraints confirmed present" },
+    { "text": "JSON is valid and matches defined schema structure", "passed": true, "evidence": "Valid JSON with all required top-level keys; 9 NEEDS_REVIEW items flagged for spec gaps (register map missing, CDC strategy undefined)" }
+  ]
+}

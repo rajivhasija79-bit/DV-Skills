@@ -1,0 +1,13 @@
+{
+  "expectations": [
+    { "text": "dv_spec_summary.md is created in output directory", "passed": true, "evidence": "File exists at without_skill/outputs/dv_spec_summary.md" },
+    { "text": "dv_spec_summary.json is created in output directory", "passed": true, "evidence": "File exists at without_skill/outputs/dv_spec_summary.json" },
+    { "text": "Markdown contains all 11 required sections", "passed": false, "evidence": "Baseline used 9 custom sections; no dedicated Sub-features section, no NEEDS_REVIEW summary; structure self-determined, not standardised" },
+    { "text": "JSON file is valid with all required fields populated", "passed": false, "evidence": "Custom schema used; missing needs_review, compliance_standards, reset_strategy as top-level fields; not compatible with downstream DV skills S2/S3/S4" },
+    { "text": "At least 5 features extracted", "passed": true, "evidence": "6 features extracted correctly" },
+    { "text": "APB interface signals correctly listed (pclk, presetn, psel, penable, pwrite, paddr, pwdata, prdata, pready, pslverr)", "passed": true, "evidence": "All 18 signals including all 10 APB signals confirmed" },
+    { "text": "Terminal summary printed with item counts and next-step hint", "passed": false, "evidence": "No terminal summary block printed; no next-step hint; agent returned prose description only" }
+  ],
+  "summary": { "passed": 4, "failed": 3, "total": 7, "pass_rate": 0.571 },
+  "timing": { "executor_duration_seconds": 47.4 }
+}

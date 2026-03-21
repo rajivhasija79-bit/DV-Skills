@@ -1,0 +1,13 @@
+{
+  "eval_id": 2,
+  "eval_name": "axi-dma-parse",
+  "prompt": "Parse the AXI DMA spec and give me a structured DV summary. Spec file: axi_dma_spec.md. Project: axi_dma.",
+  "assertions": [
+    { "text": "dv_spec_summary.md and dv_spec_summary.json are both created", "passed": true, "evidence": "Both files written to without_skill/outputs/" },
+    { "text": "Both clock domains (aclk and pclk) captured", "passed": true, "evidence": "Both clock domains captured with min/max frequency as numeric fields" },
+    { "text": "Both interfaces (AXI4 Master and APB Slave) listed with signals", "passed": true, "evidence": "All 3 interfaces with 34 signals captured" },
+    { "text": "AXI4 compliance standard captured", "passed": true, "evidence": "AXI4 and APB compliance listed" },
+    { "text": "Known constraints include word-alignment and single-outstanding-transaction", "passed": true, "evidence": "All 3 constraints listed" },
+    { "text": "JSON is valid and matches defined schema structure", "passed": false, "evidence": "Baseline added custom dv_notes object with structured DV analysis; while useful, schema diverges from the standard downstream-compatible schema defined in the skill" }
+  ]
+}

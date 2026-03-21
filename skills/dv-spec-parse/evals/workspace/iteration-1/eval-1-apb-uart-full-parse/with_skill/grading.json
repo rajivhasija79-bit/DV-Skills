@@ -1,0 +1,13 @@
+{
+  "expectations": [
+    { "text": "dv_spec_summary.md is created in output directory", "passed": true, "evidence": "File exists at with_skill/outputs/dv_spec_summary.md" },
+    { "text": "dv_spec_summary.json is created in output directory", "passed": true, "evidence": "File exists at with_skill/outputs/dv_spec_summary.json" },
+    { "text": "Markdown contains all 11 required sections", "passed": true, "evidence": "6 features, 21 sub-features, 3 interfaces, 18 signals, 4 params, 1 clock, 5 modes, 2 compliance stds; NEEDS_REVIEW summary section present" },
+    { "text": "JSON file is valid with all required fields populated", "passed": true, "evidence": "Valid JSON with project_name, features, interfaces, parameters, clock_domains, reset_strategy, needs_review all present; downstream-compatible schema" },
+    { "text": "At least 5 features extracted", "passed": true, "evidence": "6 features extracted: APB interface, TX, RX, baud rate generator, flow control, interrupts" },
+    { "text": "APB interface signals correctly listed (pclk, presetn, psel, penable, pwrite, paddr, pwdata, prdata, pready, pslverr)", "passed": true, "evidence": "All 10 APB signals confirmed in terminal summary; 18 total signals across 3 interfaces" },
+    { "text": "Terminal summary printed with item counts and next-step hint", "passed": true, "evidence": "Full terminal summary block printed with all counts, 5 NEEDS_REVIEW items, and 'Next step: run /dv-testplan' message" }
+  ],
+  "summary": { "passed": 7, "failed": 0, "total": 7, "pass_rate": 1.0 },
+  "timing": { "executor_duration_seconds": 91.5 }
+}

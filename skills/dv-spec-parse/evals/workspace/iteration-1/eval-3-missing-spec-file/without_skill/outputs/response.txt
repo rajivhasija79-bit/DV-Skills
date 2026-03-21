@@ -1,0 +1,9 @@
+I'd be happy to parse a design spec for the i2c_master project, but you haven't told me which spec file to use yet.
+
+Could you please provide one of the following?
+
+1. The file path to the design spec (e.g., /path/to/i2c_master_spec.docx or i2c_master.md)
+2. The contents of the spec directly pasted into the chat
+3. A URL or location where the spec can be found
+
+Once you share the spec file or its location, I can proceed with parsing it for DV (Design Verification) purposes — extracting features, interfaces, functional requirements, corner cases, and anything else relevant to building a verification plan.

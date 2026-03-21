@@ -1,0 +1,5 @@
+I have the project name (`i2c_master`), but I'm missing one required input before I can proceed:
+
+- **`SPEC_FILE`**: Please provide the path to your design spec file (PDF, DOCX, TXT, or Markdown).
+
+Once you provide the spec file path, I'll default the output directory to the same folder as the spec file and confirm that with you before proceeding.

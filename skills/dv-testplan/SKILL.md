@@ -29,6 +29,41 @@ downstream compatibility (S3/S4/S5 skills) are critical.
 
 ---
 
+## Step 0 — Check Environment (ALWAYS run first)
+
+**This step is mandatory before any other work.**
+
+Locate the common scripts directory relative to this skill:
+- This skill lives at: `skills/dv-testplan/`
+- Common scripts are at: `skills/common/scripts/`
+
+Run the environment check immediately:
+```bash
+python3 <REPO_ROOT>/skills/common/scripts/check_environment.py --skill s2 --install
+```
+
+This checks that `openpyxl` is installed (required for Excel generation) and
+auto-installs it if missing.
+
+**If Bash is not available in this session:**
+- Inform the user upfront: *"Note: Bash is not available. I will prepare the
+  testplan data and write the Excel using a fallback method. For best results,
+  please ensure Bash permission is granted."*
+- Continue with all steps — use the Write tool to save the testplan data JSON,
+  then use Python via Bash only for the final Excel generation step.
+- If Bash remains unavailable at Step 7, provide the exact command for the user
+  to run manually and save the data JSON so nothing is lost.
+
+**Common scripts location for this skill:**
+```
+<REPO_ROOT>/skills/common/scripts/
+  ├── check_environment.py      # dependency checker (run in Step 0)
+  ├── generate_testplan_excel.py  # Excel generator (run in Step 7)
+  └── write_spec_summary.py     # S1 output writer (used by dv-spec-parse)
+```
+
+---
+
 ## Step 1 — Gather Inputs
 
 Check the conversation and confirm all required inputs. Ask for missing ones in a
@@ -261,20 +296,49 @@ FEATURES COVERED      : N / N (total from spec)
 
 ---
 
-## Step 7 — Build Excel File
+## Step 7 — Build Excel File via Common Script
 
-Use the script at `scripts/generate_testplan_excel.py` to create the Excel workbook.
-Run it as:
+Write all testplan rows to `/tmp/<project>_testplan_data.json` with this structure:
+```json
+{
+  "total_features_in_spec": <N>,
+  "rows": [
+    {
+      "feature":              "APB Slave Interface",
+      "subfeature":           "Register Write",
+      "brief_description":    "...",
+      "verification_type":    "Testcase(Directed): apb_reg_write_test\nChecker: CHK_UART_APB_PROTOCOL_001",
+      "testcase_description": "DUT Config: ...\nStimulus: ...\nExpected Behavior: ...\nChecks: ...\nPass Criteria: ...",
+      "coverpoint_desc":      "",
+      "covergroup":           "",
+      "checker_id":           "CHK_UART_APB_PROTOCOL_001",
+      "checker_type":         "Assertion",
+      "assertion_code":       "property p_apb_no_wait;\n  ...\nendproperty\nassert property(...)",
+      "milestone":            "DV-I",
+      "parent_feature":       ""
+    }
+  ]
+}
+```
+
+Then run the shared Excel generation script from the common scripts directory:
+
 ```bash
-python3 <skill_dir>/scripts/generate_testplan_excel.py \
-  --data <path_to_testplan_data.json> \
-  --output <OUTPUT_DIR>/testplan.xlsx \
+python3 <REPO_ROOT>/skills/common/scripts/generate_testplan_excel.py \
+  --data    /tmp/<project>_testplan_data.json \
+  --output  <OUTPUT_DIR>/testplan.xlsx \
   --project <PROJECT_NAME>
 ```
 
-Before running, write the testplan data to a temporary JSON file
-(`/tmp/<project>_testplan_data.json`) in the format the script expects
-(see script for schema).
+**If Bash is unavailable:** Tell the user:
+> "The testplan data has been saved to `/tmp/<project>_testplan_data.json`.
+> Please run the following command to generate the Excel file:
+> ```
+> python3 <REPO_ROOT>/skills/common/scripts/generate_testplan_excel.py \
+>   --data /tmp/<project>_testplan_data.json \
+>   --output <OUTPUT_DIR>/testplan.xlsx \
+>   --project <PROJECT_NAME>
+> ```"
 
 ---
 

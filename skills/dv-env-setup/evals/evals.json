@@ -1,0 +1,82 @@
+{
+  "skill": "dv-env-setup",
+  "skill_version": "1.0",
+  "description": "Evals for S4 dv-env-setup — tests environment generation correctness, Makefile completeness, and UVM skeleton quality",
+  "evals": [
+    {
+      "id": "s4_eval_1_apb_uart_full",
+      "name": "APB UART — full setup from S1 JSON",
+      "description": "Generate complete DV environment for APB UART using existing S1 spec JSON. Tests that Makefile has all targets, UVM skeletons are correct, paths are consistent.",
+      "with_skill": {
+        "prompt": "Run /dv-env-setup for a project called apb_uart. PROJECT_ROOT is /tmp/apb_uart_dv_test. Use these tool paths: VCS_HOME=/tools/synopsys/vcs/T-2022.06, VERDI_HOME=/tools/synopsys/verdi/T-2022.06, UVM_HOME=/tools/uvm/uvm-1.2/src, UVM_VERSION=1.2, LICENSE_SERVER=7280@licserver. Timescale: 1ns/1ps, default timeout: 10ms. Regression tests: [sanity, apb_reg_write_test, apb_reg_read_test]. Seeds: [1,2,3]. Do NOT ask any clarifying questions — use these values directly and generate all files.",
+        "grading_criteria": [
+          "Makefile created at /tmp/apb_uart_dv_test/dv/sim/Makefile",
+          "Makefile contains all required targets: compile_rtl, compile_tb, elab, compile, sim, run, regress, cov_merge, cov_report, verdi, clean_logs, clean_run, clean_cov, clean_build, clean, show_config, help",
+          "Makefile BUILD_DIR is separate from RUN_DIR (shared build pattern)",
+          "Makefile has WAVES ?= 0, COV ?= 0, LOG ?= 1, PLUSARGS, VPLUSARGS, DEFINES, SIM_OPTS, COMP_OPTS variables",
+          "Makefile sim target checks for missing simv and errors with helpful message",
+          "compile.f references UVM_HOME/src/uvm_pkg.sv",
+          "compile.f references apb_uart_env_pkg.sv before other TB files",
+          "synopsys_sim.setup created with WORK > DEFAULT mapping",
+          "waves.tcl created with fsdbDumpfile and fsdbDumpvars",
+          "regression.sh created and references the 3 tests across 3 seeds (9 runs)",
+          "proj.cshrc created with setenv for all required variables",
+          "proj.bashrc created with export for all required variables",
+          "All 10 UVM skeleton files created: tb_top, if, env_pkg, env_cfg, scoreboard, coverage, env, base_seq, base_test, sanity_test",
+          "UVM skeleton files use correct project prefix apb_uart_",
+          "dv_env_data.json written with correct schema including directory_structure, key_files, tb_skeleton_files, env_vars"
+        ]
+      },
+      "without_skill": {
+        "prompt": "Set up a complete UVM DV environment for an APB UART project. PROJECT_ROOT=/tmp/apb_uart_dv_test. VCS_HOME=/tools/synopsys/vcs/T-2022.06, VERDI_HOME=/tools/synopsys/verdi/T-2022.06, UVM_HOME=/tools/uvm/uvm-1.2/src, LICENSE_SERVER=7280@licserver. Create: Makefile, compile.f, rtl.f, synopsys_sim.setup, waves.tcl, regression.sh, proj.cshrc, proj.bashrc, and UVM skeleton files (env, scoreboard, coverage, tb_top, sequences, tests). Tests for regression: sanity, apb_reg_write_test, apb_reg_read_test. Seeds: 1, 2, 3."
+      }
+    },
+    {
+      "id": "s4_eval_2_axi_dma_new_project",
+      "name": "AXI DMA — new project no prior outputs",
+      "description": "Generate environment for complex AXI DMA with CDC (dual clock) from scratch — no S1/S2/S3 inputs. Tests interactive flow and correct multi-clock handling in TB skeleton.",
+      "with_skill": {
+        "prompt": "Run /dv-env-setup for project axi_dma. PROJECT_ROOT=/tmp/axi_dma_dv. VCS_HOME=/tools/vcs/latest, VERDI_HOME=/tools/verdi/latest, UVM_HOME=/tools/uvm/1.2, UVM_VERSION=1.2, LICENSE_SERVER=5280@dvlic. The DUT has two clock domains: clk_200mhz (AXI master) and clk_100mhz (AXI-Lite slave). Timescale: 1ns/1ps, timeout: 5ms. Extra compile flag: -xlrm. Coverage types: line+cond+branch+tgl+fsm. Regression tests: [sanity, dma_single_chan_test, dma_multi_chan_test]. Seeds: [1,2,3,4,5]. Generate all files without asking any clarifying questions.",
+        "grading_criteria": [
+          "Makefile created with all required targets",
+          "Makefile TIMESCALE ?= 1ns/1ps used in VLOGAN_RTL_FLAGS and VLOGAN_TB_FLAGS",
+          "Makefile extra_compile_flags -xlrm included in VCS_COMMON_FLAGS",
+          "TB top (axi_dma_tb_top.sv) generated with comments for TWO clock generators (clk_200mhz and clk_100mhz)",
+          "All UVM skeleton files use axi_dma_ prefix",
+          "regression.sh runs 3 tests × 5 seeds = 15 total runs",
+          "synopsys_sim.setup references ./build/AN.DB as WORK library",
+          "compile.f has correct +incdir+ paths",
+          "proj.cshrc and proj.bashrc both set VCS_HOME, VERDI_HOME, UVM_HOME",
+          "dv_env_data.json has correct directory_structure with all required keys"
+        ]
+      },
+      "without_skill": {
+        "prompt": "Create a UVM DV simulation environment for an AXI DMA project with two clock domains (200MHz AXI master, 100MHz AXI-Lite slave). PROJECT_ROOT=/tmp/axi_dma_dv. VCS tools. Create Makefile with all standard DV targets, UVM testbench skeleton files, compilation scripts, and environment setup."
+      }
+    },
+    {
+      "id": "s4_eval_3_makefile_switches",
+      "name": "Makefile switch correctness — all options",
+      "description": "Validates that the Makefile correctly implements all conditional flags: WAVES=1 adds UCLi/FSDB, COV=1 adds coverage, LOG=0 disables log. Tests the shared BUILD_DIR pattern.",
+      "with_skill": {
+        "prompt": "Run /dv-env-setup for project i2c_master. PROJECT_ROOT=/tmp/i2c_master_dv. VCS_HOME=/tools/vcs, VERDI_HOME=/tools/verdi, UVM_HOME=/tools/uvm, LICENSE_SERVER=1234@lic. Coverage types: line+cond+branch+tgl+fsm. Generate all files. After generating, show me exactly what flags will be passed to simv when I run: (A) make sim TEST=sanity SEED=1 WAVES=1 COV=1 LOG=1, (B) make sim TEST=sanity SEED=1 (all defaults), (C) make sim TEST=err_test SEED=42 WAVES=0 COV=1 PLUSARGS='+inject_err' DEFINES='+define+DEBUG'",
+        "grading_criteria": [
+          "Case A WAVES=1: simv flags include -ucli -do waves.tcl +fsdb+delta +vcs+vcdpluson",
+          "Case A COV=1: simv flags include -cm line+cond+branch+tgl+fsm -cm_dir <COV_DIR>",
+          "Case A LOG=1: simv flags include -l <RUN_DIR>/simv.log",
+          "Case A UVM: flags include +UVM_TESTNAME=sanity +ntb_random_seed=1",
+          "Case B defaults: NO -ucli, NO -cm, HAS -l simv.log (LOG=1 default)",
+          "Case C PLUSARGS: +inject_err present in sim flags",
+          "Case C DEFINES: +define+DEBUG appears in compile flags (VLOGAN_RTL_FLAGS/VLOGAN_TB_FLAGS)",
+          "BUILD_DIR is /tmp/i2c_master_dv/dv/sim/build — same for all cases",
+          "RUN_DIR for case A is /tmp/i2c_master_dv/dv/sim/run/sanity_1",
+          "RUN_DIR for case C is /tmp/i2c_master_dv/dv/sim/run/err_test_42",
+          "make help lists all targets and all options with examples"
+        ]
+      },
+      "without_skill": {
+        "prompt": "Create a VCS Makefile for an I2C master DV project at /tmp/i2c_master_dv. The Makefile should support WAVES, COV, LOG switches, PLUSARGS, VPLUSARGS, DEFINES, TEST and SEED variables. Show what simulation command gets generated for: (A) WAVES=1 COV=1 LOG=1, (B) defaults only, (C) PLUSARGS='+inject_err' DEFINES='+define+DEBUG'."
+      }
+    }
+  ]
+}

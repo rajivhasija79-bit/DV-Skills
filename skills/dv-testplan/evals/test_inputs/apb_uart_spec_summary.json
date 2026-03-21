@@ -1,0 +1,209 @@
+{
+  "project_name": "apb_uart",
+  "source_spec": "/Users/apple/Documents/DV-Skills/skills/dv-spec-parse/evals/test_specs/apb_uart_spec.md",
+  "generated_by": "dv-spec-parse",
+  "date": "2026-03-22",
+  "block_overview": "The APB_UART is a Universal Asynchronous Receiver/Transmitter (UART) block with an APB slave interface for register access. It provides a serial communication channel in SoC designs, supporting full-duplex UART communication, programmable baud rate, configurable data frame format, and hardware flow control. The block is targeted at applications requiring low-speed serial data communication with external peripherals such as GPS modules, Bluetooth chips, and debug consoles. It operates in a single clock domain driven by pclk.",
+  "features": [
+    {
+      "id": 1,
+      "name": "APB Slave Interface",
+      "description": "AMBA APB v2.0 compliant slave interface with 32-bit data bus for register read/write access",
+      "subfeatures": [
+        { "id": "1.1", "name": "APB Protocol Compliance", "description": "Compliant with AMBA APB Protocol Specification v2.0" },
+        { "id": "1.2", "name": "32-bit Data Bus", "description": "Supports 32-bit wide read and write data transfers" },
+        { "id": "1.3", "name": "No Wait States", "description": "Register reads complete with no wait states" }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "UART Transmitter",
+      "description": "Full-featured UART TX path with 8-entry FIFO, configurable data bits, stop bits, parity, and interrupt support",
+      "subfeatures": [
+        { "id": "2.1", "name": "TX FIFO", "description": "8-entry deep TX FIFO" },
+        { "id": "2.2", "name": "Configurable Data Bits", "description": "Selectable data width: 5, 6, 7, or 8 bits" },
+        { "id": "2.3", "name": "Configurable Stop Bits", "description": "Selectable stop bits: 1 or 2" },
+        { "id": "2.4", "name": "Parity Support", "description": "Optional parity: even, odd, or none" },
+        { "id": "2.5", "name": "TX Interrupt", "description": "Interrupt on TX FIFO empty or programmable threshold" }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "UART Receiver",
+      "description": "Full-featured UART RX path with 8-entry FIFO, error detection (overrun, framing, parity), break detection, and interrupt support",
+      "subfeatures": [
+        { "id": "3.1", "name": "RX FIFO", "description": "8-entry deep RX FIFO" },
+        { "id": "3.2", "name": "Error Detection", "description": "Overrun, framing, and parity error detection" },
+        { "id": "3.3", "name": "RX Interrupt", "description": "Interrupt on RX FIFO full or programmable threshold" },
+        { "id": "3.4", "name": "Break Detection", "description": "Detection of UART break condition" }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "Baud Rate Generator",
+      "description": "Programmable baud rate via 16-bit divisor register; supports standard baud rates up to 115200 bps",
+      "subfeatures": [
+        { "id": "4.1", "name": "16-bit Divisor Register", "description": "Programmable baud rate via 16-bit divisor" },
+        { "id": "4.2", "name": "Standard Baud Rates", "description": "Supports 9600, 19200, 38400, 57600, 115200 bps" },
+        { "id": "4.3", "name": "Clock Source", "description": "Baud rate derived from system clock pclk" }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Hardware Flow Control",
+      "description": "RTS/CTS hardware flow control with auto-RTS/CTS mode",
+      "subfeatures": [
+        { "id": "5.1", "name": "RTS Output", "description": "Request to Send output signal (active-low)" },
+        { "id": "5.2", "name": "CTS Input", "description": "Clear to Send input signal (active-low)" },
+        { "id": "5.3", "name": "Auto-RTS/CTS", "description": "Automatic hardware flow control mode supported" }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "Interrupts",
+      "description": "Individual and combined interrupt outputs for TX FIFO, RX FIFO, and error conditions",
+      "subfeatures": [
+        { "id": "6.1", "name": "TX FIFO Empty Interrupt", "description": "Interrupt asserted when TX FIFO is empty" },
+        { "id": "6.2", "name": "RX FIFO Threshold Interrupt", "description": "Interrupt asserted when RX FIFO reaches threshold" },
+        { "id": "6.3", "name": "Error Interrupt", "description": "Interrupt for framing, parity, and overrun errors" },
+        { "id": "6.4", "name": "Combined Interrupt", "description": "Single combined interrupt output (OR of all sources)" }
+      ]
+    }
+  ],
+  "interfaces": [
+    {
+      "name": "APB Interface",
+      "type": "Slave",
+      "protocol": "AMBA APB v2.0",
+      "width": "32-bit data, 8-bit address",
+      "direction": "Input/Output",
+      "signals": [
+        { "name": "pclk",    "direction": "Input",  "width": "1",  "description": "APB clock" },
+        { "name": "presetn", "direction": "Input",  "width": "1",  "description": "Active-low synchronous reset" },
+        { "name": "psel",    "direction": "Input",  "width": "1",  "description": "Peripheral select" },
+        { "name": "penable", "direction": "Input",  "width": "1",  "description": "Enable strobe" },
+        { "name": "pwrite",  "direction": "Input",  "width": "1",  "description": "Write/Read select (1=write)" },
+        { "name": "paddr",   "direction": "Input",  "width": "8",  "description": "Register address" },
+        { "name": "pwdata",  "direction": "Input",  "width": "32", "description": "Write data" },
+        { "name": "prdata",  "direction": "Output", "width": "32", "description": "Read data" },
+        { "name": "pready",  "direction": "Output", "width": "1",  "description": "Transfer ready" },
+        { "name": "pslverr", "direction": "Output", "width": "1",  "description": "Slave error response" }
+      ]
+    },
+    {
+      "name": "UART Interface",
+      "type": "External Serial",
+      "protocol": "RS-232 / UART",
+      "width": "1-bit serial",
+      "direction": "Input/Output",
+      "signals": [
+        { "name": "uart_txd", "direction": "Output", "width": "1", "description": "UART transmit data" },
+        { "name": "uart_rxd", "direction": "Input",  "width": "1", "description": "UART receive data" },
+        { "name": "uart_rts", "direction": "Output", "width": "1", "description": "Request to send (active-low)" },
+        { "name": "uart_cts", "direction": "Input",  "width": "1", "description": "Clear to send (active-low)" }
+      ]
+    },
+    {
+      "name": "Interrupt Interface",
+      "type": "Output",
+      "protocol": "N/A",
+      "width": "1-bit per signal",
+      "direction": "Output",
+      "signals": [
+        { "name": "uart_intr", "direction": "Output", "width": "1", "description": "Combined interrupt output" },
+        { "name": "tx_intr",   "direction": "Output", "width": "1", "description": "TX FIFO interrupt" },
+        { "name": "rx_intr",   "direction": "Output", "width": "1", "description": "RX FIFO interrupt" },
+        { "name": "err_intr",  "direction": "Output", "width": "1", "description": "Error interrupt" }
+      ]
+    }
+  ],
+  "parameters": [
+    { "name": "DATA_WIDTH",     "default": "32", "description": "APB data bus width" },
+    { "name": "ADDR_WIDTH",     "default": "8",  "description": "APB address bus width" },
+    { "name": "FIFO_DEPTH",     "default": "8",  "description": "TX and RX FIFO depth (number of entries)" },
+    { "name": "BAUD_DIVISOR_W", "default": "16", "description": "Width of baud rate divisor register" }
+  ],
+  "clock_domains": [
+    {
+      "name": "pclk",
+      "source": "SoC APB bus",
+      "frequency": "50–100 MHz",
+      "affected_logic": "All logic (single clock domain)"
+    }
+  ],
+  "reset_strategy": [
+    {
+      "name": "presetn",
+      "type": "Synchronous",
+      "polarity": "Active-low",
+      "affected_domains": "All logic"
+    }
+  ],
+  "operating_modes": [
+    {
+      "name": "Normal Mode",
+      "description": "Full-duplex UART TX and RX with FIFO",
+      "configuration": "Default operating mode"
+    },
+    {
+      "name": "Loopback Mode",
+      "description": "Internal loopback — TX connected to RX internally",
+      "configuration": "Configured via control register ⚠️ NEEDS_REVIEW"
+    },
+    {
+      "name": "Flow Control Mode",
+      "description": "Hardware RTS/CTS handshaking enabled",
+      "configuration": "Enable auto-RTS/CTS in control register ⚠️ NEEDS_REVIEW"
+    },
+    {
+      "name": "Interrupt Mode",
+      "description": "Interrupts enabled; CPU notified on TX/RX events",
+      "configuration": "Enable interrupt mask bits in interrupt enable register ⚠️ NEEDS_REVIEW"
+    },
+    {
+      "name": "Polling Mode",
+      "description": "Interrupts disabled; software polls status registers",
+      "configuration": "Disable interrupt mask bits; poll status register ⚠️ NEEDS_REVIEW"
+    }
+  ],
+  "compliance_standards": [
+    {
+      "standard": "AMBA APB Protocol Specification",
+      "version": "v2.0 (ARM IHI0024)",
+      "notes": "APB slave interface compliance"
+    },
+    {
+      "standard": "RS-232",
+      "version": "TBD ⚠️ NEEDS_REVIEW",
+      "notes": "Serial communication framing and baud rate compliance; specific version not cited in spec"
+    }
+  ],
+  "known_constraints": [
+    "Maximum supported baud rate is 115200 bps when pclk = 50 MHz",
+    "TX and RX FIFOs share the same depth parameter (FIFO_DEPTH); they cannot be independently sized",
+    "No DMA interface supported in this version (v1.0)",
+    "pslverr is always driven low — no error response supported in v1.0"
+  ],
+  "needs_review": [
+    {
+      "field": "operating_modes[*].configuration",
+      "note": "Register map is absent from the spec. Control register bit names and addresses for Loopback, Flow Control, Interrupt, and Polling modes are unknown."
+    },
+    {
+      "field": "compliance_standards[1].version",
+      "note": "RS-232 standard version is not cited in the spec. Confirm applicable standard version."
+    },
+    {
+      "field": "interrupts — enable/mask register",
+      "note": "The spec describes interrupt outputs but does not document the interrupt enable/mask register structure needed for full interrupt verification planning."
+    },
+    {
+      "field": "interfaces[APB Interface].signals[pready]",
+      "note": "Spec states no wait states on reads but does not fully document pready behaviour on writes or back-to-back transfers."
+    },
+    {
+      "field": "features[UART Transmitter/Receiver].subfeatures[threshold]",
+      "note": "TX and RX FIFO threshold interrupt is mentioned but it is unclear whether the threshold is fixed, parameterised, or register-programmable."
+    }
+  ]
+}

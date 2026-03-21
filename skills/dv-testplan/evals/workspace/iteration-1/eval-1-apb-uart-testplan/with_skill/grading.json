@@ -1,0 +1,63 @@
+{
+  "expectations": [
+    {
+      "text": "testplan.xlsx exists",
+      "passed": true,
+      "evidence": "File found at /Users/apple/Documents/DV-Skills/skills/dv-testplan/evals/workspace/iteration-1/eval-1-apb-uart-testplan/with_skill/outputs/testplan.xlsx"
+    },
+    {
+      "text": "Excel has 2 sheets named Summary and Testplan",
+      "passed": true,
+      "evidence": "Sheets found: ['Summary', 'Testplan']"
+    },
+    {
+      "text": "Testplan sheet has exactly 11 columns matching expected",
+      "passed": true,
+      "evidence": "Headers found: ['Feature', 'Sub-feature', 'Brief Description', 'Verification Type', 'Testcase Description', 'Coverpoint Description', 'Checker ID', 'Checker Type', 'Assertion Code', 'Milestone', 'Parent Feature']"
+    },
+    {
+      "text": "All 6 features from spec appear (APB Slave Interface, UART Transmitter, UART Receiver, Baud Rate Generator, Hardware Flow Control, Interrupts)",
+      "passed": true,
+      "evidence": "Features found: ['APB Slave Interface', 'Baud Rate Generator', 'Hardware Flow Control', 'Interrupts', 'UART Receiver', 'UART Transmitter'], Missing: []"
+    },
+    {
+      "text": "Random test names end with _rand_test",
+      "passed": true,
+      "evidence": "Random tests found: ['apb_data_bus_rand_test', 'tx_fifo_rand_test', 'tx_data_bits_rand_test', 'tx_stop_bits_rand_test', 'tx_parity_rand_test', 'rx_fifo_rand_test', 'baud_rate_rand_test'], all end with _rand_test: True"
+    },
+    {
+      "text": "Checker IDs follow CHK_UART_<FEATURE>_<TYPE>_<NNN> format",
+      "passed": true,
+      "evidence": "Total checker IDs: 31, Non-matching: [], Sample: ['CHK_UART_APB_PROTOCOL_001', 'CHK_UART_APB_DATA_INTEGRITY_002', 'CHK_UART_APB_TIMING_003']"
+    },
+    {
+      "text": "Negative/error rows have [NEG] prefix in Sub-feature and Parent Feature populated",
+      "passed": true,
+      "evidence": "NEG rows: 4, all have Parent Feature: True, sample: [('[NEG] pslverr Always Zero', 'APB Slave Interface / APB Protocol Compliance'), ('[NEG] TX FIFO Overflow', 'UART Transmitter / TX FIFO')]"
+    },
+    {
+      "text": "At least 2 cross coverpoint rows present",
+      "passed": true,
+      "evidence": "Cross coverpoint rows found: 3"
+    },
+    {
+      "text": "Milestone column uses DV-I/DV-C/DV-F (not M1/M2/M3 or other)",
+      "passed": true,
+      "evidence": "Unique milestones: ['DV-C', 'DV-F', 'DV-I'], Invalid: []"
+    },
+    {
+      "text": "Summary sheet contains counts",
+      "passed": true,
+      "evidence": "Summary rows: 23, Counts found: ['2026-03-22', '33', '24', '7', '2']"
+    }
+  ],
+  "summary": {
+    "passed": 10,
+    "failed": 0,
+    "total": 10,
+    "pass_rate": 1.0
+  },
+  "timing": {
+    "executor_duration_seconds": 0.01
+  }
+}

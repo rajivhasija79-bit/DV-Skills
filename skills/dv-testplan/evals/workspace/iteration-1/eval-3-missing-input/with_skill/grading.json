@@ -1,0 +1,9 @@
+{
+  "expectations": [
+    { "text": "Skill asks for missing SPEC_SOURCE before proceeding", "passed": true, "evidence": "Skill halted at Step 1, clearly identified SPEC_SOURCE as missing, presented input status table" },
+    { "text": "No testplan.xlsx generated without spec", "passed": true, "evidence": "Only response.txt written; no Excel file created" },
+    { "text": "Skill does not re-ask for PROJECT_NAME already provided", "passed": true, "evidence": "Response confirmed i2c_controller as PROJECT_NAME and derived IP_NAME=I2C without asking again" }
+  ],
+  "summary": { "passed": 3, "failed": 0, "total": 3, "pass_rate": 1.0 },
+  "timing": { "executor_duration_seconds": 26.5 }
+}

@@ -1,0 +1,18 @@
+I'd be happy to help generate a test plan for your i2c_controller project, but I'm unable to proceed without a specification document.
+
+A specification (spec) is essential for creating a meaningful test plan because it defines:
+
+1. **Functional requirements** - What the i2c_controller is supposed to do (supported I2C modes: standard, fast, fast-plus, high-speed; master/slave roles; addressing modes: 7-bit, 10-bit; etc.)
+2. **Interface definitions** - Signal names, widths, protocols, and behavior
+3. **Register map** - Programmable registers, their fields, reset values, and access types
+4. **Timing requirements** - Clock frequencies, setup/hold times, timeouts
+5. **Error conditions** - How the controller should behave on bus errors, arbitration loss, NACK, etc.
+6. **Corner cases and edge cases** - Specific behaviors the design must handle
+
+Without a spec, any test plan I generate would be based on generic I2C controller assumptions, which may not match your actual design intent and could lead to incomplete or incorrect verification coverage.
+
+**To proceed, please provide:**
+- The design specification document (PDF, Word, text, etc.)
+- Or a description of the key features and requirements for your i2c_controller
+
+Once I have the spec, I can generate a comprehensive test plan covering functional tests, corner cases, error injection scenarios, and coverage goals tailored to your specific design.

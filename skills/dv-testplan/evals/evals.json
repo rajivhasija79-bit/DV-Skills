@@ -1,0 +1,53 @@
+{
+  "skill_name": "dv-testplan",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Generate a DV testplan for the APB UART block. Use the S1 JSON at /Users/apple/Documents/DV-Skills/skills/dv-testplan/evals/test_inputs/apb_uart_spec_summary.json. Project name is apb_uart, IP name is UART. For cross coverage, include: baud_divisor × data_bits, parity_mode × stop_bits. Save output to /Users/apple/Documents/DV-Skills/skills/dv-testplan/evals/workspace/iteration-1/eval-1-apb-uart-testplan/with_skill/outputs/",
+      "expected_output": "testplan.xlsx with 2 sheets: Summary and Testplan. Testplan must have 11 columns. All 6 APB UART features (APB interface, TX, RX, baud rate, flow control, interrupts) must appear. Random tests must end in _rand_test. Checker IDs follow CHK_UART_<FEATURE>_<TYPE>_<NNN> format. At least 2 cross coverpoint rows added. Negative tests have parent feature linked. DV-I/DV-C/DV-F milestone column populated. Summary sheet shows totals.",
+      "files": [
+        "/Users/apple/Documents/DV-Skills/skills/dv-testplan/evals/test_inputs/apb_uart_spec_summary.json"
+      ],
+      "assertions": [
+        { "text": "testplan.xlsx is created in the output directory" },
+        { "text": "Excel has 2 sheets named Summary and Testplan" },
+        { "text": "Testplan sheet has exactly 11 columns matching the defined schema" },
+        { "text": "All 6 features from spec appear in testplan rows" },
+        { "text": "Random test names end with _rand_test" },
+        { "text": "Checker IDs follow CHK_UART_<FEATURE>_<TYPE>_<NNN> format" },
+        { "text": "Negative/error rows have [NEG] prefix and Parent Feature populated" },
+        { "text": "At least 2 cross coverpoint rows present" },
+        { "text": "Milestone column populated for all rows (DV-I/DV-C/DV-F)" },
+        { "text": "Summary sheet contains total test count, milestone breakdown, checker counts" }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Run /dv-testplan on the raw AXI DMA spec file at /Users/apple/Documents/DV-Skills/skills/dv-spec-parse/evals/test_specs/axi_dma_spec.md without using an S1 JSON. Project: axi_dma, IP name: DMA. Skip cross coverage (type SKIP when asked). Save output to /Users/apple/Documents/DV-Skills/skills/dv-testplan/evals/workspace/iteration-1/eval-2-axi-dma-testplan/with_skill/outputs/",
+      "expected_output": "Skill must parse the raw spec file directly (no S1 JSON), notify the user it parsed directly, and generate testplan.xlsx. Since DMA has a state machine (Idle/Active/Error), FSM transition coverpoints must appear. No cross coverage rows since user chose SKIP. AXI4 protocol compliance tests should appear. Both aclk and pclk domains implied — reset sequence test should be DV-I.",
+      "files": [
+        "/Users/apple/Documents/DV-Skills/skills/dv-spec-parse/evals/test_specs/axi_dma_spec.md"
+      ],
+      "assertions": [
+        { "text": "testplan.xlsx created from raw spec file without S1 JSON" },
+        { "text": "Skill informed user it parsed directly from raw spec" },
+        { "text": "FSM transition coverpoints present (Idle->Active->Error states)" },
+        { "text": "No cross coverage rows (user chose SKIP)" },
+        { "text": "AXI4 protocol compliance tests present" },
+        { "text": "11 columns present in Testplan sheet" },
+        { "text": "Summary sheet present with counts" }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "I want to generate a testplan but I haven't provided a spec yet. Project is i2c_controller.",
+      "expected_output": "Skill must detect missing SPEC_SOURCE and ask for it in a single message before doing anything. Must not generate any files.",
+      "files": [],
+      "assertions": [
+        { "text": "Skill asks for the missing spec source (S1 JSON or raw spec) before proceeding" },
+        { "text": "No testplan.xlsx generated without the spec" },
+        { "text": "Skill does not re-ask for project name which was already given" }
+      ]
+    }
+  ]
+}

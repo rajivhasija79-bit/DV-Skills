@@ -1,0 +1,53 @@
+{
+  "expectations": [
+    {
+      "text": "testplan.xlsx exists",
+      "passed": true,
+      "evidence": "File found at /Users/apple/Documents/DV-Skills/skills/dv-testplan/evals/workspace/iteration-1/eval-2-axi-dma-testplan/with_skill/outputs/testplan.xlsx"
+    },
+    {
+      "text": "Excel has 2 sheets named Summary and Testplan",
+      "passed": true,
+      "evidence": "Sheets found: ['Summary', 'Testplan']"
+    },
+    {
+      "text": "Testplan sheet has exactly 11 columns matching expected",
+      "passed": true,
+      "evidence": "Headers found: ['Feature', 'Sub-feature', 'Brief Description', 'Verification Type', 'Testcase Description', 'Coverpoint Description', 'Checker ID', 'Checker Type', 'Assertion Code', 'Milestone', 'Parent Feature']"
+    },
+    {
+      "text": "FSM transition coverpoints present (Idle, Active, Error states mentioned)",
+      "passed": true,
+      "evidence": "FSM coverpoint rows (Idle+Active in coverpoint): 1, FSM rows (all 3 keywords in row): 3"
+    },
+    {
+      "text": "No cross coverage rows (user chose SKIP)",
+      "passed": true,
+      "evidence": "Cross coverpoint rows found: 0"
+    },
+    {
+      "text": "AXI4 protocol compliance tests present",
+      "passed": true,
+      "evidence": "AXI4 protocol/compliance rows: 7, AXI-related rows total: 17"
+    },
+    {
+      "text": "Milestone column uses DV-I/DV-C/DV-F",
+      "passed": true,
+      "evidence": "Unique milestones: ['DV-C', 'DV-F', 'DV-I'], Invalid: []"
+    },
+    {
+      "text": "Summary sheet present with counts",
+      "passed": true,
+      "evidence": "Summary rows: 23, Counts found: ['2026-03-22', '32', '26', '6', '0']"
+    }
+  ],
+  "summary": {
+    "passed": 8,
+    "failed": 0,
+    "total": 8,
+    "pass_rate": 1.0
+  },
+  "timing": {
+    "executor_duration_seconds": 0.01
+  }
+}

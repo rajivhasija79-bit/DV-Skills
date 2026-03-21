@@ -1,0 +1,121 @@
+{
+  "metadata": {
+    "skill_name": "dv-testplan",
+    "skill_path": "/Users/apple/Documents/DV-Skills/skills/dv-testplan",
+    "executor_model": "claude-sonnet-4-6",
+    "timestamp": "2026-03-22T00:00:00Z",
+    "evals_run": ["apb-uart-testplan", "axi-dma-testplan", "missing-input-handling"],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 1, "eval_name": "apb-uart-testplan", "configuration": "with_skill", "run_number": 1,
+      "result": { "pass_rate": 1.0, "passed": 10, "failed": 0, "total": 10, "time_seconds": 239.0, "tokens": 53855, "tool_calls": 7, "errors": 0 },
+      "expectations": [
+        { "text": "testplan.xlsx created", "passed": true, "evidence": "File exists" },
+        { "text": "2 sheets: Summary and Testplan", "passed": true, "evidence": "Both sheets confirmed" },
+        { "text": "11 columns with correct names", "passed": true, "evidence": "All 11 column names match schema exactly" },
+        { "text": "All 6 features present", "passed": true, "evidence": "APB, TX, RX, Baud Rate, Flow Control, Interrupts all found" },
+        { "text": "Random tests end with _rand_test", "passed": true, "evidence": "7 random tests all have _rand_test suffix" },
+        { "text": "Checker IDs follow CHK_UART_<FEATURE>_<TYPE>_<NNN>", "passed": true, "evidence": "31 checker IDs all in correct format" },
+        { "text": "[NEG] rows have Parent Feature populated", "passed": true, "evidence": "4 [NEG] rows found with parent feature linked" },
+        { "text": "At least 2 cross coverpoint rows", "passed": true, "evidence": "3 cross coverpoint rows: cg_cross_baud_x_data, cg_cross_parity_x_stop, cg_flow_control_x_baud" },
+        { "text": "Milestone uses DV-I/DV-C/DV-F", "passed": true, "evidence": "DV-I=3, DV-C=18, DV-F=11" },
+        { "text": "Summary sheet has counts", "passed": true, "evidence": "Total tests, milestones, checkers, coverage counts all present" }
+      ],
+      "notes": ["32 testplan rows generated; 9 covergroups; 31 checkers; 5 NEEDS_REVIEW items flagged"]
+    },
+    {
+      "eval_id": 1, "eval_name": "apb-uart-testplan", "configuration": "without_skill", "run_number": 1,
+      "result": { "pass_rate": 0.6, "passed": 6, "failed": 4, "total": 10, "time_seconds": 149.4, "tokens": 39958, "tool_calls": 5, "errors": 0 },
+      "expectations": [
+        { "text": "testplan.xlsx created", "passed": true, "evidence": "File exists, 60 rows" },
+        { "text": "2 sheets: Summary and Testplan", "passed": true, "evidence": "Both sheets present" },
+        { "text": "11 columns with correct names", "passed": true, "evidence": "Correct 11 columns used" },
+        { "text": "All 6 features present", "passed": true, "evidence": "All 6 features plus Reset and Operating Modes" },
+        { "text": "Random tests end with _rand_test", "passed": true, "evidence": "Random tests have _rand_test suffix" },
+        { "text": "Checker IDs follow CHK_UART_<FEATURE>_<TYPE>_<NNN>", "passed": false, "evidence": "Simple CHK_001 format used — no IP/feature/type tags" },
+        { "text": "[NEG] rows have Parent Feature populated", "passed": false, "evidence": "No [NEG] prefix rows; negative tests not distinctly marked" },
+        { "text": "At least 2 cross coverpoint rows", "passed": false, "evidence": "No cross coverpoint rows generated" },
+        { "text": "Milestone uses DV-I/DV-C/DV-F", "passed": false, "evidence": "M1/M2/M3 used instead of DV-I/DV-C/DV-F — schema non-compliant" },
+        { "text": "Summary sheet has counts", "passed": true, "evidence": "Summary sheet present with counts" }
+      ],
+      "notes": ["Good content volume (60 rows) but schema non-compliance on checker IDs, milestones, and no negative test marking"]
+    },
+    {
+      "eval_id": 2, "eval_name": "axi-dma-testplan", "configuration": "with_skill", "run_number": 1,
+      "result": { "pass_rate": 1.0, "passed": 8, "failed": 0, "total": 8, "time_seconds": 203.7, "tokens": 50839, "tool_calls": 6, "errors": 0 },
+      "expectations": [
+        { "text": "testplan.xlsx created from raw spec", "passed": true, "evidence": "File created; skill noted it parsed directly from raw spec" },
+        { "text": "2 sheets: Summary and Testplan", "passed": true, "evidence": "Both sheets confirmed" },
+        { "text": "11 columns correct", "passed": true, "evidence": "All 11 columns present with correct names" },
+        { "text": "FSM transition coverpoints present", "passed": true, "evidence": "covergroup with Idle/Active/Error state transitions found" },
+        { "text": "No cross coverage rows (SKIP honored)", "passed": true, "evidence": "Zero cross coverpoint rows" },
+        { "text": "AXI4 protocol compliance tests present", "passed": true, "evidence": "AXI4 handshake, response checking tests found" },
+        { "text": "Milestone uses DV-I/DV-C/DV-F", "passed": true, "evidence": "DV-I/DV-C/DV-F used throughout" },
+        { "text": "Summary sheet with counts", "passed": true, "evidence": "Summary sheet present with all counts" }
+      ],
+      "notes": ["32 rows generated from raw spec; skill correctly noted direct parse without S1 JSON"]
+    },
+    {
+      "eval_id": 2, "eval_name": "axi-dma-testplan", "configuration": "without_skill", "run_number": 1,
+      "result": { "pass_rate": 0.75, "passed": 6, "failed": 2, "total": 8, "time_seconds": 139.0, "tokens": 35934, "tool_calls": 4, "errors": 0 },
+      "expectations": [
+        { "text": "testplan.xlsx created", "passed": true, "evidence": "File created, 47 rows" },
+        { "text": "2 sheets: Summary and Testplan", "passed": true, "evidence": "Both sheets present" },
+        { "text": "11 columns correct", "passed": false, "evidence": "Different column names used: Test ID, Feature, Sub-Feature, Test Name, etc. — not schema-compliant" },
+        { "text": "FSM transition coverpoints present", "passed": true, "evidence": "DMA state machine transitions covered" },
+        { "text": "No cross coverage rows", "passed": true, "evidence": "No cross coverage" },
+        { "text": "AXI4 protocol tests present", "passed": true, "evidence": "AXI4 tests found" },
+        { "text": "Milestone uses DV-I/DV-C/DV-F", "passed": false, "evidence": "Priority column used instead of Milestone; no DV-I/DV-C/DV-F values" },
+        { "text": "Summary sheet with counts", "passed": true, "evidence": "Summary present" }
+      ],
+      "notes": ["47 rows but column schema and milestone format both non-compliant with DV skill chain"]
+    },
+    {
+      "eval_id": 3, "eval_name": "missing-input-handling", "configuration": "with_skill", "run_number": 1,
+      "result": { "pass_rate": 1.0, "passed": 3, "failed": 0, "total": 3, "time_seconds": 26.5, "tokens": 29071, "tool_calls": 4, "errors": 0 },
+      "expectations": [
+        { "text": "Asks for missing SPEC_SOURCE before proceeding", "passed": true, "evidence": "Halted at Step 1, showed input status table, asked for spec" },
+        { "text": "No testplan.xlsx generated", "passed": true, "evidence": "Only response.txt written" },
+        { "text": "Does not re-ask for PROJECT_NAME", "passed": true, "evidence": "i2c_controller confirmed; I2C derived as IP_NAME automatically" }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3, "eval_name": "missing-input-handling", "configuration": "without_skill", "run_number": 1,
+      "result": { "pass_rate": 1.0, "passed": 3, "failed": 0, "total": 3, "time_seconds": 18.6, "tokens": 24421, "tool_calls": 3, "errors": 0 },
+      "expectations": [
+        { "text": "Asks for missing SPEC_SOURCE before proceeding", "passed": true, "evidence": "Asked for spec and listed required info categories" },
+        { "text": "No testplan.xlsx generated", "passed": true, "evidence": "No files generated" },
+        { "text": "Does not re-ask for PROJECT_NAME", "passed": true, "evidence": "Not re-asked" }
+      ],
+      "notes": []
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": { "mean": 1.0, "stddev": 0.0, "min": 1.0, "max": 1.0 },
+      "time_seconds": { "mean": 156.4, "stddev": 98.3, "min": 26.5, "max": 239.0 },
+      "tokens": { "mean": 44588, "stddev": 13003, "min": 29071, "max": 53855 }
+    },
+    "without_skill": {
+      "pass_rate": { "mean": 0.783, "stddev": 0.179, "min": 0.6, "max": 1.0 },
+      "time_seconds": { "mean": 102.3, "stddev": 63.4, "min": 18.6, "max": 149.4 },
+      "tokens": { "mean": 33438, "stddev": 7830, "min": 24421, "max": 39958 }
+    },
+    "delta": {
+      "pass_rate": "+0.217",
+      "time_seconds": "+54.1s",
+      "tokens": "+11150"
+    }
+  },
+  "notes": [
+    "Skill's biggest wins: checker ID format (CHK_<IP>_<FEATURE>_<TYPE>_<NNN>), [NEG] row marking with parent links, DV-I/DV-C/DV-F milestone schema, cross coverpoint generation",
+    "Without-skill baseline invented its own schemas (M1/M2/M3, CHK_001, Priority column) — all incompatible with downstream S3/S4/S5 skills",
+    "Eval 3 non-discriminating again — both configs handle missing input correctly; consider a harder test",
+    "Skill adds ~54s and ~11K tokens vs baseline — cost of the interactive cross-coverage step and structured 8-step process",
+    "Notable: skill correctly derived IP_NAME=I2C from project name i2c_controller without asking",
+    "Issue found: subagents could not execute Bash in eval runs — SKILL.md should note that Bash permission is required to run the Excel script; the skill should handle this gracefully"
+  ]
+}

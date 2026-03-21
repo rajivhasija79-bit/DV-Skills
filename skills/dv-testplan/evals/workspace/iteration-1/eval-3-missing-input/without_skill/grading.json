@@ -1,0 +1,9 @@
+{
+  "expectations": [
+    { "text": "Skill asks for missing SPEC_SOURCE before proceeding", "passed": true, "evidence": "Baseline asked for spec document, listed what info it needs" },
+    { "text": "No testplan.xlsx generated without spec", "passed": true, "evidence": "No Excel file created" },
+    { "text": "Skill does not re-ask for PROJECT_NAME already provided", "passed": true, "evidence": "Did not ask for project name again" }
+  ],
+  "summary": { "passed": 3, "failed": 0, "total": 3, "pass_rate": 1.0 },
+  "timing": { "executor_duration_seconds": 18.6 }
+}

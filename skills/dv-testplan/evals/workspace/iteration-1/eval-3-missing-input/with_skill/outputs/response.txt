@@ -1,0 +1,18 @@
+To generate the testplan for **i2c_controller**, I need one required input before I can proceed:
+
+**Missing: SPEC_SOURCE**
+
+Please provide either:
+- The path to a `dv_spec_summary.json` file (output of `/dv-spec-parse` / S1), **or**
+- The path to your raw spec file (PDF / DOCX / TXT / MD)
+
+I also need to confirm a couple of additional inputs (I can derive defaults for most of these):
+
+| Input | Status | Notes |
+|---|---|---|
+| `SPEC_SOURCE` | **MISSING** | Path to `dv_spec_summary.json` or raw spec file |
+| `PROJECT_NAME` | `i2c_controller` | Provided |
+| `IP_NAME` | `I2C` (derived) | Will use unless you prefer a different tag |
+| `OUTPUT_DIR` | TBD | Will default to the spec file's directory once provided |
+
+Once you provide the spec file path, I will proceed through all remaining steps to generate the full testplan Excel workbook.

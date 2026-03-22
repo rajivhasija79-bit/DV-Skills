@@ -1,0 +1,61 @@
+{
+  "skill": "dv-tb-scaffold",
+  "iteration": 1,
+  "date": "2026-03-22",
+  "description": "Iteration-1 benchmark: S5 VIP/RAL/env generation with and without skill guidance",
+
+  "eval_cases": [
+    {
+      "id": "s5_eval_1",
+      "name": "AHB+AXI4-Stream+SPI+I2C multi-protocol scaffold",
+      "description": "4 unique VIPs, 5 registers (AHB RAL), full env. Tests VIP deduplication, protocol-aware signal generation, parameterization.",
+      "total_assertions": 10,
+      "with_skill":    { "score": 10, "pct": 100.0, "key_pass": ["a1","a2","a3","a4","a5","a6","a7","a8","a9","a10"] },
+      "without_skill": { "score": 10, "pct": 100.0, "note": "self-graded — file layout differed (vip/ vs agents/), naming inconsistent with S5 schema", "key_fail": [] }
+    },
+    {
+      "id": "s5_eval_2",
+      "name": "Dual TileLink (DATA_WIDTH=256 and 128) + APB registers",
+      "description": "Key test: 2 TileLink instances with different params → 1 parameterized VIP. Tests VIP deduplication logic.",
+      "total_assertions": 7,
+      "with_skill":    { "score": 7, "pct": 100.0, "key_pass": ["a1","a2","a3","a4","a5","a6","a7"] },
+      "without_skill": { "score": 7, "pct": 100.0, "note": "correctly handled TileLink parameterization without guidance", "key_fail": [] }
+    },
+    {
+      "id": "s5_eval_3",
+      "name": "APB-UART — no prior skill outputs, full interactive path",
+      "description": "Most discriminating eval: skill must ask for interface list, register map, and reference model. Without skill: skips questions.",
+      "total_assertions": 6,
+      "with_skill":    { "score": 6, "pct": 100.0, "key_pass": ["a1","a2","a3","a4","a5","a6"] },
+      "without_skill": { "score": 4, "pct": 66.7,  "key_fail": ["a1 (no interface question asked)", "a6 (no ref model question — assumed and documented as TODO)"] }
+    }
+  ],
+
+  "aggregate": {
+    "total_assertions": 23,
+    "with_skill_total":    23,
+    "without_skill_total": 21,
+    "with_skill_pct":    100.0,
+    "without_skill_pct":  91.3,
+    "delta_pct": 8.7
+  },
+
+  "analysis": {
+    "where_skill_adds_value": [
+      "Eval 3 a1: Skill explicitly asks for interface list when no S1 JSON found — without-skill assumed and proceeded silently",
+      "Eval 3 a6: Skill asks about reference model existence before generating ref_model.sv — without-skill generated without asking",
+      "Eval 1: Without-skill self-graded 10/10 but used non-standard directory layout (vip/ vs agents/) and non-standard naming — would break S6+ skill chain that expects dv_tb_data.json schema",
+      "Skill enforces consistent dv_tb_data.json output schema for downstream consumption (S6+)"
+    ],
+    "where_skill_less_needed": [
+      "Eval 2: TileLink parameterization — strong agents handle this correctly without guidance",
+      "Eval 1: Basic multi-protocol VIP structure — agents know UVM well"
+    ],
+    "recommended_improvements": [
+      "Add harder eval case: proprietary protocol interface (tests S1 proprietary_interfaces[] consumption)",
+      "Add eval case: S1+S2+S3+S4 all available — test schema pass-through fidelity",
+      "Eval 1 without-skill self-grading is generous; future evals should use independent grading agent",
+      "Add assertion: dv_tb_data.json schema compatibility with S6 downstream (key discriminator)"
+    ]
+  }
+}

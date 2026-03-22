@@ -571,7 +571,7 @@ def _execute_skill(skill_id: str, run_id: str, params: dict):
         _run_demo(skill_id, run_id, params)
         return
 
-    cmd = _build_cmd(skill_id, params, script)
+    cmd = _build_cmd(skill_id, params, script, run_id)
     _add_line(run_id, "system", f"   cmd: {' '.join(str(c) for c in cmd)}")
 
     try:
@@ -605,15 +605,157 @@ def _execute_skill(skill_id: str, run_id: str, params: dict):
         _finish_run(run_id, skill_id, 1)
 
 
-def _build_cmd(skill_id: str, params: dict, script: Path) -> list:
+def _load_json_file(path: str) -> dict:
+    """Safely load a JSON file; return empty dict on any error."""
+    try:
+        p = Path(path)
+        if p.exists() and p.is_file():
+            return json.loads(p.read_text())
+    except Exception:
+        pass
+    return {}
+
+
+def _load_testplan_rows(path: str) -> list:
+    """Load testplan rows from a JSON file; return empty list on error."""
+    data = _load_json_file(path)
+    # Support both { "testplan_rows": [...] } and a bare list
+    if isinstance(data, list):
+        return data
+    return data.get("testplan_rows", data.get("rows", []))
+
+
+def _write_input_json(run_id: str, payload: dict) -> Path:
+    """Write the assembled input JSON to a temp file and return its path."""
+    tmp = RUNS_DIR / f"{run_id}_input.json"
+    tmp.write_text(json.dumps(payload, indent=2))
+    return tmp
+
+
+def _build_cmd(skill_id: str, params: dict, script: Path, run_id: str = "") -> list:
+    """Build the correct CLI for each skill script.
+
+    S6 / S7 / S8 all use  --input <assembled_json>  --output <dv_root>
+    S9  uses its own flag set
+    S10 uses --project / --vdb / --out / --reg-data / --assert-data
+    """
+    project    = params.get("project_name", "project")
+    output_dir = params.get("output_dir", ".")
+
+    # ── S6 — generate_sequences.py ────────────────────────────────────────
+    if skill_id == "s6":
+        tb_data = _load_json_file(params.get("tb_data", ""))
+        if not tb_data:
+            tb_data = {"project_name": project}
+        else:
+            tb_data.setdefault("project_name", project)
+
+        testplan_path = params.get("testplan", "")
+        payload: dict = {
+            "project_name": project,
+            "tb_data":      tb_data,
+        }
+        if testplan_path and Path(testplan_path).exists():
+            if testplan_path.endswith(".xlsx"):
+                payload["testplan_xlsx"] = testplan_path
+            else:
+                payload["testplan_rows"] = _load_testplan_rows(testplan_path)
+        # pass user options through
+        if params.get("gen_random")   is not None: payload["gen_random"]   = params["gen_random"]
+        if params.get("gen_directed") is not None: payload["gen_directed"] = params["gen_directed"]
+
+        input_file = _write_input_json(run_id or skill_id, payload)
+        return ["python3", str(script),
+                "--input",  str(input_file),
+                "--output", output_dir]
+
+    # ── S7 — generate_assertions.py ───────────────────────────────────────
+    if skill_id == "s7":
+        tb_data = _load_json_file(params.get("tb_data", ""))
+        if not tb_data:
+            tb_data = {"project_name": project, "unique_vips": []}
+        else:
+            tb_data.setdefault("project_name", project)
+
+        testplan_path = params.get("testplan", "")
+        testplan_rows = []
+        if testplan_path and Path(testplan_path).exists():
+            testplan_rows = _load_testplan_rows(testplan_path)
+
+        payload = {
+            "project_name":  project,
+            "tb_data":       tb_data,
+            "testplan_rows": testplan_rows,
+        }
+        for opt in ("auto_gen_protocols", "gen_bind_module",
+                    "gen_assert_checker", "skip_sva_in_sb"):
+            if params.get(opt) is not None:
+                payload[opt] = params[opt]
+
+        input_file = _write_input_json(run_id or skill_id, payload)
+        return ["python3", str(script),
+                "--input",  str(input_file),
+                "--output", output_dir]
+
+    # ── S8 — generate_scoreboard.py ───────────────────────────────────────
+    if skill_id == "s8":
+        tb_data = _load_json_file(params.get("tb_data", ""))
+        if not tb_data:
+            tb_data = {"project_name": project, "unique_vips": []}
+        else:
+            tb_data.setdefault("project_name", project)
+
+        testplan_path = params.get("testplan", "")
+        testplan_rows = []
+        if testplan_path and Path(testplan_path).exists():
+            testplan_rows = _load_testplan_rows(testplan_path)
+
+        assert_data = _load_json_file(params.get("assert_data", ""))
+
+        payload = {
+            "project_name":  project,
+            "tb_data":       tb_data,
+            "testplan_rows": testplan_rows,
+            "assert_data":   assert_data,
+        }
+        for opt in ("style", "trigger", "ref_model_type", "skip_sva_duplicates"):
+            if params.get(opt) is not None:
+                payload[opt] = params[opt]
+
+        input_file = _write_input_json(run_id or skill_id, payload)
+        return ["python3", str(script),
+                "--input",  str(input_file),
+                "--output", output_dir]
+
+    # ── S9 — run_regression.py ────────────────────────────────────────────
+    if skill_id == "s9":
+        cmd = ["python3", str(script),
+               "--project",  project,
+               "--dv-root",  output_dir]
+        if params.get("seq_data"):    cmd += ["--seq-data",  params["seq_data"]]
+        if params.get("tb_data"):     cmd += ["--tb-data",   params["tb_data"]]
+        if params.get("max_jobs"):    cmd += ["--jobs",      str(params["max_jobs"])]
+        if params.get("grid_type") and params["grid_type"] != "local":
+            cmd += ["--grid"]
+        if params.get("grid_queue"):  cmd += []   # run_regression reads via --grid-cfg
+        if params.get("stop_on_fail"): cmd += ["--stop-on-fail"]
+        return cmd
+
+    # ── S10 — generate_coverage_closure.py ────────────────────────────────
+    if skill_id == "s10":
+        cmd = ["python3", str(script),
+               "--project", project,
+               "--out",     output_dir]
+        if params.get("vdb_path"):       cmd += ["--vdb",          params["vdb_path"]]
+        if params.get("reg_data"):       cmd += ["--reg-data",     params["reg_data"]]
+        if params.get("assert_data"):    cmd += ["--assert-data",  params["assert_data"]]
+        if params.get("non_interactive"): cmd += ["--non-interactive"]
+        return cmd
+
+    # ── Fallback (future skills) ───────────────────────────────────────────
     cmd = ["python3", str(script)]
-    if params.get("project_name"):  cmd += ["--project",     params["project_name"]]
-    if params.get("output_dir"):    cmd += ["--out",          params["output_dir"]]
-    if params.get("tb_data"):       cmd += ["--tb-data",      params["tb_data"]]
-    if params.get("assert_data"):   cmd += ["--assert-data",  params["assert_data"]]
-    if params.get("reg_data"):      cmd += ["--reg-data",     params["reg_data"]]
-    if params.get("vdb_path"):      cmd += ["--vdb",          params["vdb_path"]]
-    if params.get("non_interactive"): cmd += ["--non-interactive"]
+    if params.get("project_name"):  cmd += ["--project",  project]
+    if params.get("output_dir"):    cmd += ["--out",       output_dir]
     return cmd
 
 

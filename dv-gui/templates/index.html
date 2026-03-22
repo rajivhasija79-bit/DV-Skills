@@ -640,6 +640,81 @@ textarea.form-input { height:auto; padding:10px 13px; resize:vertical; min-heigh
 .empty-state p { font-size:13px; line-height:1.6; }
 
 @media (prefers-reduced-motion:reduce) { *,*::before,*::after { transition-duration:.01ms !important; animation-duration:.01ms !important; } }
+
+/* ── Project Section Action Footer ───────────────────────────────────────── */
+.proj-section-footer {
+  display:flex; align-items:center; justify-content:space-between;
+  gap:12px; padding-top:16px; margin-top:18px;
+  border-top:1px solid var(--glass-border);
+}
+
+.proj-action-status {
+  display:flex; align-items:center; gap:8px;
+  font-size:12px; font-weight:500; color:var(--t3); flex:1; min-width:0;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+
+.proj-action-dot {
+  width:7px; height:7px; border-radius:50%; flex-shrink:0;
+  transition:all var(--normal) var(--ease);
+}
+.proj-action-dot.incomplete { background:var(--t4); }
+.proj-action-dot.ready      { background:var(--green);        box-shadow:0 0 8px rgba(16,185,129,.55); }
+.proj-action-dot.running    { background:var(--indigo-soft);  box-shadow:0 0 8px rgba(99,102,241,.6);  animation:pulse 1.2s ease-in-out infinite; }
+.proj-action-dot.success    { background:var(--green);        box-shadow:0 0 10px rgba(16,185,129,.65); }
+.proj-action-dot.error      { background:var(--red);          box-shadow:0 0 8px rgba(244,63,94,.55); }
+
+.proj-action-btn {
+  display:inline-flex; align-items:center; gap:6px; flex-shrink:0;
+  height:32px; padding:0 16px; border-radius:var(--r-pill);
+  font-family:var(--font); font-size:12px; font-weight:700; letter-spacing:.03em;
+  cursor:pointer; border:1px solid transparent; outline:none;
+  transition:all var(--normal) var(--ease); white-space:nowrap;
+  user-select:none;
+}
+/* Incomplete — subtle ghost */
+.proj-action-btn.incomplete {
+  background:transparent; color:var(--t4);
+  border-color:var(--glass-border); cursor:default;
+}
+/* Ready — neon indigo glow */
+.proj-action-btn.ready {
+  background:linear-gradient(135deg,#4338CA,var(--indigo));
+  color:#fff; border-color:transparent;
+  box-shadow:0 3px 14px rgba(99,102,241,.45);
+}
+.proj-action-btn.ready:hover {
+  box-shadow:0 5px 22px rgba(99,102,241,.65);
+  transform:translateY(-1px);
+}
+.proj-action-btn.ready:active { transform:scale(.97); }
+/* Running */
+.proj-action-btn.running-state {
+  background:var(--indigo-dim); color:var(--indigo-soft);
+  border-color:var(--indigo-mid); cursor:wait;
+}
+/* Success flash */
+.proj-action-btn.success-state {
+  background:linear-gradient(135deg,#065F46,var(--green));
+  color:#fff; border-color:transparent;
+  box-shadow:0 3px 14px rgba(16,185,129,.45);
+}
+/* Error flash */
+.proj-action-btn.error-state {
+  background:linear-gradient(135deg,#9B1C1C,var(--red));
+  color:#fff; border-color:transparent;
+  box-shadow:0 3px 14px rgba(244,63,94,.45);
+}
+
+/* Completion ring on section card when all actions done */
+.proj-section.action-done {
+  border-color:rgba(16,185,129,.35);
+  box-shadow:var(--sh-sm), 0 0 0 1px rgba(16,185,129,.12), inset 0 1px 0 rgba(255,255,255,.07);
+}
+.proj-section.action-error {
+  border-color:rgba(244,63,94,.35);
+  box-shadow:var(--sh-sm), 0 0 0 1px rgba(244,63,94,.12), inset 0 1px 0 rgba(255,255,255,.07);
+}
 </style>
 </head>
 <body>
@@ -960,8 +1035,9 @@ const API = {
   async reset(sid)            { return fetch(`/api/reset/${sid}`,{method:'POST'}); },
   async resetAll()            { return fetch('/api/reset-all',{method:'POST'}); },
   async browse(path,type)     { const r=await fetch(`/api/browse?path=${encodeURIComponent(path)}&type=${type||'both'}`); return r.json(); },
-  async getProjectConfig()    { return (await fetch('/api/project-config')).json(); },
-  async saveProjectConfig(cfg){ const r=await fetch('/api/project-config',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(cfg)}); return r.json(); },
+  async getProjectConfig()          { return (await fetch('/api/project-config')).json(); },
+  async saveProjectConfig(cfg)      { const r=await fetch('/api/project-config',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(cfg)}); return r.json(); },
+  async runProjectAction(actionId,p){ const r=await fetch(`/api/project-action/${actionId}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(p)}); return r.json(); },
   stream(rid)                 { return new EventSource(`/api/stream/${rid}`); },
 };
 
@@ -1180,9 +1256,21 @@ const Fields = {
 /* ═══════════════════════════════════════════════════════════════════════════
    PROJECT SETTINGS
    ═══════════════════════════════════════════════════════════════════════════ */
+
+// Per-section action config: which fields must be filled to unlock the button
+const PROJ_SECTION_ACTIONS = {
+  identity:   { actionId:'init_project',     label:'Initialize Project', icon:'🚀', required:['project_name','workspace_dir'] },
+  workspace:  { actionId:'setup_workspace',  label:'Setup Workspace',    icon:'📂', required:['workspace_dir'] },
+  tools:      { actionId:'verify_tools',     label:'Verify Tools',       icon:'🔍', required:['eda_tool_path'] },
+  guidelines: { actionId:'validate_docs',    label:'Validate Docs',      icon:'📋', required:['coding_guidelines'] },
+  dut:        { actionId:'gen_dut_config',   label:'Generate Config',    icon:'⚙️', required:['top_module','clock_freq'] },
+  sim:        { actionId:'gen_sim_defaults', label:'Apply Defaults',     icon:'▶',  required:[] },
+};
+
 const ProjectSettings = {
   _cfg: {},
   _selectedTool: 'vcs',
+  _sectionStates: {},   // sectionId → 'incomplete'|'ready'|'running'|'success'|'error'
 
   async load() {
     try { this._cfg = await API.getProjectConfig(); } catch(e) { this._cfg={}; }
@@ -1196,127 +1284,239 @@ const ProjectSettings = {
     this._cfg.eda_tool = this._selectedTool;
     await API.saveProjectConfig(this._cfg);
     State.projectConfig = {...this._cfg};
-
-    // Show saved pill
     const pill = document.getElementById('proj-saved-pill');
     if(pill){ pill.style.display='inline-flex'; setTimeout(()=>pill.style.display='none', 2800); }
-
-    // Update sidebar dot
-    const hasName = !!(this._cfg.project_name);
     const dot = document.getElementById('proj-dot');
-    if(dot) dot.style.background = hasName ? 'var(--green)' : 'var(--t4)';
+    if(dot) dot.style.background = this._cfg.project_name ? 'var(--green)' : 'var(--t4)';
   },
 
+  // ── Run a project action ────────────────────────────────────────────────
+  async runAction(sectionId) {
+    const ac = PROJ_SECTION_ACTIONS[sectionId];
+    if(!ac) return;
+    this._cfg.eda_tool = this._selectedTool;
+    await API.saveProjectConfig(this._cfg);      // auto-save first
+    State.projectConfig = {...this._cfg};
+
+    this._setSectionState(sectionId, 'running');
+    const r = await fetch(`/api/project-action/${ac.actionId}`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(this._cfg)
+    });
+    const data = await r.json();
+    if(data.error){ this._setSectionState(sectionId,'error'); alert(data.error); return; }
+
+    Terminal.startStream(data.run_id, ac.label);
+
+    // Poll for completion
+    const poll = setInterval(async () => {
+      const res = await fetch(`/api/run/${data.run_id}/log`);
+      const log = await res.json();
+      if(log.status === 'done'){
+        clearInterval(poll);
+        const st = log.exit_code===0 ? 'success' : 'error';
+        this._setSectionState(sectionId, st);
+        // Reset to ready after 4 s
+        if(st==='success') setTimeout(()=>this._setSectionState(sectionId,'ready'),4000);
+      }
+    }, 800);
+  },
+
+  // ── Update section footer state ─────────────────────────────────────────
+  _setSectionState(sectionId, state) {
+    this._sectionStates[sectionId] = state;
+    const sec  = document.getElementById(`ps-sec-${sectionId}`);
+    const dot  = document.getElementById(`ps-dot-${sectionId}`);
+    const btn  = document.getElementById(`ps-btn-${sectionId}`);
+    const lbl  = document.getElementById(`ps-lbl-${sectionId}`);
+    if(!sec || !dot || !btn || !lbl) return;
+
+    const ac = PROJ_SECTION_ACTIONS[sectionId];
+
+    // Remove all state classes
+    sec.classList.remove('action-done','action-error');
+    dot.className = `proj-action-dot ${state}`;
+    btn.className = `proj-action-btn ${state==='running'?'running-state':state==='success'?'success-state':state==='error'?'error-state':state}`;
+
+    if(state==='incomplete'){
+      lbl.textContent = 'Fill required fields to unlock';
+      btn.innerHTML = `${ac.icon} ${ac.label}`;
+      btn.onclick = null;
+    } else if(state==='ready'){
+      lbl.textContent = 'Ready to run';
+      btn.innerHTML = `${ac.icon} ${ac.label}`;
+      btn.onclick = ()=>this.runAction(sectionId);
+    } else if(state==='running'){
+      lbl.textContent = 'Running…';
+      btn.innerHTML = `<span style="display:inline-block;width:11px;height:11px;border:2px solid rgba(255,255,255,.3);border-top-color:var(--indigo-soft);border-radius:50%;animation:spin .7s linear infinite"></span> Running`;
+      btn.onclick = null;
+    } else if(state==='success'){
+      lbl.textContent = 'Completed successfully';
+      btn.innerHTML = `✓ Done`;
+      sec.classList.add('action-done');
+      btn.onclick = ()=>this.runAction(sectionId);
+    } else if(state==='error'){
+      lbl.textContent = 'Action failed — check terminal';
+      btn.innerHTML = `✕ Retry`;
+      sec.classList.add('action-error');
+      btn.onclick = ()=>this.runAction(sectionId);
+    }
+  },
+
+  // ── Re-evaluate all section button states based on current cfg ──────────
+  _refreshAllStates() {
+    for(const [sectionId, ac] of Object.entries(PROJ_SECTION_ACTIONS)){
+      const cur = this._sectionStates[sectionId];
+      if(cur==='running') continue;   // don't interrupt a run
+      const filled = ac.required.every(k => !!(this._cfg[k]));
+      const next = filled ? 'ready' : 'incomplete';
+      if(cur !== 'success' && cur !== 'error'){   // preserve terminal states
+        this._setSectionState(sectionId, next);
+      }
+    }
+  },
+
+  // ── Render full Project Settings view ───────────────────────────────────
   render() {
     const cfg = this._cfg;
     const el = document.getElementById('proj-content');
     el.innerHTML = '';
 
-    // ── Header ─────────────────────────────────────────────────────────────
+    // Header
     const hdr = document.createElement('div');
     hdr.style.cssText = 'margin-bottom:24px';
     hdr.innerHTML = `
       <h2 style="font-size:24px;font-weight:800;letter-spacing:-.03em;color:var(--t1);margin-bottom:6px">Project Settings</h2>
-      <p style="font-size:14px;color:var(--t3);line-height:1.6">Configure your DV project once — all skills inherit these settings automatically.</p>`;
+      <p style="font-size:14px;color:var(--t3);line-height:1.6">Configure your DV project once — all skills inherit these settings automatically. Use each section's action button to execute setup steps.</p>`;
     el.appendChild(hdr);
 
-    // ── Grid ───────────────────────────────────────────────────────────────
     const grid = document.createElement('div');
     grid.className = 'proj-grid';
 
-    // 1. Identity
-    grid.appendChild(this._section('🏷️', 'Project Identity', 'Core project identification used across all generated files and reports.', [
-      this._row2(
-        this._field('project_name', 'Project Name', 'text', 'e.g., apb_uart_ss', cfg.project_name||''),
-        this._field('user_name',    'User / Engineer Name', 'text', 'e.g., john.doe', cfg.user_name||'')
-      ),
-      this._fieldFull('github_repo', 'GitHub Repository', 'text', 'e.g., https://github.com/org/apb-uart-dv', cfg.github_repo||''),
-    ]));
+    // 1 ── Project Identity
+    const idSec = this._section('identity','🏷️','Project Identity',
+      'Core project identification used across all generated files and reports.');
+    idSec.appendChild(this._row2(
+      this._field('project_name','Project Name','text','e.g., apb_uart_ss',cfg.project_name||''),
+      this._field('user_name','User / Engineer Name','text','e.g., john.doe',cfg.user_name||'')
+    ));
+    idSec.appendChild(this._fieldFull('github_repo','GitHub Repository','text','e.g., https://github.com/org/repo',cfg.github_repo||''));
+    idSec.appendChild(this._sectionFooter('identity'));
+    grid.appendChild(idSec);
 
-    // 2. Workspace
-    grid.appendChild(this._section('📁', 'Workspace', 'Directories and paths used as roots for all skill outputs.', [
-      this._fieldPicker('workspace_dir', 'Workspace Directory', 'dir', cfg.workspace_dir||''),
-      this._fieldPicker('spec_path',     'Specification Path',  'file', cfg.spec_path||''),
-    ]));
+    // 2 ── Workspace
+    const wsSec = this._section('workspace','📁','Workspace',
+      'Root directories and paths used by all skill outputs.');
+    wsSec.appendChild(this._fieldPicker('workspace_dir','Workspace Directory','dir',cfg.workspace_dir||''));
+    wsSec.appendChild(this._fieldPicker('spec_path','Specification Path','file',cfg.spec_path||''));
+    wsSec.appendChild(this._sectionFooter('workspace'));
+    grid.appendChild(wsSec);
 
-    // 3. EDA Tools (full width)
-    const toolSec = this._section('🔧', 'EDA Tools', 'Select your primary simulation/verification tool and provide the install path.', []);
+    // 3 ── EDA Tools (full width)
+    const toolSec = this._section('tools','🔧','EDA Tools',
+      'Select your primary simulation tool, install path, and licence server.');
     toolSec.classList.add('proj-section-full');
     toolSec.appendChild(this._toolSelector());
-    toolSec.appendChild(this._fieldPicker('eda_tool_path', 'Tool Installation Path', 'dir', cfg.eda_tool_path||''));
-    toolSec.appendChild(this._fieldFull('license_server', 'License Server', 'text', 'e.g., 27000@license-host.domain.com', cfg.license_server||''));
+    toolSec.appendChild(this._row2(
+      this._fieldPicker('eda_tool_path','Tool Installation Path','dir',cfg.eda_tool_path||''),
+      this._field('license_server','License Server','text','27000@license-host',cfg.license_server||'')
+    ));
+    toolSec.appendChild(this._sectionFooter('tools'));
     grid.appendChild(toolSec);
 
-    // 4. Guidelines
-    grid.appendChild(this._section('📐', 'Guidelines & Standards', 'Path to coding standards and integration guidelines documents.', [
-      this._fieldPicker('coding_guidelines', 'Coding Guidelines', 'file', cfg.coding_guidelines||''),
-      this._fieldPicker('soc_integ_guidelines', 'IP-to-SoC Integration Guidelines', 'file', cfg.soc_integ_guidelines||''),
-    ]));
+    // 4 ── Guidelines
+    const docSec = this._section('guidelines','📐','Guidelines & Standards',
+      'Paths to coding standards and SoC integration guideline documents.');
+    docSec.appendChild(this._fieldPicker('coding_guidelines','Coding Guidelines','file',cfg.coding_guidelines||''));
+    docSec.appendChild(this._fieldPicker('soc_integ_guidelines','IP-to-SoC Integration Guidelines','file',cfg.soc_integ_guidelines||''));
+    docSec.appendChild(this._sectionFooter('guidelines'));
+    grid.appendChild(docSec);
 
-    // 5. DUT Configuration
-    grid.appendChild(this._section('⚡', 'DUT Configuration', 'Electrical and timing properties of the design under test.', [
-      this._row2(
-        this._field('top_module',  'Top-Level Module',    'text', 'e.g., apb_uart_top',  cfg.top_module||''),
-        this._field('clock_freq',  'Clock Frequency (MHz)','text', 'e.g., 100',           cfg.clock_freq||'')
-      ),
-      this._row2(
-        this._field('timescale',   'Simulation Timescale', 'text', 'e.g., 1ns/1ps',      cfg.timescale||'1ns/1ps'),
-        this._fieldSelect('reset_polarity', 'Reset Polarity',
-          [{v:'active_low',l:'Active Low (negedge)'},{v:'active_high',l:'Active High (posedge)'}],
-          cfg.reset_polarity||'active_low')
-      ),
-    ]));
+    // 5 ── DUT Configuration
+    const dutSec = this._section('dut','⚡','DUT Configuration',
+      'Electrical and timing properties of the design under test.');
+    dutSec.appendChild(this._row2(
+      this._field('top_module','Top-Level Module','text','e.g., apb_uart_top',cfg.top_module||''),
+      this._field('clock_freq','Clock Frequency (MHz)','text','e.g., 100',cfg.clock_freq||'')
+    ));
+    dutSec.appendChild(this._row2(
+      this._field('timescale','Simulation Timescale','text','e.g., 1ns/1ps',cfg.timescale||'1ns/1ps'),
+      this._fieldSelect('reset_polarity','Reset Polarity',
+        [{v:'active_low',l:'Active Low (negedge)'},{v:'active_high',l:'Active High (posedge)'}],
+        cfg.reset_polarity||'active_low')
+    ));
+    dutSec.appendChild(this._sectionFooter('dut'));
+    grid.appendChild(dutSec);
 
-    // 6. Simulation Defaults
-    grid.appendChild(this._section('🎛️', 'Simulation Defaults', 'Default settings inherited by S9 regression runs and S10 coverage closure.', [
-      this._row2(
-        this._fieldSelect('wave_format', 'Wave Dump Format',
-          [{v:'fsdb',l:'FSDB (Verdi)'},{v:'vpd',l:'VPD (DVE)'},{v:'vcd',l:'VCD (universal)'},{v:'none',l:'No waves'}],
-          cfg.wave_format||'fsdb'),
-        this._fieldSelect('uvm_verbosity', 'Default UVM Verbosity',
-          [{v:'UVM_MEDIUM',l:'UVM_MEDIUM (default)'},{v:'UVM_LOW',l:'UVM_LOW'},{v:'UVM_HIGH',l:'UVM_HIGH'},{v:'UVM_FULL',l:'UVM_FULL'}],
-          cfg.uvm_verbosity||'UVM_MEDIUM')
-      ),
-      this._fieldFull('extra_sim_flags', 'Extra Simulation Flags', 'text',
-        'e.g., +define+SIM +vcs+lic+wait', cfg.extra_sim_flags||''),
-    ]));
+    // 6 ── Simulation Defaults
+    const simSec = this._section('sim','🎛️','Simulation Defaults',
+      'Default settings inherited by S9 regression runs and S10 coverage closure.');
+    simSec.appendChild(this._row2(
+      this._fieldSelect('wave_format','Wave Dump Format',
+        [{v:'fsdb',l:'FSDB (Verdi)'},{v:'vpd',l:'VPD (DVE)'},{v:'vcd',l:'VCD (universal)'},{v:'none',l:'No waves'}],
+        cfg.wave_format||'fsdb'),
+      this._fieldSelect('uvm_verbosity','Default UVM Verbosity',
+        [{v:'UVM_MEDIUM',l:'UVM_MEDIUM (default)'},{v:'UVM_LOW',l:'UVM_LOW'},{v:'UVM_HIGH',l:'UVM_HIGH'},{v:'UVM_FULL',l:'UVM_FULL'}],
+        cfg.uvm_verbosity||'UVM_MEDIUM')
+    ));
+    simSec.appendChild(this._fieldFull('extra_sim_flags','Extra Simulation Flags','text',
+      'e.g., +define+SIM +vcs+lic+wait',cfg.extra_sim_flags||''));
+    simSec.appendChild(this._sectionFooter('sim'));
+    grid.appendChild(simSec);
 
     el.appendChild(grid);
 
-    // ── Save bar ───────────────────────────────────────────────────────────
+    // Save bar
     const saveBar = document.createElement('div');
     saveBar.className = 'proj-save-bar'; saveBar.style.marginTop = '24px';
     saveBar.innerHTML = `
       <div class="proj-save-bar-msg">
-        <strong style="color:var(--t1)">Settings saved to project_config.json</strong>
-        <span style="display:block;font-size:12px;margin-top:2px;color:var(--t4)">All skills will inherit these values automatically when run.</span>
+        <strong style="color:var(--t1)">Auto-saved to project_config.json</strong>
+        <span style="display:block;font-size:12px;margin-top:2px;color:var(--t4)">Settings are saved automatically when you run any section action. Use the button below to save manually.</span>
       </div>
       <div style="display:flex;gap:10px;align-items:center">
         <span class="proj-saved-pill" id="proj-saved-pill" style="display:none">✓ Saved</span>
-        <button class="btn btn-primary" onclick="ProjectSettings.save()">Save Project Settings</button>
+        <button class="btn btn-primary" onclick="ProjectSettings.save()">Save All Settings</button>
       </div>`;
     el.appendChild(saveBar);
 
-    // Wire up all inputs
+    // Wire inputs → cfg + live state refresh
     this._wireInputs(el);
+    // Initial state evaluation
+    this._refreshAllStates();
   },
 
-  _section(icon, title, desc, children) {
+  // ── Section container ────────────────────────────────────────────────────
+  _section(sectionId, icon, title, desc) {
     const sec = document.createElement('div');
-    sec.className = 'proj-section';
+    sec.className = 'proj-section'; sec.id = `ps-sec-${sectionId}`;
     sec.innerHTML = `
       <span class="proj-section-icon">${icon}</span>
       <div class="proj-section-title">${title}</div>
       <div class="proj-section-desc">${desc}</div>`;
-    children.forEach(c => { if(c) sec.appendChild(c); });
     return sec;
   },
 
+  // ── Section action footer ────────────────────────────────────────────────
+  _sectionFooter(sectionId) {
+    const ac  = PROJ_SECTION_ACTIONS[sectionId];
+    const ftr = document.createElement('div');
+    ftr.className = 'proj-section-footer';
+    ftr.innerHTML = `
+      <div class="proj-action-status" id="ps-status-${sectionId}">
+        <span class="proj-action-dot incomplete" id="ps-dot-${sectionId}"></span>
+        <span id="ps-lbl-${sectionId}">Fill required fields to unlock</span>
+      </div>
+      <button class="proj-action-btn incomplete" id="ps-btn-${sectionId}">
+        ${ac.icon} ${ac.label}
+      </button>`;
+    return ftr;
+  },
+
+  // ── Form helpers ──────────────────────────────────────────────────────────
   _row2(a, b) {
-    const row = document.createElement('div');
-    row.className = 'form-row-2';
-    if(a) row.appendChild(a); if(b) row.appendChild(b);
-    return row;
+    const row = document.createElement('div'); row.className='form-row-2';
+    if(a) row.appendChild(a); if(b) row.appendChild(b); return row;
   },
 
   _field(key, label, type, placeholder, value) {
@@ -1326,21 +1526,22 @@ const ProjectSettings = {
     inp.type = type||'text'; inp.className = 'form-input';
     inp.placeholder = placeholder||''; inp.value = value||'';
     inp.dataset.cfgKey = key;
-    g.appendChild(inp);
-    return g;
+    g.appendChild(inp); return g;
   },
 
   _fieldFull(key, label, type, placeholder, value) {
     const g = this._field(key, label, type, placeholder, value);
-    g.style.gridColumn = '1/-1';
-    return g;
+    g.style.gridColumn = '1/-1'; return g;
   },
 
   _fieldSelect(key, label, options, currentVal) {
     const g = document.createElement('div'); g.className = 'form-group';
     g.innerHTML = `<div class="form-label">${label}</div>`;
-    const sel = document.createElement('select'); sel.className = 'form-select'; sel.dataset.cfgKey = key;
-    for(const o of options){ const opt=document.createElement('option'); opt.value=o.v; opt.textContent=o.l; if(o.v===currentVal) opt.selected=true; sel.appendChild(opt); }
+    const sel = document.createElement('select'); sel.className='form-select'; sel.dataset.cfgKey=key;
+    for(const o of options){
+      const opt=document.createElement('option'); opt.value=o.v; opt.textContent=o.l;
+      if(o.v===currentVal) opt.selected=true; sel.appendChild(opt);
+    }
     g.appendChild(sel); return g;
   },
 
@@ -1349,30 +1550,28 @@ const ProjectSettings = {
     g.innerHTML = `<div class="form-label">${label}</div>`;
     const wrap = document.createElement('div'); wrap.className = 'file-picker';
     const inp = document.createElement('input'); inp.type='text'; inp.className='form-input file-picker-path';
-    inp.placeholder = type==='dir' ? '/path/to/directory' : '/path/to/file';
+    inp.placeholder = type==='dir'?'/path/to/directory':'/path/to/file';
     inp.value = value||''; inp.style.fontFamily='var(--mono)'; inp.style.fontSize='12.5px';
     inp.dataset.cfgKey = key;
     const btn = document.createElement('button'); btn.type='button'; btn.className='file-picker-btn';
     btn.innerHTML = `${type==='dir'?'📁':'📄'} Browse`;
-    btn.addEventListener('click', ()=>{ FilePicker.open(type, (p)=>{ inp.value=p; this._cfg[key]=p; }); });
-    wrap.append(inp, btn); g.appendChild(wrap);
-    return g;
+    btn.addEventListener('click',()=>FilePicker.open(type,(p)=>{ inp.value=p; this._cfg[key]=p; this._refreshAllStates(); }));
+    wrap.append(inp,btn); g.appendChild(wrap); return g;
   },
 
   _toolSelector() {
     const tools = [
-      { id:'vcs',    icon:'⚗️',  name:'VCS',    ver:'Synopsys VCS MX' },
-      { id:'questa', icon:'🔬', name:'Questa',  ver:'Siemens Questa' },
-      { id:'xcelium',icon:'🧬', name:'Xcelium', ver:'Cadence Xcelium' },
+      {id:'vcs',    icon:'⚗️', name:'VCS',     ver:'Synopsys VCS MX'},
+      {id:'questa', icon:'🔬', name:'Questa',   ver:'Siemens Questa'},
+      {id:'xcelium',icon:'🧬', name:'Xcelium',  ver:'Cadence Xcelium'},
     ];
-    const wrap = document.createElement('div'); wrap.className = 'tool-selector'; wrap.style.marginBottom='16px';
+    const wrap = document.createElement('div'); wrap.className='tool-selector'; wrap.style.marginBottom='16px';
     for(const t of tools){
       const card = document.createElement('div');
-      card.className = 'tool-card' + (this._selectedTool===t.id ? ' selected' : '');
+      card.className = 'tool-card'+(this._selectedTool===t.id?' selected':'');
       card.innerHTML = `<div class="tool-card-icon">${t.icon}</div><div class="tool-card-name">${t.name}</div><div class="tool-card-ver">${t.ver}</div>`;
-      card.addEventListener('click', ()=>{
-        this._selectedTool = t.id;
-        this._cfg.eda_tool = t.id;
+      card.addEventListener('click',()=>{
+        this._selectedTool = t.id; this._cfg.eda_tool = t.id;
         wrap.querySelectorAll('.tool-card').forEach(c=>c.classList.remove('selected'));
         card.classList.add('selected');
       });
@@ -1381,11 +1580,15 @@ const ProjectSettings = {
     return wrap;
   },
 
+  // ── Wire all [data-cfg-key] inputs → _cfg + live state refresh ───────────
   _wireInputs(container) {
     container.querySelectorAll('[data-cfg-key]').forEach(el => {
       const key = el.dataset.cfgKey;
-      el.addEventListener('input', ()=>{ this._cfg[key] = el.value; });
-      el.addEventListener('change', ()=>{ this._cfg[key] = el.value; });
+      const update = () => { this._cfg[key] = el.value; this._refreshAllStates(); };
+      el.addEventListener('input', update);
+      el.addEventListener('change', update);
+      // Initialise cfg from current value
+      if(el.value) this._cfg[key] = el.value;
     });
   },
 };

@@ -292,6 +292,136 @@ def post_project_config():
     return jsonify({"status": "saved"})
 
 
+# ── Project Actions ────────────────────────────────────────────────────────
+
+PROJECT_ACTION_DEMOS = {
+    "init_project": [
+        "Initializing DV project structure…",
+        "Creating  {workspace_dir}/{project_name}/",
+        "Creating  {workspace_dir}/{project_name}/rtl/",
+        "Creating  {workspace_dir}/{project_name}/dv/",
+        "Creating  {workspace_dir}/{project_name}/dv/tb/",
+        "Creating  {workspace_dir}/{project_name}/dv/sequences/",
+        "Creating  {workspace_dir}/{project_name}/dv/tests/",
+        "Creating  {workspace_dir}/{project_name}/dv/assertions/",
+        "Creating  {workspace_dir}/{project_name}/dv/coverage/",
+        "Creating  {workspace_dir}/{project_name}/dv/regression/",
+        "Initialising git repository…",
+        "Writing  .gitignore",
+        "Writing  README.md",
+        "Writing  project_config.json",
+        "✓  Project '{project_name}' initialised — engineer: {user_name}",
+    ],
+    "setup_workspace": [
+        "Validating workspace path…",
+        "Workspace root : {workspace_dir}",
+        "Specification  : {spec_path}",
+        "Checking write permissions…  OK",
+        "Creating {workspace_dir}/runs/",
+        "Creating {workspace_dir}/logs/",
+        "Creating {workspace_dir}/reports/",
+        "Creating {workspace_dir}/artifacts/",
+        "Writing  workspace.yaml",
+        "✓  Workspace ready at {workspace_dir}",
+    ],
+    "verify_tools": [
+        "Checking EDA tool installation…",
+        "Tool selected  : {eda_tool}",
+        "Install path   : {eda_tool_path}",
+        "Running binary version check…",
+        "License server : {license_server}",
+        "Sending test checkout request…",
+        "Feature: vcs_mx   — GRANTED",
+        "Feature: vcselab  — GRANTED",
+        "License server response time: 42 ms",
+        "✓  {eda_tool} verified — licence OK",
+    ],
+    "validate_docs": [
+        "Validating documentation paths…",
+        "Coding guidelines    : {coding_guidelines}",
+        "  → file found, size: OK",
+        "SoC integration guide: {soc_integ_guidelines}",
+        "  → file found, size: OK",
+        "Parsing section headings…",
+        "  Found 24 coding rules",
+        "  Found 12 SoC integration checkpoints",
+        "✓  All documentation files validated and accessible",
+    ],
+    "gen_dut_config": [
+        "Generating DUT configuration files…",
+        "Top-level module : {top_module}",
+        "Clock frequency  : {clock_freq} MHz  →  period = {clock_period} ns",
+        "Timescale        : {timescale}",
+        "Reset polarity   : {reset_polarity}",
+        "Writing  dut_config.yaml",
+        "Writing  dut_params_pkg.sv",
+        "Writing  dut_if_params.sv",
+        "✓  DUT configuration generated for '{top_module}'",
+    ],
+    "gen_sim_defaults": [
+        "Applying simulation defaults…",
+        "Wave format     : {wave_format}",
+        "UVM verbosity   : {uvm_verbosity}",
+        "Extra sim flags : {extra_sim_flags}",
+        "Writing  sim_defaults.yaml",
+        "Writing  Makefile.sim_defaults",
+        "Writing  run_sim.sh  (template)",
+        "✓  Simulation defaults applied and written",
+    ],
+}
+
+
+def _fmt(s: str, params: dict) -> str:
+    """Interpolate {key} placeholders; leave unknown keys as-is."""
+    safe = {k: (v or "(not set)") for k, v in params.items()}
+    # compute clock_period if clock_freq is numeric
+    try:
+        mhz = float(safe.get("clock_freq", "0"))
+        safe["clock_period"] = f"{1000/mhz:.2f}" if mhz else "?"
+    except Exception:
+        safe["clock_period"] = "?"
+    try:
+        return s.format_map(safe)
+    except Exception:
+        return s
+
+
+@app.route("/api/project-action/<action_id>", methods=["POST"])
+def run_project_action(action_id):
+    if action_id not in PROJECT_ACTION_DEMOS:
+        return jsonify({"error": "Unknown action"}), 404
+
+    params = request.get_json() or {}
+    merged = {**load_project_config(), **params}
+    run_id = f"proj_{action_id}_{int(time.time())}_{uuid.uuid4().hex[:6]}"
+
+    with _runs_lock:
+        _runs[run_id] = {
+            "skill_id": f"proj_{action_id}", "params": merged,
+            "lines": [], "status": "running", "exit_code": None,
+            "started_at": time.time(), "finished_at": None,
+        }
+
+    threading.Thread(
+        target=_run_project_action_demo,
+        args=(action_id, run_id, merged), daemon=True
+    ).start()
+    return jsonify({"run_id": run_id, "status": "started"})
+
+
+def _run_project_action_demo(action_id: str, run_id: str, params: dict):
+    import random
+    _add_line(run_id, "system", f"▶  Project Action — {action_id.replace('_', ' ').title()}")
+    _add_line(run_id, "system", f"   {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    steps = PROJECT_ACTION_DEMOS.get(action_id, ["Running…", "✓ Done"])
+    for step in steps:
+        time.sleep(random.uniform(0.28, 0.65))
+        text = _fmt(step, params)
+        t = "success" if text.startswith("✓") else "stdout"
+        _add_line(run_id, t, text)
+    _finish_run(run_id, f"proj_{action_id}", 0)
+
+
 @app.route("/api/browse")
 def browse():
     path        = request.args.get("path", os.path.expanduser("~"))

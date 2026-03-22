@@ -1,0 +1,141 @@
+{
+  "skill_name": "dv-assertions",
+  "skill_version": "1.0",
+  "description": "Evals for S7 dv-assertions: per-VIP SVA modules, DUT bind, assertion control, UVM checker, auto-gen protocol stubs",
+
+  "test_cases": [
+
+    {
+      "id": "s7_eval_1_apb_uart_full",
+      "name": "APB-UART: full assertion generation from testplan + S5 TB data",
+      "description": "3 testplan rows with checker_type=Assertion/Both. Tests: VIP assignment heuristic (APB protocol signals matched to apb_vip), assert+cover pair generation, CHK_ID in action blocks, DUT bind, UVM checker registration.",
+      "input": {
+        "project_name": "apb_uart",
+        "tb_data": {
+          "project_name": "apb_uart",
+          "unique_vips": [
+            {"vip_name": "apb_vip",  "protocol": "APB",  "data_width": 32, "addr_width": 32,
+             "instances": [{"if_name": "apb_if"}]},
+            {"vip_name": "uart_vip", "protocol": "UART", "data_width": 1,  "addr_width": 0,
+             "instances": [{"if_name": "uart_if"}]}
+          ],
+          "ral": {"reg_block_class": "apb_uart_reg_block", "registers": [{"name":"UART_CTRL"},{"name":"UART_STATUS"}]},
+          "env": {"virtual_seqr_class": "apb_uart_virtual_seqr"},
+          "base_test": {"base_test_class": "apb_uart_base_test"}
+        },
+        "testplan_rows": [
+          {
+            "feature": "APB Slave Interface", "subfeature": "Setup Phase",
+            "checker_id": "CHK_UART_APB_PROTOCOL_001", "checker_type": "Assertion",
+            "milestone": "DV-I",
+            "assertion_code": "property p_apb_setup;\n  @(posedge pclk) disable iff (!presetn)\n  $rose(penable) |-> $past(psel);\nendproperty\nassert property (p_apb_setup) else\n  $error(\"[FAIL] CHK_UART_APB_PROTOCOL_001 violated at %0t\", $time);"
+          },
+          {
+            "feature": "UART TX", "subfeature": "Start Bit",
+            "checker_id": "CHK_UART_TX_FUNCTIONAL_001", "checker_type": "Assertion",
+            "milestone": "DV-C",
+            "assertion_code": "property p_uart_start;\n  @(posedge clk) disable iff (!rst_n)\n  $fell(txd) |-> !txd;\nendproperty\nassert property (p_uart_start) else\n  $error(\"[FAIL] CHK_UART_TX_FUNCTIONAL_001 at %0t\", $time);"
+          },
+          {
+            "feature": "UART TX", "subfeature": "Data Integrity",
+            "checker_id": "CHK_UART_TX_DATA_INTEGRITY_001", "checker_type": "Both",
+            "milestone": "DV-C",
+            "assertion_code": ""
+          }
+        ]
+      },
+      "output_dir": "/tmp/s7_eval/apb_uart/dv",
+      "assertions": [
+        {
+          "id": "a1",
+          "description": "Per-VIP assertion directories created: apb_vip_agent/assertions/ and uart_vip_agent/assertions/",
+          "check": "dv/agents/apb_vip_agent/assertions/apb_vip_if_assertions.sv exists AND dv/agents/uart_vip_agent/assertions/uart_vip_if_assertions.sv exists"
+        },
+        {
+          "id": "a2",
+          "description": "APB assertion correctly assigned to apb_vip (pclk/presetn/psel/penable match APB signal list)",
+          "check": "apb_vip_if_assertions.sv contains CHK_UART_APB_PROTOCOL_001 AND p_apb_setup"
+        },
+        {
+          "id": "a3",
+          "description": "UART assertion correctly assigned to uart_vip (txd/clk match UART signal list)",
+          "check": "uart_vip_if_assertions.sv contains CHK_UART_TX_FUNCTIONAL_001 AND p_uart_start"
+        },
+        {
+          "id": "a4",
+          "description": "Every assert has matching cover property with COV_ label and $info action",
+          "check": "apb_vip_if_assertions.sv contains COV_CHK_UART_APB_PROTOCOL_001 AND cover property AND $info(\"[COV]\""
+        },
+        {
+          "id": "a5",
+          "description": "Pass action block added: $info('[PASS] CHK_ID...') on assert pass side",
+          "check": "apb_vip_if_assertions.sv contains \"[PASS] CHK_UART_APB_PROTOCOL_001\""
+        },
+        {
+          "id": "a6",
+          "description": "Empty assertion_code row (CHK_UART_TX_DATA_INTEGRITY_001) gets auto protocol stub with NEEDS_REVIEW",
+          "check": "uart_vip_if_assertions.sv contains CHK_UART_TX_DATA_INTEGRITY_001 AND NEEDS_REVIEW"
+        },
+        {
+          "id": "a7",
+          "description": "Assertion control: $assertoff at time-0, $asserton after rst_n posedge in each module",
+          "check": "apb_vip_if_assertions.sv contains $assertoff AND @(posedge rst_n) AND $asserton"
+        },
+        {
+          "id": "a8",
+          "description": "DUT bind module generated with bind blocks for both VIPs and dut_internal_assertions module",
+          "check": "apb_uart_dut_bind.sv contains bind apb_uart_tb_top apb_vip_if_assertions AND bind apb_uart_tb_top uart_vip_if_assertions AND apb_uart_dut_internal_assertions"
+        },
+        {
+          "id": "a9",
+          "description": "UVM assertion checker generated with all 3 CHK_IDs registered in _register_all_checkers",
+          "check": "apb_uart_assertion_checker.sv contains CHK_UART_APB_PROTOCOL_001 AND CHK_UART_TX_FUNCTIONAL_001 AND CHK_UART_TX_DATA_INTEGRITY_001"
+        },
+        {
+          "id": "a10",
+          "description": "compile.f updated: VIP assertion .sv files before tb_top, bind file last",
+          "check": "compile.f contains apb_vip_if_assertions.sv AND uart_vip_if_assertions.sv AND apb_uart_dut_bind.sv (bind file appears after other assertion entries)"
+        }
+      ]
+    },
+
+    {
+      "id": "s7_eval_2_auto_protocol_stubs",
+      "name": "AXI4 VIP with no testplan assertions — auto-generate protocol stubs",
+      "description": "VIP has no Assertion rows in testplan. Skill must auto-generate AXI4 protocol-standard properties (awvalid_stable, wvalid_stable, arvalid_stable) with NEEDS_REVIEW tags.",
+      "input": {
+        "project_name": "axi_dma",
+        "tb_data": {
+          "project_name": "axi_dma",
+          "unique_vips": [
+            {"vip_name": "axi4_vip", "protocol": "AXI4", "data_width": 64, "addr_width": 32,
+             "instances": [{"if_name": "axi_if"}]}
+          ],
+          "ral": {"reg_block_class": "axi_dma_reg_block", "registers": []},
+          "env": {"virtual_seqr_class": "axi_dma_virtual_seqr"},
+          "base_test": {"base_test_class": "axi_dma_base_test"}
+        },
+        "testplan_rows": []
+      },
+      "output_dir": "/tmp/s7_eval/axi_dma/dv",
+      "assertions": [
+        {
+          "id": "a1",
+          "description": "Auto-generated AXI4 properties: awvalid_stable, wvalid_stable, arvalid_stable",
+          "check": "axi4_vip_if_assertions.sv contains p_axi_awvalid_stable AND p_axi_wvalid_stable AND p_axi_arvalid_stable"
+        },
+        {
+          "id": "a2",
+          "description": "Auto-generated properties have NEEDS_REVIEW tag",
+          "check": "axi4_vip_if_assertions.sv contains NEEDS_REVIEW"
+        },
+        {
+          "id": "a3",
+          "description": "dv_assertions_data.json summary shows auto_generated > 0",
+          "check": "dv_assertions_data.json summary.auto_generated >= 3"
+        }
+      ]
+    }
+
+  ]
+}

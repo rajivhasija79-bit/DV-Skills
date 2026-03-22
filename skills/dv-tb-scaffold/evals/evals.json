@@ -1,0 +1,232 @@
+{
+  "skill_name": "dv-tb-scaffold",
+  "skill_version": "1.0",
+  "description": "Evals for S5 dv-tb-scaffold: VIP generation, RAL model, UVM env scaffold",
+  "test_cases": [
+
+    {
+      "id": "s5_eval_1_ahb_spi_i2c",
+      "name": "AHB+SPI+I2C multi-protocol DUT scaffold",
+      "description": "DUT has AHB-Lite slave for registers, SPI master output, I2C master output, and AXI4 slave data input. Tests VIP deduplication (unique protocols), RAL generation from 5 registers, and full env scaffold.",
+      "input": {
+        "project_name": "data_gw",
+        "project_root": "/tmp/dv_scaffold_test/data_gw",
+        "s1_json_path":  null,
+        "interfaces": [
+          {"name": "ahb_reg_if",   "protocol": "AHB-Lite",     "data_width": 32, "addr_width": 32, "role": "slave"},
+          {"name": "axi4s_in_if",  "protocol": "AXI4-Stream",  "data_width": 64, "addr_width": 0,  "role": "slave"},
+          {"name": "spi_out_if",   "protocol": "SPI",          "data_width": 8,  "addr_width": 0,  "role": "master"},
+          {"name": "i2c_out_if",   "protocol": "I2C",          "data_width": 1,  "addr_width": 0,  "role": "master"}
+        ],
+        "register_map": {
+          "bus_vip": "ahb_vip",
+          "bus_if":  "ahb_reg_if",
+          "base_addr": "0x0",
+          "registers": [
+            {"name": "CTRL",       "offset": "0x00", "reset_value": "0x00000000",
+             "fields": [{"name": "MODE",   "bits": "[1:0]", "width": 2,  "access": "RW", "reset_value": "0x0"},
+                        {"name": "ENABLE", "bits": "[2]",   "width": 1,  "access": "RW", "reset_value": "0x0"}]},
+            {"name": "STATUS",     "offset": "0x04", "reset_value": "0x00000000",
+             "fields": [{"name": "BUSY",   "bits": "[0]",   "width": 1,  "access": "RO", "reset_value": "0x0"},
+                        {"name": "DONE",   "bits": "[1]",   "width": 1,  "access": "W1C","reset_value": "0x0"}]},
+            {"name": "DATA_SIZE",  "offset": "0x08", "reset_value": "0x00000000",
+             "fields": [{"name": "SIZE",   "bits": "[7:0]", "width": 8,  "access": "RW", "reset_value": "0x0"}]},
+            {"name": "IRQ_EN",     "offset": "0x0C", "reset_value": "0x00000000",
+             "fields": [{"name": "DONE_EN","bits": "[0]",   "width": 1,  "access": "RW", "reset_value": "0x0"},
+                        {"name": "ERR_EN", "bits": "[1]",   "width": 1,  "access": "RW", "reset_value": "0x0"}]},
+            {"name": "IRQ_STATUS", "offset": "0x10", "reset_value": "0x00000000",
+             "fields": [{"name": "IRQ",    "bits": "[1:0]", "width": 2,  "access": "W1C","reset_value": "0x0"}]}
+          ]
+        },
+        "ref_model": {"exists": false}
+      },
+      "output_dir": "/tmp/dv_scaffold_test/data_gw/dv",
+      "assertions": [
+        {
+          "id": "a1",
+          "description": "4 unique VIPs identified: ahb_vip, axi4s_vip, spi_vip, i2c_vip",
+          "check": "unique_vip_count == 4 AND vip_names contains ahb_vip AND axi4s_vip AND spi_vip AND i2c_vip"
+        },
+        {
+          "id": "a2",
+          "description": "Each VIP has all 11 component files generated",
+          "check": "for each vip: _if.sv, _seq_item.sv, _cfg.sv, _driver.sv, _monitor.sv, _sequencer.sv, _coverage.sv, _agent.sv, _base_seq.sv, _reset_seq.sv, _agent_pkg.sv all present"
+        },
+        {
+          "id": "a3",
+          "description": "RAL model generated with 5 registers and correct AHB adapter",
+          "check": "ral/data_gw_reg_block.sv exists AND contains 5 register handles AND ahb_vip_ral_adapter.sv exists"
+        },
+        {
+          "id": "a4",
+          "description": "All env files generated",
+          "check": "env_cfg, ref_model, scoreboard, env, virtual_seqr, tb_top, dut_stub, env_pkg all present"
+        },
+        {
+          "id": "a5",
+          "description": "Parameterized VIPs: AXI4-Stream uses DATA_WIDTH=64, AHB uses DATA_WIDTH=32",
+          "check": "axi4s_vip_if.sv parameter DATA_WIDTH default=64 AND ahb_vip_if.sv parameter DATA_WIDTH default=32"
+        },
+        {
+          "id": "a6",
+          "description": "Interface files include clocking blocks, modports, and SVA comment block",
+          "check": "each _if.sv contains clocking driver_cb AND clocking monitor_cb AND modport master_mp AND modport monitor_mp"
+        },
+        {
+          "id": "a7",
+          "description": "RAL adapter uses correct VIP: ahb_vip_ral_adapter",
+          "check": "ahb_vip_ral_adapter.sv exists AND reg_block.sv includes ahb_vip_ral_adapter"
+        },
+        {
+          "id": "a8",
+          "description": "dv_tb_data.json output file written with correct schema",
+          "check": "dv_tb_data.json contains project_name=data_gw, unique_vips array len=4, ral.reg_count=5"
+        },
+        {
+          "id": "a9",
+          "description": "DUT stub has correct module name and safe output assignments",
+          "check": "data_gw_dut_stub.sv contains module data_gw_dut AND TODO port comments for each interface"
+        },
+        {
+          "id": "a10",
+          "description": "env.sv instantiates all 4 agents with correct parameterization",
+          "check": "data_gw_env.sv contains m_ahb_reg_if_agent AND m_axi4s_in_if_agent AND m_spi_out_if_agent AND m_i2c_out_if_agent"
+        }
+      ]
+    },
+
+    {
+      "id": "s5_eval_2_tilelink_parameterized",
+      "name": "Dual TileLink instances with different data widths",
+      "description": "DUT has two TileLink interfaces with different data widths (256-bit and 128-bit) — tests single parameterized VIP with two different parameter sets. Also has APB slave for registers.",
+      "input": {
+        "project_name": "tl_router",
+        "project_root": "/tmp/dv_scaffold_test/tl_router",
+        "s1_json_path":  null,
+        "interfaces": [
+          {"name": "apb_reg_if",  "protocol": "APB",      "data_width": 32,  "addr_width": 32,  "role": "slave"},
+          {"name": "tl_wide_if",  "protocol": "TileLink",  "data_width": 256, "addr_width": 64,  "role": "slave"},
+          {"name": "tl_narrow_if","protocol": "TileLink",  "data_width": 128, "addr_width": 64,  "role": "master"}
+        ],
+        "register_map": {
+          "bus_vip": "apb_vip",
+          "bus_if":  "apb_reg_if",
+          "base_addr": "0x0",
+          "registers": [
+            {"name": "ROUTE_CTRL", "offset": "0x00", "reset_value": "0x00000000",
+             "fields": [{"name": "ROUTE_MODE", "bits": "[2:0]", "width": 3, "access": "RW", "reset_value": "0x0"}]},
+            {"name": "ROUTE_STATUS","offset": "0x04", "reset_value": "0x00000000",
+             "fields": [{"name": "ACTIVE", "bits": "[0]", "width": 1, "access": "RO", "reset_value": "0x0"}]}
+          ]
+        },
+        "ref_model": {"exists": false}
+      },
+      "output_dir": "/tmp/dv_scaffold_test/tl_router/dv",
+      "assertions": [
+        {
+          "id": "a1",
+          "description": "Only 2 unique VIPs: tilelink_vip (used twice) and apb_vip — not 3 separate VIPs",
+          "check": "unique_vip_count == 2 AND vip_names contains tilelink_vip AND apb_vip"
+        },
+        {
+          "id": "a2",
+          "description": "TileLink VIP is parameterized: interface instantiated twice with different DATA_WIDTH",
+          "check": "tb_top.sv contains tilelink_vip_if #(.DATA_WIDTH(256)) u_tl_wide_if AND tilelink_vip_if #(.DATA_WIDTH(128)) u_tl_narrow_if"
+        },
+        {
+          "id": "a3",
+          "description": "TileLink interface signals match TileLink Channel A and D (a_opcode, d_opcode etc.)",
+          "check": "tilelink_vip_if.sv contains a_opcode AND a_address AND a_valid AND d_opcode AND d_data AND d_valid"
+        },
+        {
+          "id": "a4",
+          "description": "APB RAL adapter generated (apb_vip_ral_adapter)",
+          "check": "apb_vip_ral_adapter.sv exists AND contains uvm_reg_adapter"
+        },
+        {
+          "id": "a5",
+          "description": "env instantiates m_tl_wide_if_agent and m_tl_narrow_if_agent as separate instances",
+          "check": "tl_router_env.sv contains m_tl_wide_if_agent AND m_tl_narrow_if_agent"
+        },
+        {
+          "id": "a6",
+          "description": "Virtual sequencer has sequencer handles for all 3 interface instances",
+          "check": "tl_router_virtual_seqr.sv contains m_apb_reg_if_seqr AND m_tl_wide_if_seqr AND m_tl_narrow_if_seqr"
+        },
+        {
+          "id": "a7",
+          "description": "APB interface includes clocking blocks with correct APB signals",
+          "check": "apb_vip_if.sv contains paddr AND psel AND penable AND pwrite AND pwdata AND prdata AND pready"
+        }
+      ]
+    },
+
+    {
+      "id": "s5_eval_3_no_s1_user_provides",
+      "name": "No prior skill outputs — user provides interface info interactively",
+      "description": "No S1/S2/S3/S4 outputs available. Skill must ask user for interface list, register map, and other missing info. Tests the interactive fallback path.",
+      "input": {
+        "project_name": "apb_uart",
+        "project_root": "/tmp/dv_scaffold_test/apb_uart",
+        "s1_json_path":  null,
+        "s2_json_path":  null,
+        "s4_json_path":  null,
+        "user_responses": {
+          "interfaces": [
+            {"name": "apb_if",  "protocol": "APB",  "data_width": 32, "addr_width": 32, "role": "slave"},
+            {"name": "uart_if", "protocol": "UART",  "data_width": 1,  "addr_width": 0,  "role": "master"}
+          ],
+          "register_map": {
+            "bus_vip": "apb_vip",
+            "bus_if":  "apb_if",
+            "base_addr": "0x0",
+            "registers": [
+              {"name": "UART_CTRL",  "offset": "0x00", "reset_value": "0x00000000",
+               "fields": [{"name": "TX_EN", "bits": "[0]", "width": 1, "access": "RW", "reset_value": "0x0"},
+                          {"name": "RX_EN", "bits": "[1]", "width": 1, "access": "RW", "reset_value": "0x0"}]},
+              {"name": "UART_STATUS","offset": "0x04", "reset_value": "0x00000000",
+               "fields": [{"name": "TX_FULL", "bits": "[0]", "width": 1, "access": "RO", "reset_value": "0x0"},
+                          {"name": "RX_EMPTY","bits": "[1]", "width": 1, "access": "RO", "reset_value": "0x0"}]}
+            ]
+          },
+          "ref_model_exists": false,
+          "register_bus": "apb_if"
+        }
+      },
+      "output_dir": "/tmp/dv_scaffold_test/apb_uart/dv",
+      "assertions": [
+        {
+          "id": "a1",
+          "description": "Skill asks for interface list when no S1 JSON provided",
+          "check": "skill output contains question asking user to list DUT interfaces"
+        },
+        {
+          "id": "a2",
+          "description": "2 unique VIPs generated: apb_vip and uart_vip",
+          "check": "unique_vip_count == 2 AND vip_names contains apb_vip AND uart_vip"
+        },
+        {
+          "id": "a3",
+          "description": "UART interface signals: txd, rxd, rts_n, cts_n",
+          "check": "uart_vip_if.sv contains txd AND rxd"
+        },
+        {
+          "id": "a4",
+          "description": "RAL generated with 2 registers (UART_CTRL, UART_STATUS)",
+          "check": "apb_uart_reg_block.sv contains uart_ctrl AND uart_status handles"
+        },
+        {
+          "id": "a5",
+          "description": "Terminal summary mentions which VIPs were generated and what TODOs remain",
+          "check": "output contains TODO count for drive_item tasks AND collect_transaction tasks"
+        },
+        {
+          "id": "a6",
+          "description": "Skill asks user about reference model existence before generating ref_model.sv",
+          "check": "skill output contains question about reference model before writing ref_model file"
+        }
+      ]
+    }
+
+  ]
+}

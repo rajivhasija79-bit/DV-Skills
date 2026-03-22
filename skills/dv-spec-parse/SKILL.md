@@ -78,6 +78,34 @@ Extract the following sections. For each section:
 9. **Operating Modes** — All modes the DUT can be configured into
 10. **Compliance Standards** — Protocols/standards the block must comply with (AXI4, APB, USB, etc.)
 11. **Known Constraints** — Design constraints, timing requirements, or limitations explicitly stated
+12. **Register Map** — For every register in the DUT, extract:
+    - Register name (as it appears in spec)
+    - Byte offset (hex)
+    - Reset value (hex)
+    - Register description (1–2 sentences)
+    - Whether it is a shadowed register (yes/no)
+    - Whether it is an interrupt status/mask/enable register (yes/no)
+    - For each field within the register:
+      - Field name
+      - Bit range (e.g. `[7:4]`)
+      - Width (bits)
+      - Access type: `RW` / `RO` / `WO` / `W1C` / `W1S` / `RC` / `RS` / `RSVD`
+      - Reset value (per-field, hex or binary)
+      - Description
+    If no registers are present (e.g. no memory-mapped registers in spec), set `register_map` to `[]`
+    and add a `⚠️ NEEDS_REVIEW` note.
+
+13. **Proprietary / Non-standard Interfaces** — For any interface whose protocol does NOT match a
+    standard (AXI4, AXI4-Lite, AXI4-Stream, AHB, APB, SPI, I2C, UART, PCIe, USB, TileLink, CHI,
+    ACE), extract the full protocol detail needed to generate a VIP:
+    - Signal-by-signal list: signal name, direction, width, description
+    - Clock/reset relationships (which clock drives this interface)
+    - Protocol phases: describe each phase (e.g. arbitration, address, data, response)
+    - Timing diagram in prose form (e.g. "addr valid on rising edge, data captured 2 cycles later")
+    - Handshake mechanism (req/ack, valid/ready, or other)
+    - Ordering rules (in-order, out-of-order, pipelined?)
+    - Error signaling mechanism
+    If all interfaces are standard protocols, set `proprietary_interfaces` to `[]`.
 
 ---
 
@@ -136,6 +164,43 @@ this schema exactly (this is the canonical downstream-compatible format):
   "operating_modes":    [{ "name": "", "description": "", "configuration": "" }],
   "compliance_standards": [{ "standard": "", "version": "", "notes": "" }],
   "known_constraints":  [],
+  "register_map": [
+    {
+      "name":        "REG_NAME",
+      "offset":      "0x00",
+      "reset_value": "0x00000000",
+      "description": "",
+      "is_shadowed":    false,
+      "is_interrupt_reg": false,
+      "fields": [
+        {
+          "name":        "FIELD_NAME",
+          "bits":        "[7:0]",
+          "width":       8,
+          "access":      "RW",
+          "reset_value": "0x00",
+          "description": ""
+        }
+      ]
+    }
+  ],
+  "proprietary_interfaces": [
+    {
+      "name":       "if_name",
+      "description": "",
+      "signals": [
+        { "name": "", "direction": "", "width": "", "description": "" }
+      ],
+      "clock":        "clk_name",
+      "reset":        "rst_name",
+      "phases": [
+        { "name": "", "description": "", "timing": "" }
+      ],
+      "handshake":    "req/ack | valid/ready | other — describe",
+      "ordering":     "in-order | out-of-order | pipelined",
+      "error_signal": ""
+    }
+  ],
   "needs_review":       []
 }
 ```
@@ -182,6 +247,8 @@ Then print the terminal summary manually:
     Clock Domains     : <N>
     Operating Modes   : <N>
     Compliance Stds   : <N>
+    Registers         : <N>  (fields: <N>)
+    Proprietary IFs   : <N>
 ------------------------------------------------------------
   ⚠️  Items needing review : <N>
   Output files:
@@ -189,6 +256,7 @@ Then print the terminal summary manually:
     → <OUTPUT_DIR>/dv_spec_summary.json
 ------------------------------------------------------------
   Next step: run /dv-testplan to generate the testplan
+  Note: Register map (Registers: <N>) feeds /dv-tb-scaffold (S5) RAL generation
 ============================================================
 ```
 

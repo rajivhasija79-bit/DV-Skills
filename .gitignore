@@ -1,2 +1,12 @@
 *.rbc
 *.fyc
+.DS_Store
+**/.DS_Store
+
+# TileLink skill run outputs — do not check in
+tilelink/
+
+# GUI runtime outputs
+dv-gui/runs/
+dv-gui/__pycache__/
+dv-gui/*.pyc

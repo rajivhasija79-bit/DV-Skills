@@ -1,0 +1,2322 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DV Skills</title>
+<script>
+  // Prevent flash of wrong theme
+  (function(){
+    const t = localStorage.getItem('dv-theme') || 'light';
+    document.documentElement.dataset.theme = t;
+  })();
+</script>
+<style>
+/* ═══════════════════════════════════════════════════════════════════════════
+   DV SKILLS — Apple-quality design system
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* Accent */
+  --blue:        #007AFF;
+  --blue-hover:  #0066D6;
+  --blue-light:  rgba(0,122,255,.10);
+  --blue-ring:   rgba(0,122,255,.30);
+
+  /* Status */
+  --green:   #34C759;
+  --red:     #FF3B30;
+  --orange:  #FF9F0A;
+  --purple:  #AF52DE;
+
+  /* Surfaces */
+  --bg:          #F2F2F7;
+  --surface:     #FFFFFF;
+  --surface-2:   #F9F9FB;
+  --sidebar-bg:  rgba(242,242,247,.85);
+  --terminal-bg: #0D0D0F;
+
+  /* Text */
+  --t1:  #1D1D1F;
+  --t2:  #3C3C43;
+  --t3:  #8E8E93;
+  --t4:  #AEAEB2;
+
+  /* Borders */
+  --border:   rgba(0,0,0,.08);
+  --border-s: rgba(0,0,0,.15);
+
+  /* Shadow */
+  --sh-xs: 0 1px 2px rgba(0,0,0,.06);
+  --sh-sm: 0 2px 8px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
+  --sh-md: 0 4px 16px rgba(0,0,0,.10), 0 2px 4px rgba(0,0,0,.06);
+  --sh-lg: 0 12px 40px rgba(0,0,0,.12), 0 4px 12px rgba(0,0,0,.08);
+  --sh-xl: 0 24px 64px rgba(0,0,0,.16), 0 8px 24px rgba(0,0,0,.10);
+
+  /* Radius */
+  --r-xs: 4px;  --r-sm: 6px;  --r-md: 10px;
+  --r-lg: 14px; --r-xl: 20px; --r-pill: 999px;
+
+  /* Type */
+  --font:  -apple-system, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+  --mono:  "SF Mono", "Fira Code", "JetBrains Mono", "Menlo", monospace;
+
+  /* Motion */
+  --ease:    cubic-bezier(.25,.46,.45,.94);
+  --spring:  cubic-bezier(.34,1.56,.64,1);
+  --fast:    120ms;
+  --normal:  220ms;
+  --slow:    380ms;
+
+  /* Layout */
+  --sidebar-w: 240px;
+  --header-h:  52px;
+}
+
+[data-theme="dark"] {
+  --bg:         #000000;
+  --surface:    #1C1C1E;
+  --surface-2:  #2C2C2E;
+  --sidebar-bg: rgba(22,22,26,.9);
+  --t1:  #F5F5F7;
+  --t2:  #EBEBF5;
+  --t3:  #8E8E93;
+  --t4:  #48484A;
+  --border:   rgba(255,255,255,.08);
+  --border-s: rgba(255,255,255,.16);
+  --sh-sm: 0 2px 8px rgba(0,0,0,.4);
+  --sh-md: 0 4px 16px rgba(0,0,0,.5);
+  --sh-lg: 0 12px 40px rgba(0,0,0,.6);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--t1);
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+/* ── App shell ────────────────────────────────────────────────────────────── */
+#app {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ── Sidebar ──────────────────────────────────────────────────────────────── */
+#sidebar {
+  width: var(--sidebar-w);
+  flex-shrink: 0;
+  background: var(--sidebar-bg);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 10;
+}
+
+.sb-header {
+  height: var(--header-h);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 14px 0 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.sb-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -.01em;
+  color: var(--t1);
+}
+.sb-brand-icon {
+  width: 28px; height: 28px;
+  background: var(--blue);
+  border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  box-shadow: var(--sh-xs);
+}
+.sb-theme-btn {
+  width: 28px; height: 28px;
+  border: none; background: transparent;
+  color: var(--t3);
+  cursor: pointer;
+  border-radius: var(--r-sm);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px;
+  transition: background var(--fast) var(--ease), color var(--fast) var(--ease);
+}
+.sb-theme-btn:hover { background: var(--border); color: var(--t1); }
+
+.sb-scroll { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 8px 0; }
+.sb-scroll::-webkit-scrollbar { width: 4px; }
+.sb-scroll::-webkit-scrollbar-thumb { background: var(--border-s); border-radius: 2px; }
+
+.sb-section-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--t3);
+  padding: 12px 16px 4px;
+}
+
+.sb-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 12px 7px 14px;
+  margin: 1px 8px;
+  border-radius: var(--r-md);
+  cursor: pointer;
+  transition: background var(--fast) var(--ease);
+  user-select: none;
+  position: relative;
+}
+.sb-item:hover { background: var(--border); }
+.sb-item.active {
+  background: var(--blue);
+  color: white;
+}
+.sb-item.active .sb-item-name { color: white; }
+.sb-item.active .sb-badge { background: rgba(255,255,255,.25); color: white; }
+.sb-item.disabled { opacity: .45; pointer-events: none; }
+
+.sb-icon {
+  width: 28px; height: 28px;
+  border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+  transition: transform var(--fast) var(--spring);
+}
+.sb-item:hover .sb-icon { transform: scale(1.08); }
+.sb-item.active .sb-icon { transform: scale(1.0); }
+
+.sb-item-name {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--t1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sb-item-sub {
+  font-size: 11px;
+  color: var(--t3);
+  margin-top: 1px;
+}
+
+.sb-badge {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: var(--r-pill);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.sb-badge.idle     { background: var(--surface-2); color: var(--t4); }
+.sb-badge.success  { background: rgba(52,199,89,.15); color: var(--green); }
+.sb-badge.error    { background: rgba(255,59,48,.12); color: var(--red); }
+.sb-badge.running  { background: rgba(0,122,255,.12); color: var(--blue); }
+.sb-badge.pending  { background: var(--surface-2); color: var(--t4); }
+
+.sb-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  flex-shrink: 0;
+}
+.sb-dot.idle     { background: var(--t4); }
+.sb-dot.success  { background: var(--green); }
+.sb-dot.error    { background: var(--red); }
+.sb-dot.running  { background: var(--blue); animation: pulse 1.2s ease-in-out infinite; }
+.sb-dot.pending  { background: transparent; border: 1.5px solid var(--t4); }
+
+@keyframes pulse {
+  0%,100% { opacity:1; transform:scale(1); }
+  50% { opacity:.6; transform:scale(.85); }
+}
+
+.sb-footer {
+  padding: 10px 12px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.sb-reset-btn {
+  width: 100%;
+  padding: 7px;
+  border: 1px solid var(--border-s);
+  background: transparent;
+  color: var(--t3);
+  font-family: var(--font);
+  font-size: 12px;
+  border-radius: var(--r-md);
+  cursor: pointer;
+  transition: all var(--fast) var(--ease);
+}
+.sb-reset-btn:hover { background: var(--border); color: var(--t1); }
+
+/* ── Main panel ───────────────────────────────────────────────────────────── */
+#main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.main-header {
+  height: var(--header-h);
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  flex-shrink: 0;
+  gap: 12px;
+}
+.main-header h1 {
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -.01em;
+  color: var(--t1);
+  flex: 1;
+}
+.main-header-sub {
+  font-size: 13px;
+  color: var(--t3);
+}
+
+.main-body {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+/* ── Views ────────────────────────────────────────────────────────────────── */
+.view {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  transition: opacity var(--normal) var(--ease), transform var(--normal) var(--ease);
+}
+.view.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(12px);
+}
+.view::-webkit-scrollbar { width: 6px; }
+.view::-webkit-scrollbar-thumb { background: var(--border-s); border-radius: 3px; }
+
+/* ── Dashboard ────────────────────────────────────────────────────────────── */
+#view-dash {
+  padding: 28px 28px 100px;
+}
+
+.dash-hero {
+  margin-bottom: 28px;
+}
+.dash-hero h2 {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -.02em;
+  color: var(--t1);
+  margin-bottom: 6px;
+}
+.dash-hero p {
+  font-size: 15px;
+  color: var(--t3);
+  line-height: 1.5;
+}
+
+.dash-progress {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 28px;
+  background: var(--surface);
+  border-radius: var(--r-lg);
+  padding: 14px 18px;
+  box-shadow: var(--sh-sm);
+  border: 1px solid var(--border);
+}
+.dash-progress-label { font-size: 13px; color: var(--t3); white-space: nowrap; }
+.dash-progress-bar {
+  flex: 1;
+  height: 6px;
+  background: var(--border-s);
+  border-radius: var(--r-pill);
+  overflow: hidden;
+}
+.dash-progress-fill {
+  height: 100%;
+  background: var(--green);
+  border-radius: var(--r-pill);
+  transition: width var(--slow) var(--ease);
+}
+.dash-progress-count { font-size: 13px; font-weight: 600; color: var(--t1); white-space: nowrap; }
+
+.dash-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 14px;
+}
+
+.skill-card {
+  background: var(--surface);
+  border-radius: var(--r-lg);
+  border: 1px solid var(--border);
+  box-shadow: var(--sh-sm);
+  cursor: pointer;
+  transition: transform var(--normal) var(--ease), box-shadow var(--normal) var(--ease);
+  overflow: hidden;
+  position: relative;
+}
+.skill-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--sh-md);
+}
+.skill-card:active { transform: translateY(0); }
+.skill-card.disabled { opacity: .55; cursor: not-allowed; }
+.skill-card.disabled:hover { transform: none; box-shadow: var(--sh-sm); }
+
+.skill-card-bar {
+  height: 3px;
+  background: var(--t4);
+}
+.skill-card-bar.success { background: var(--green); }
+.skill-card-bar.error   { background: var(--red); }
+.skill-card-bar.running { background: var(--blue);
+  background: linear-gradient(90deg, var(--blue) 0%, #5AC8FA 100%);
+  animation: shimmer 1.4s linear infinite;
+  background-size: 200%;
+}
+@keyframes shimmer { 0%{background-position:200%} 100%{background-position:-200%} }
+
+.skill-card-body { padding: 16px; }
+.skill-card-icon {
+  width: 38px; height: 38px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+.skill-card-tag {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--t3);
+  margin-bottom: 2px;
+}
+.skill-card-name {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -.01em;
+  color: var(--t1);
+  margin-bottom: 4px;
+}
+.skill-card-desc {
+  font-size: 12px;
+  color: var(--t3);
+  line-height: 1.45;
+  margin-bottom: 12px;
+}
+.skill-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.skill-card-status {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: var(--r-pill);
+}
+.skill-card-status.idle    { background: var(--surface-2); color: var(--t4); }
+.skill-card-status.success { background: rgba(52,199,89,.12); color: var(--green); }
+.skill-card-status.error   { background: rgba(255,59,48,.10); color: var(--red); }
+.skill-card-status.running { background: rgba(0,122,255,.10); color: var(--blue); }
+.skill-card-status.pending { background: var(--surface-2); color: var(--t4); }
+.skill-card-open {
+  font-size: 12px;
+  color: var(--blue);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+/* ── Wizard ───────────────────────────────────────────────────────────────── */
+#view-wizard {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.wizard-header {
+  padding: 20px 28px 0;
+  flex-shrink: 0;
+}
+.wizard-skill-tag {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--t3);
+  margin-bottom: 4px;
+}
+.wizard-skill-name {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -.02em;
+  color: var(--t1);
+  margin-bottom: 4px;
+}
+.wizard-skill-desc {
+  font-size: 14px;
+  color: var(--t3);
+  line-height: 1.5;
+  margin-bottom: 18px;
+}
+
+/* Dependency strip */
+.dep-strip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+.dep-label { font-size: 12px; color: var(--t3); }
+.dep-chip {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: var(--r-pill);
+}
+.dep-chip.met   { background: rgba(52,199,89,.12); color: var(--green); }
+.dep-chip.unmet { background: rgba(255,59,48,.10); color: var(--red); }
+
+/* Step indicator */
+.step-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 20px;
+}
+.step-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+.step-circle {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--mono);
+  transition: all var(--normal) var(--ease);
+}
+.step-circle.done { background: var(--blue); color: white; }
+.step-circle.current {
+  background: var(--surface);
+  color: var(--blue);
+  border: 2px solid var(--blue);
+  box-shadow: 0 0 0 3px var(--blue-ring);
+}
+.step-circle.future { background: var(--border-s); color: var(--t4); }
+.step-label {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--t3);
+  white-space: nowrap;
+}
+.step-label.current { color: var(--blue); font-weight: 600; }
+.step-connector {
+  flex: 1;
+  height: 2px;
+  background: var(--border-s);
+  min-width: 20px;
+  max-width: 60px;
+  margin: 0 4px;
+  margin-bottom: 20px;
+  transition: background var(--normal) var(--ease);
+}
+.step-connector.done { background: var(--blue); }
+
+/* Step content */
+.wizard-steps-wrap {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  min-height: 0;
+}
+.wizard-step {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  padding: 0 28px 120px;
+  transition: transform var(--normal) var(--ease), opacity var(--normal) var(--ease);
+}
+.wizard-step::-webkit-scrollbar { width: 5px; }
+.wizard-step::-webkit-scrollbar-thumb { background: var(--border-s); border-radius: 3px; }
+.wizard-step.hidden-left  { transform: translateX(-28px); opacity: 0; pointer-events: none; }
+.wizard-step.hidden-right { transform: translateX(28px);  opacity: 0; pointer-events: none; }
+
+.step-title {
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: -.01em;
+  color: var(--t1);
+  margin-bottom: 4px;
+  padding-top: 4px;
+}
+.step-desc {
+  font-size: 13px;
+  color: var(--t3);
+  margin-bottom: 22px;
+  line-height: 1.5;
+}
+
+/* Dep warning banner */
+.dep-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: rgba(255,159,10,.08);
+  border: 1px solid rgba(255,159,10,.25);
+  border-radius: var(--r-md);
+  padding: 12px 14px;
+  margin-bottom: 20px;
+}
+.dep-warning-icon { font-size: 18px; flex-shrink: 0; }
+.dep-warning-text { font-size: 13px; color: var(--t2); line-height: 1.5; }
+.dep-warning strong { color: var(--orange); }
+
+/* Wizard footer */
+.wizard-footer {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  left: var(--sidebar-w);
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 14px 28px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 5;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.wf-spacer { flex: 1; }
+
+/* ── Form elements ────────────────────────────────────────────────────────── */
+.form-group {
+  margin-bottom: 20px;
+}
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+@media (max-width: 640px) { .form-row { grid-template-columns: 1fr; } }
+
+.form-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--t2);
+  margin-bottom: 6px;
+}
+.form-required {
+  color: var(--red);
+  font-size: 11px;
+}
+
+.form-input {
+  width: 100%;
+  height: 36px;
+  padding: 0 11px;
+  background: var(--surface);
+  border: 1px solid var(--border-s);
+  border-radius: var(--r-md);
+  font-family: var(--font);
+  font-size: 14px;
+  color: var(--t1);
+  outline: none;
+  transition: border-color var(--fast) var(--ease), box-shadow var(--fast) var(--ease);
+  -webkit-appearance: none;
+}
+.form-input:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px var(--blue-ring);
+}
+.form-input.error {
+  border-color: var(--red);
+  box-shadow: 0 0 0 3px rgba(255,59,48,.20);
+}
+.form-input[data-mono] { font-family: var(--mono); font-size: 13px; }
+
+.form-select {
+  width: 100%;
+  height: 36px;
+  padding: 0 32px 0 11px;
+  background: var(--surface);
+  border: 1px solid var(--border-s);
+  border-radius: var(--r-md);
+  font-family: var(--font);
+  font-size: 14px;
+  color: var(--t1);
+  outline: none;
+  cursor: pointer;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238E8E93' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 11px center;
+  transition: border-color var(--fast) var(--ease), box-shadow var(--fast) var(--ease);
+}
+.form-select:focus { border-color: var(--blue); box-shadow: 0 0 0 3px var(--blue-ring); }
+
+.form-hint {
+  font-size: 11.5px;
+  color: var(--t3);
+  margin-top: 5px;
+  line-height: 1.4;
+}
+.form-error-msg {
+  font-size: 11.5px;
+  color: var(--red);
+  margin-top: 5px;
+  animation: slideIn var(--fast) var(--ease);
+}
+@keyframes slideIn { from { transform: translateY(-3px); opacity:0; } to { transform: none; opacity:1; } }
+
+/* File / dir picker */
+.file-picker {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+.file-picker-path {
+  flex: 1;
+  font-family: var(--mono);
+  font-size: 12.5px;
+}
+.file-picker-btn {
+  height: 36px;
+  padding: 0 13px;
+  background: var(--surface-2);
+  border: 1px solid var(--border-s);
+  border-radius: var(--r-md);
+  font-family: var(--font);
+  font-size: 13px;
+  color: var(--t2);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background var(--fast) var(--ease);
+  display: flex; align-items: center; gap: 5px;
+}
+.file-picker-btn:hover { background: var(--border); }
+
+/* Toggle */
+.toggle-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+}
+.toggle-track {
+  width: 44px; height: 26px;
+  background: var(--border-s);
+  border-radius: var(--r-pill);
+  position: relative;
+  transition: background var(--normal) var(--ease);
+  flex-shrink: 0;
+}
+.toggle-track.on { background: var(--green); }
+.toggle-thumb {
+  position: absolute;
+  top: 3px; left: 3px;
+  width: 20px; height: 20px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0,0,0,.3);
+  transition: transform var(--normal) var(--spring);
+}
+.toggle-track.on .toggle-thumb { transform: translateX(18px); }
+.toggle-label { font-size: 14px; color: var(--t1); }
+
+/* Chips multi-select */
+.chip-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.chip {
+  padding: 5px 12px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--border-s);
+  background: var(--surface);
+  font-size: 13px;
+  color: var(--t2);
+  cursor: pointer;
+  transition: all var(--fast) var(--ease);
+  user-select: none;
+}
+.chip:hover { border-color: var(--blue); color: var(--blue); }
+.chip.selected {
+  background: var(--blue);
+  border-color: var(--blue);
+  color: white;
+}
+
+/* Number input */
+.num-input-wrap { display: flex; align-items: center; gap: 8px; }
+.num-btn {
+  width: 28px; height: 28px;
+  border: 1px solid var(--border-s);
+  background: var(--surface-2);
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  font-size: 16px;
+  color: var(--t2);
+  display: flex; align-items: center; justify-content: center;
+  transition: background var(--fast);
+  flex-shrink: 0;
+}
+.num-btn:hover { background: var(--border); }
+.num-input {
+  width: 70px;
+  height: 36px;
+  text-align: center;
+}
+
+/* Review section */
+.review-section {
+  background: var(--surface-2);
+  border-radius: var(--r-lg);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+.review-section-header {
+  padding: 10px 16px;
+  background: var(--border);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+  color: var(--t3);
+}
+.review-row {
+  display: flex;
+  padding: 9px 16px;
+  border-bottom: 1px solid var(--border);
+  gap: 16px;
+}
+.review-row:last-child { border-bottom: none; }
+.review-key {
+  width: 160px;
+  font-size: 13px;
+  color: var(--t3);
+  flex-shrink: 0;
+}
+.review-val {
+  font-size: 13px;
+  color: var(--t1);
+  font-family: var(--mono);
+  word-break: break-all;
+}
+.review-val.empty { color: var(--t4); font-family: var(--font); font-style: italic; }
+
+/* ── Buttons ──────────────────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 16px;
+  border-radius: var(--r-md);
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  transition: all var(--fast) var(--ease);
+  white-space: nowrap;
+  user-select: none;
+}
+.btn:active { transform: scale(.97); }
+.btn:disabled { opacity: .4; pointer-events: none; }
+
+.btn-primary {
+  background: var(--blue);
+  color: white;
+  box-shadow: 0 1px 3px rgba(0,122,255,.35);
+}
+.btn-primary:hover { background: var(--blue-hover); }
+
+.btn-run {
+  background: var(--green);
+  color: white;
+  height: 40px;
+  padding: 0 22px;
+  font-size: 15px;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(52,199,89,.35);
+}
+.btn-run:hover { background: #28b84e; }
+
+.btn-secondary {
+  background: var(--surface-2);
+  color: var(--t2);
+  border: 1px solid var(--border-s);
+}
+.btn-secondary:hover { background: var(--border); }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--blue);
+  padding: 0 10px;
+}
+.btn-ghost:hover { background: var(--blue-light); }
+
+.btn-danger {
+  background: rgba(255,59,48,.10);
+  color: var(--red);
+}
+.btn-danger:hover { background: rgba(255,59,48,.18); }
+
+.btn-sm { height: 30px; padding: 0 12px; font-size: 12.5px; }
+
+.spinner {
+  width: 14px; height: 14px;
+  border: 2px solid rgba(255,255,255,.35);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+}
+.spinner.dark {
+  border-color: rgba(0,122,255,.2);
+  border-top-color: var(--blue);
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Terminal panel ───────────────────────────────────────────────────────── */
+#terminal-panel {
+  background: var(--terminal-bg);
+  border-top: 1px solid rgba(255,255,255,.08);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  transition: height var(--slow) var(--ease);
+  height: 36px;
+  overflow: hidden;
+  position: relative;
+}
+#terminal-panel.expanded { height: 40vh; }
+
+.term-header {
+  height: 36px;
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  gap: 8px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.term-title { font-size: 12px; font-weight: 500; color: rgba(255,255,255,.6); flex: 1; }
+.term-badge {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: var(--r-pill);
+}
+.term-badge.idle    { background: rgba(255,255,255,.08); color: rgba(255,255,255,.4); }
+.term-badge.running { background: rgba(0,122,255,.3); color: #5AC8FA; }
+.term-badge.success { background: rgba(52,199,89,.25); color: #32D74B; }
+.term-badge.error   { background: rgba(255,59,48,.25); color: #FF453A; }
+
+.term-actions { display: flex; gap: 4px; align-items: center; }
+.term-btn {
+  height: 24px;
+  padding: 0 8px;
+  border: none;
+  background: rgba(255,255,255,.06);
+  color: rgba(255,255,255,.5);
+  border-radius: var(--r-sm);
+  font-size: 11px;
+  cursor: pointer;
+  transition: background var(--fast);
+}
+.term-btn:hover { background: rgba(255,255,255,.12); color: rgba(255,255,255,.8); }
+
+.term-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 0;
+  opacity: 0;
+  transition: opacity var(--fast) var(--ease) .15s;
+}
+#terminal-panel.expanded .term-body { opacity: 1; }
+.term-body::-webkit-scrollbar { width: 4px; }
+.term-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); }
+
+.term-line {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 1.5px 16px;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  line-height: 1.65;
+}
+.term-ts {
+  font-size: 10px;
+  color: rgba(255,255,255,.2);
+  flex-shrink: 0;
+  min-width: 52px;
+}
+.term-text { white-space: pre-wrap; word-break: break-word; }
+.term-line.stdout .term-text { color: #E5E5EA; }
+.term-line.stderr .term-text { color: #FF9F0A; }
+.term-line.system .term-text { color: #64D2FF; font-style: italic; }
+.term-line.success .term-text { color: #32D74B; }
+.term-line.exit-fail .term-text { color: #FF453A; }
+
+/* ── File picker modal ────────────────────────────────────────────────────── */
+#fp-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--normal) var(--ease);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+#fp-modal.open { opacity: 1; pointer-events: all; }
+
+.fp-window {
+  width: min(560px, 92vw);
+  background: var(--surface);
+  border-radius: var(--r-xl);
+  box-shadow: var(--sh-xl);
+  overflow: hidden;
+  transform: scale(.95) translateY(8px);
+  transition: transform var(--normal) var(--spring);
+}
+#fp-modal.open .fp-window { transform: none; }
+
+.fp-header {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.fp-header h3 { font-size: 15px; font-weight: 600; flex: 1; }
+.fp-breadcrumb {
+  font-size: 12px;
+  color: var(--t3);
+  font-family: var(--mono);
+  background: var(--surface-2);
+  border-radius: var(--r-sm);
+  padding: 4px 9px;
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  direction: rtl;
+  text-align: left;
+}
+.fp-list {
+  max-height: 340px;
+  overflow-y: auto;
+  padding: 6px;
+}
+.fp-list::-webkit-scrollbar { width: 4px; }
+.fp-list::-webkit-scrollbar-thumb { background: var(--border-s); }
+.fp-list-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 11px;
+  border-radius: var(--r-md);
+  cursor: pointer;
+  transition: background var(--fast);
+}
+.fp-list-item:hover { background: var(--blue-light); }
+.fp-list-item.selected { background: var(--blue-light); }
+.fp-icon { font-size: 16px; flex-shrink: 0; width: 22px; text-align: center; }
+.fp-name { font-size: 13.5px; color: var(--t1); flex: 1; }
+.fp-name.dir { font-weight: 500; }
+.fp-size { font-size: 11px; color: var(--t3); }
+.fp-footer {
+  padding: 12px 16px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.fp-selected-path {
+  flex: 1;
+  font-size: 12px;
+  font-family: var(--mono);
+  color: var(--t3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Misc ─────────────────────────────────────────────────────────────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--r-pill);
+}
+.divider { height: 1px; background: var(--border); margin: 20px 0; }
+.empty-state {
+  padding: 48px 24px;
+  text-align: center;
+  color: var(--t3);
+}
+.empty-state .es-icon { font-size: 40px; margin-bottom: 12px; }
+.empty-state h3 { font-size: 16px; font-weight: 600; color: var(--t2); margin-bottom: 6px; }
+.empty-state p { font-size: 13px; line-height: 1.5; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+}
+</style>
+</head>
+<body>
+
+<div id="app">
+  <!-- Sidebar -->
+  <aside id="sidebar">
+    <div class="sb-header">
+      <div class="sb-brand">
+        <div class="sb-brand-icon">⚡</div>
+        DV Skills
+      </div>
+      <button class="sb-theme-btn" onclick="App.toggleTheme()" title="Toggle dark mode">
+        <span id="theme-icon">🌙</span>
+      </button>
+    </div>
+    <div class="sb-scroll">
+      <div class="sb-section-label">Navigation</div>
+      <div class="sb-item" id="nav-dash" onclick="App.navigate('dash')">
+        <div class="sb-icon" style="background:rgba(0,122,255,.12)">⊞</div>
+        <div><div class="sb-item-name">Dashboard</div></div>
+      </div>
+      <div class="sb-section-label" style="margin-top:4px">Verification Flow</div>
+      <div id="skill-list-1"></div>
+      <div class="sb-section-label" style="margin-top:4px">Implementation</div>
+      <div id="skill-list-2"></div>
+      <div class="sb-section-label" style="margin-top:4px">Analysis</div>
+      <div id="skill-list-3"></div>
+    </div>
+    <div class="sb-footer">
+      <button class="sb-reset-btn" onclick="App.resetAll()">↺ Reset All Skills</button>
+    </div>
+  </aside>
+
+  <!-- Main content -->
+  <main id="main">
+    <div class="main-header">
+      <h1 id="main-title">Dashboard</h1>
+      <div class="main-header-sub" id="main-sub"></div>
+    </div>
+    <div class="main-body">
+      <!-- Dashboard -->
+      <div class="view" id="view-dash">
+        <div style="padding:28px 28px 8px">
+          <div class="dash-hero">
+            <h2>DV Verification Flow</h2>
+            <p>A 10-skill pipeline from specification extraction to coverage sign-off.<br>
+               Complete skills in order — each skill builds on the previous outputs.</p>
+          </div>
+          <div class="dash-progress" id="dash-progress">
+            <span class="dash-progress-label">Overall progress</span>
+            <div class="dash-progress-bar"><div class="dash-progress-fill" id="progress-fill" style="width:0%"></div></div>
+            <span class="dash-progress-count" id="progress-count">0 / 10</span>
+          </div>
+        </div>
+        <div class="dash-grid" style="padding:0 28px 100px" id="dash-grid"></div>
+      </div>
+
+      <!-- Wizard -->
+      <div class="view hidden" id="view-wizard">
+        <div class="wizard-header" id="wizard-header"></div>
+        <div class="wizard-steps-wrap" id="wizard-steps-wrap"></div>
+        <div class="wizard-footer" id="wizard-footer"></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Terminal -->
+<div id="terminal-panel">
+  <div class="term-header" onclick="Terminal.toggle()">
+    <span style="font-size:11px;color:rgba(255,255,255,.35)">▶</span>
+    <span class="term-title" id="term-title">Terminal</span>
+    <span class="term-badge idle" id="term-badge">Idle</span>
+    <div class="term-actions" onclick="event.stopPropagation()">
+      <button class="term-btn" id="term-cancel-btn" style="display:none" onclick="Terminal.cancel()">Cancel</button>
+      <button class="term-btn" onclick="Terminal.clear()">Clear</button>
+    </div>
+  </div>
+  <div class="term-body" id="term-body"></div>
+</div>
+
+<!-- File picker modal -->
+<div id="fp-modal">
+  <div class="fp-window">
+    <div class="fp-header">
+      <h3 id="fp-title">Choose location</h3>
+      <div class="fp-breadcrumb" id="fp-breadcrumb">/</div>
+      <button class="btn btn-secondary btn-sm" onclick="FilePicker.close()">Cancel</button>
+    </div>
+    <div class="fp-list" id="fp-list"></div>
+    <div class="fp-footer">
+      <span class="fp-selected-path" id="fp-selected-path">Nothing selected</span>
+      <button class="btn btn-primary btn-sm" id="fp-select-btn" onclick="FilePicker.confirm()">Select</button>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SKILL DEFINITIONS
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+const SKILLS = [
+  {
+    id:'s1', tag:'S1', name:'Spec Extraction', group:1,
+    color:'#007AFF', icon:'📋',
+    desc:'Extract VIP interfaces, protocols, and register map from specification documents.',
+    deps:[],
+    steps:[
+      { title:'Project Setup', desc:'Name your project and provide the specification document.',
+        fields:[
+          {id:'project_name', label:'Project Name', type:'text', placeholder:'e.g., apb_uart',
+           hint:'Lowercase, underscore-separated. Used for all generated file names.', required:true},
+          {id:'spec_file', label:'Specification Document', type:'file', accept:'.pdf,.docx,.txt,.md',
+           hint:'PDF, Word document, or text specification file describing the DUT.'},
+          {id:'output_dir', label:'Output Directory', type:'dir', placeholder:'./dv',
+           hint:'Where to write dv_spec_data.json and extracted interface files.', required:true},
+        ]},
+      { title:'Protocol Detection', desc:'Select the protocols present in your design.',
+        fields:[
+          {id:'protocols', label:'Expected Protocols', type:'chips',
+           options:['APB','AHB','AHB-Lite','AXI4','AXI4-Stream','SPI','I2C','UART','TileLink','Custom'],
+           hint:'Used to guide interface extraction and VIP selection.'},
+          {id:'extract_ral', label:'Extract Register Map', type:'toggle', def:true,
+           hint:'Parse register definitions and generate a RAL-ready register map.'},
+          {id:'extract_clocks', label:'Extract Clock Domains', type:'toggle', def:true,
+           hint:'Identify and document clock domain crossings.'},
+        ]},
+    ]},
+
+  {
+    id:'s2', tag:'S2', name:'Testplan', group:1,
+    color:'#5856D6', icon:'📝',
+    desc:'Generate a structured verification testplan with CHK_IDs, milestones, and coverage targets.',
+    deps:['s1'],
+    steps:[
+      { title:'Project & Sources', desc:'Set your project name and link the specification data from S1.',
+        fields:[
+          {id:'project_name', label:'Project Name', type:'text', placeholder:'e.g., apb_uart',
+           hint:'Must match the name used in S1.', required:true},
+          {id:'spec_data', label:'S1 Spec Data (dv_spec_data.json)', type:'file', accept:'.json',
+           hint:'Output from S1 — provides VIP interfaces and register map.', inherit:{skill:'s1',field:'output_dir'}},
+          {id:'output_dir', label:'Output Directory', type:'dir', placeholder:'./dv',
+           hint:'Where to write testplan.xlsx and dv_testplan_data.json.', required:true},
+        ]},
+      { title:'Testplan Options', desc:'Choose the output format and milestone structure.',
+        fields:[
+          {id:'format', label:'Output Format', type:'select',
+           options:[{v:'both',l:'Excel + JSON (recommended)'},{v:'xlsx',l:'Excel only'},{v:'json',l:'JSON only'}],
+           def:'both'},
+          {id:'milestone', label:'Target Milestone', type:'select',
+           options:[{v:'all',l:'All milestones (DV-I, DV-C, DV-F)'},{v:'DV-I',l:'DV-I only'},{v:'DV-C',l:'DV-C only'},{v:'DV-F',l:'DV-F only'}],
+           def:'all'},
+        ]},
+    ]},
+
+  {
+    id:'s3', tag:'S3', name:'TB Architecture', group:1,
+    color:'#FF9500', icon:'🏗️',
+    desc:'Design the UVM testbench architecture — agents, env, hierarchy, and VIP deduplication.',
+    deps:['s1','s2'],
+    steps:[
+      { title:'Project & Sources', desc:'Link spec and testplan data to drive TB architecture decisions.',
+        fields:[
+          {id:'project_name', label:'Project Name', type:'text', required:true},
+          {id:'spec_data', label:'Spec Data (dv_spec_data.json)', type:'file', accept:'.json', hint:'From S1.'},
+          {id:'testplan_data', label:'Testplan (dv_testplan_data.json)', type:'file', accept:'.json,.xlsx', hint:'From S2.'},
+          {id:'output_dir', label:'Output Directory', type:'dir', required:true},
+        ]},
+      { title:'Architecture Options', desc:'Configure the UVM TB style and component generation.',
+        fields:[
+          {id:'virtual_seqr', label:'Generate Virtual Sequencer', type:'toggle', def:true,
+           hint:'Adds a virtual sequencer with handles to all VIP sequencers.'},
+          {id:'uvm_version', label:'UVM Version', type:'select',
+           options:[{v:'uvm_1.2',l:'UVM 1.2 (recommended)'},{v:'ieee_uvm',l:'IEEE UVM (1800.2)'}], def:'uvm_1.2'},
+        ]},
+    ]},
+
+  {
+    id:'s4', tag:'S4', name:'RAL Generation', group:1,
+    color:'#FF3B30', icon:'📦',
+    desc:'Generate the UVM Register Abstraction Layer (RAL) from the extracted register map.',
+    deps:['s1'],
+    steps:[
+      { title:'Project & Sources', desc:'Configure RAL generation from the S1 register map.',
+        fields:[
+          {id:'project_name', label:'Project Name', type:'text', required:true},
+          {id:'spec_data', label:'Spec Data (dv_spec_data.json)', type:'file', accept:'.json', hint:'From S1 — provides the register map.'},
+          {id:'output_dir', label:'Output Directory', type:'dir', required:true},
+        ]},
+      { title:'RAL Options', desc:'Configure frontdoor/backdoor access and register sequences.',
+        fields:[
+          {id:'frontdoor_access', label:'Enable Frontdoor Access', type:'toggle', def:true,
+           hint:'Generate bus-protocol frontdoor read/write tasks.'},
+          {id:'backdoor_access', label:'Enable Backdoor Access', type:'toggle', def:true,
+           hint:'Generate direct DUT path backdoor access via UVM RAL.'},
+          {id:'gen_reg_sequences', label:'Generate Register Sequences', type:'toggle', def:true,
+           hint:'Generate hw_reset, bit_bash, and reg_access sequences.'},
+        ]},
+    ]},
+
+  {
+    id:'s5', tag:'S5', name:'TB Scaffold', group:1,
+    color:'#34C759', icon:'🔧',
+    desc:'Generate all UVM TB source files — agents, env, cfg, tests, compile.f, and Makefile.',
+    deps:['s1','s2','s3','s4'],
+    steps:[
+      { title:'Project & Sources', desc:'Link all upstream outputs to drive scaffold generation.',
+        fields:[
+          {id:'project_name', label:'Project Name', type:'text', required:true},
+          {id:'tb_arch_data', label:'TB Arch Data (dv_tb_arch_data.json)', type:'file', accept:'.json', hint:'From S3.'},
+          {id:'ral_data', label:'RAL Data (dv_ral_data.json)', type:'file', accept:'.json', hint:'From S4.'},
+          {id:'output_dir', label:'Output Directory', type:'dir', required:true},
+        ]},
+      { title:'Scaffold Options', desc:'Choose optional extensions to include in the generated TB.',
+        fields:[
+          {id:'run_sanity', label:'Run Compilation Sanity Check', type:'toggle', def:false,
+           hint:'After generation, compile + elaborate + run a minimal sanity simulation.'},
+          {id:'include_cov_hooks', label:'Include Coverage Hooks', type:'toggle', def:true,
+           hint:'Add coverage enable/disable plusargs and covergroup template in env.'},
+        ]},
+    ]},
+
+  {
+    id:'s6', tag:'S6', name:'Sequences', group:2,
+    color:'#5AC8FA', icon:'🎯',
+    desc:'Generate all UVM sequences and test classes from the testplan.',
+    deps:['s5','s2'],
+    steps:[
+      { title:'Project & Sources', desc:'Provide the TB data and testplan to drive sequence generation.',
+        fields:[
+          {id:'project_name', label:'Project Name', type:'text', required:true},
+          {id:'tb_data', label:'TB Data (dv_tb_data.json)', type:'file', accept:'.json', hint:'From S5.', required:true},
+          {id:'testplan', label:'Testplan', type:'file', accept:'.json,.xlsx',
+           hint:'testplan.xlsx or dv_testplan_data.json from S2.'},
+          {id:'output_dir', label:'Output Directory', type:'dir', required:true},
+        ]},
+      { title:'Generation Options', desc:'Configure sequence generation strategy.',
+        fields:[
+          {id:'gen_random', label:'Generate Random Sequences', type:'toggle', def:true,
+           hint:'Generate randomized virtual sequences with configurable constraints.'},
+          {id:'gen_directed', label:'Generate Directed Sequences', type:'toggle', def:true,
+           hint:'Generate one directed sequence per testplan row.'},
+        ]},
+    ]},
+
+  {
+    id:'s7', tag:'S7', name:'Assertions', group:3,
+    color:'#FF6B35', icon:'✅',
+    desc:'Generate per-interface SVA files, bind modules, cover properties, and assertion checker.',
+    deps:['s5'],
+    steps:[
+      { title:'Project & Sources', desc:'Link TB data and optionally the testplan for CHK_ID mapping.',
+        fields:[
+          {id:'project_name', label:'Project Name', type:'text', required:true},
+          {id:'tb_data', label:'TB Data (dv_tb_data.json)', type:'file', accept:'.json', hint:'From S5.', required:true},
+          {id:'testplan', label:'Testplan (optional)', type:'file', accept:'.json,.xlsx',
+           hint:'Maps assertion CHK_IDs to testplan features.'},
+          {id:'output_dir', label:'Output Directory', type:'dir', required:true},
+        ]},
+      { title:'Assertion Options', desc:'Configure what assertion artifacts to generate.',
+        fields:[
+          {id:'auto_gen_protocols', label:'Auto-generate Protocol Properties', type:'toggle', def:true,
+           hint:'Generates standard SVA properties for APB/AXI/UART/SPI/I2C etc.'},
+          {id:'gen_bind_module', label:'Generate DUT Bind Module', type:'toggle', def:true,
+           hint:'Creates a bind file that attaches assertion modules to the DUT.'},
+          {id:'gen_assert_checker', label:'Generate Assertion Checker', type:'toggle', def:true,
+           hint:'UVM component that reports CHK_ID pass/fail counts in report_phase.'},
+          {id:'skip_sva_in_sb', label:'Tag SVA checks to skip in Scoreboard', type:'toggle', def:true,
+           hint:'Writes dv_assertions_data.json so S8 scoreboard skips duplicate checks.'},
+        ]},
+    ]},
+
+  {
+    id:'s8', tag:'S8', name:'Scoreboard', group:3,
+    color:'#AF52DE', icon:'⚖️',
+    desc:'Generate scoreboard, reference model, sb_transaction, and functional coverage model.',
+    deps:['s5','s7'],
+    steps:[
+      { title:'Project & Sources', desc:'Link TB data, assertions, and testplan for scoreboard generation.',
+        fields:[
+          {id:'project_name', label:'Project Name', type:'text', required:true},
+          {id:'tb_data', label:'TB Data (dv_tb_data.json)', type:'file', accept:'.json', hint:'From S5.', required:true},
+          {id:'assert_data', label:'Assertions Data (optional)', type:'file', accept:'.json',
+           hint:'dv_assertions_data.json from S7 — used to skip duplicate SVA checks.'},
+          {id:'testplan', label:'Testplan (optional)', type:'file', accept:'.json,.xlsx',
+           hint:'Used to generate per-CHK_ID check stubs in the scoreboard.'},
+          {id:'output_dir', label:'Output Directory', type:'dir', required:true},
+        ]},
+      { title:'Scoreboard Configuration', desc:'Configure scoreboard style and reference model type.',
+        fields:[
+          {id:'style', label:'Scoreboard Style', type:'select',
+           options:[{v:'in_order',l:'In-order (standard)'},{v:'out_of_order',l:'Out-of-order'}], def:'in_order'},
+          {id:'trigger', label:'Comparison Trigger', type:'select',
+           options:[{v:'auto',l:'Auto (on every response)'},{v:'explicit',l:'Explicit (call check_all())'}], def:'auto'},
+          {id:'ref_model_type', label:'Reference Model Type', type:'select',
+           options:[{v:'sv_stub',l:'SV stub (NEEDS_ENGINEER_REVIEW)'},{v:'dpi_c',l:'DPI-C C model'},{v:'none',l:'None (scoreboard only)'}], def:'sv_stub'},
+          {id:'skip_sva_duplicates', label:'Skip SVA-backed Checks', type:'toggle', def:true,
+           hint:'Cross-references dv_assertions_data.json to avoid duplicate verification.'},
+        ]},
+    ]},
+
+  {
+    id:'s9', tag:'S9', name:'Regression', group:3,
+    color:'#30B0C7', icon:'🔄',
+    desc:'Generate milestone test lists, run parallel regression, parse logs, and generate HTML report.',
+    deps:['s6'],
+    steps:[
+      { title:'Project & Sources', desc:'Link sequence data to build regression test lists.',
+        fields:[
+          {id:'project_name', label:'Project Name', type:'text', required:true},
+          {id:'seq_data', label:'Sequences Data (dv_sequences_data.json)', type:'file', accept:'.json', hint:'From S6.'},
+          {id:'output_dir', label:'Output Directory', type:'dir', required:true},
+        ]},
+      { title:'Grid Configuration', desc:'Configure execution environment — local or grid compute.',
+        fields:[
+          {id:'grid_type', label:'Execution Mode', type:'select',
+           options:[{v:'local',l:'Local (ThreadPoolExecutor)'},{v:'LSF',l:'LSF (bsub)'},{v:'SGE',l:'SGE (qsub)'},{v:'Slurm',l:'Slurm (sbatch)'}], def:'local'},
+          {id:'max_jobs', label:'Max Parallel Jobs', type:'number', def:8, min:1, max:128,
+           hint:'Number of concurrent simulation processes.'},
+          {id:'grid_queue', label:'Grid Queue Name', type:'text', placeholder:'normal',
+           hint:'Required when using LSF/SGE/Slurm. Leave blank for local.'},
+        ]},
+      { title:'Seed Configuration', desc:'Set the number of random seeds per milestone.',
+        fields:[
+          {id:'dv_i_seeds', label:'DV-I Seeds', type:'number', def:1, min:1, max:100},
+          {id:'dv_c_seeds', label:'DV-C Seeds', type:'number', def:5, min:1, max:100},
+          {id:'dv_f_seeds', label:'DV-F Seeds', type:'number', def:20, min:1, max:500},
+          {id:'stop_on_fail', label:'Stop on First Failure', type:'toggle', def:false,
+           hint:'By default regression continues even when tests fail.'},
+        ]},
+    ]},
+
+  {
+    id:'s10', tag:'S10', name:'Coverage Closure', group:3,
+    color:'#FF2D55', icon:'📊',
+    desc:'Analyse code + functional coverage, generate exclusions, test stubs, and sign-off report.',
+    deps:['s7','s9'],
+    steps:[
+      { title:'Project & Sources', desc:'Link coverage VDB and upstream skill outputs.',
+        fields:[
+          {id:'project_name', label:'Project Name', type:'text', required:true},
+          {id:'vdb_path', label:'Merged VDB (merged.vdb)', type:'dir', hint:'Coverage database from S9 urg merge.', required:true},
+          {id:'reg_data', label:'Regression Data (dv_regression_data.json)', type:'file', accept:'.json', hint:'From S9.'},
+          {id:'assert_data', label:'Assertions Data (dv_assertions_data.json)', type:'file', accept:'.json', hint:'From S7.'},
+          {id:'output_dir', label:'Output Directory', type:'dir', required:true},
+        ]},
+      { title:'Analysis Options', desc:'Configure coverage closure analysis and milestone thresholds.',
+        fields:[
+          {id:'non_interactive', label:'Non-interactive Mode', type:'toggle', def:false,
+           hint:'Auto-accept all suggested exclusions and stubs without prompting.'},
+          {id:'dv_f_line_thr', label:'DV-F Line Coverage Threshold (%)', type:'number', def:99, min:0, max:100},
+          {id:'dv_f_toggle_thr', label:'DV-F Toggle Coverage Threshold (%)', type:'number', def:95, min:0, max:100},
+          {id:'dv_f_func_thr', label:'DV-F Functional Coverage Threshold (%)', type:'number', def:99, min:0, max:100},
+        ]},
+    ]},
+];
+
+const SKILL_MAP = Object.fromEntries(SKILLS.map(s => [s.id, s]));
+
+const SKILL_GROUPS = { 1:['s1','s2','s3','s4','s5'], 2:['s6'], 3:['s7','s8','s9','s10'] };
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   APP STATE
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+const State = {
+  active:   null,    // skill id | 'dash'
+  step:     0,
+  runState: Object.fromEntries(SKILLS.map(s => [s.id,
+    {status:'idle', last_run:null, run_id:null, exit_code:null, deps_met:true}])),
+  formData: {},
+  errors:   {},
+  activeRunId: null,
+
+  get(skillId, fieldId) {
+    return this.formData[skillId]?.[fieldId];
+  },
+  set(skillId, fieldId, value) {
+    if (!this.formData[skillId]) this.formData[skillId] = {};
+    this.formData[skillId][fieldId] = value;
+    this.persist();
+  },
+  persist() {
+    try { sessionStorage.setItem('dvskills_form', JSON.stringify(this.formData)); } catch(e) {}
+  },
+  restore() {
+    try {
+      const d = sessionStorage.getItem('dvskills_form');
+      if (d) this.formData = JSON.parse(d);
+    } catch(e) {}
+  },
+};
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   API
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+const API = {
+  async status() {
+    const r = await fetch('/api/status');
+    return r.json();
+  },
+  async run(skillId, params) {
+    const r = await fetch(`/api/run/${skillId}`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(params)
+    });
+    return r.json();
+  },
+  async cancel(runId) {
+    return fetch(`/api/cancel/${runId}`, {method:'POST'});
+  },
+  async reset(skillId) {
+    return fetch(`/api/reset/${skillId}`, {method:'POST'});
+  },
+  async resetAll() {
+    return fetch('/api/reset-all', {method:'POST'});
+  },
+  async browse(path, type='both') {
+    const r = await fetch(`/api/browse?path=${encodeURIComponent(path)}&type=${type}`);
+    return r.json();
+  },
+  stream(runId) {
+    return new EventSource(`/api/stream/${runId}`);
+  },
+};
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   TERMINAL
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+const Terminal = {
+  _sse: null,
+  _autoScroll: true,
+  _runId: null,
+
+  toggle() {
+    const p = document.getElementById('terminal-panel');
+    p.classList.toggle('expanded');
+  },
+  expand() { document.getElementById('terminal-panel').classList.add('expanded'); },
+  collapse() { document.getElementById('terminal-panel').classList.remove('expanded'); },
+
+  setTitle(t) { document.getElementById('term-title').textContent = t; },
+  setBadge(status, label) {
+    const b = document.getElementById('term-badge');
+    b.className = `term-badge ${status}`;
+    b.textContent = label;
+  },
+
+  clear() { document.getElementById('term-body').innerHTML = ''; },
+
+  appendLine(type, text, ts) {
+    const body = document.getElementById('term-body');
+    const line = document.createElement('div');
+    const t = ts ? new Date(ts*1000) : new Date();
+    const hms = t.toTimeString().slice(0,8);
+    line.className = `term-line ${type}`;
+    line.innerHTML = `<span class="term-ts">${hms}</span><span class="term-text"></span>`;
+    line.querySelector('.term-text').textContent = text;
+    body.appendChild(line);
+
+    // Cap at 5000 lines
+    while (body.children.length > 5000) body.removeChild(body.firstChild);
+
+    if (this._autoScroll) body.scrollTop = body.scrollHeight;
+  },
+
+  startStream(runId, skillName) {
+    this._runId = runId;
+    State.activeRunId = runId;
+    if (this._sse) { this._sse.close(); this._sse = null; }
+
+    this.clear();
+    this.setTitle(`Terminal — ${skillName}`);
+    this.setBadge('running', 'Running');
+    this.expand();
+
+    document.getElementById('term-cancel-btn').style.display = 'inline-flex';
+
+    this._sse = API.stream(runId);
+    this._sse.onmessage = (e) => {
+      const d = JSON.parse(e.data);
+      if (d.type === 'stdout') this.appendLine('stdout', d.line, d.ts);
+      else if (d.type === 'stderr') this.appendLine('stderr', d.line, d.ts);
+      else if (d.type === 'system') this.appendLine('system', d.line, d.ts);
+      else if (d.type === 'exit') {
+        const ok = d.code === 0;
+        const cls = ok ? 'success' : 'exit-fail';
+        this.appendLine(cls, `Process exited with code ${d.code}`, d.ts);
+        this.setBadge(ok ? 'success' : 'error', ok ? 'Success' : `Error (${d.code})`);
+        document.getElementById('term-cancel-btn').style.display = 'none';
+        Sidebar.refreshAll();
+      } else if (d.type === 'done') {
+        this._sse.close(); this._sse = null;
+      }
+    };
+    this._sse.onerror = () => {
+      this.setBadge('error', 'Disconnected');
+      if (this._sse) { this._sse.close(); this._sse = null; }
+    };
+
+    // Auto-scroll tracking
+    const body = document.getElementById('term-body');
+    body.addEventListener('scroll', () => {
+      this._autoScroll = body.scrollHeight - body.scrollTop - body.clientHeight < 40;
+    });
+  },
+
+  cancel() {
+    if (this._runId) API.cancel(this._runId);
+  },
+};
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   FILE PICKER
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+const FilePicker = {
+  _resolve: null,
+  _type: 'both',
+  _selected: null,
+  _current: '',
+
+  open(type, resolve) {
+    this._type = type;
+    this._resolve = resolve;
+    this._selected = null;
+    const modal = document.getElementById('fp-modal');
+    document.getElementById('fp-title').textContent =
+      type === 'dir' ? 'Choose Directory' : 'Choose File';
+    document.getElementById('fp-selected-path').textContent = 'Nothing selected';
+    modal.classList.add('open');
+    this._browse(this._current || (typeof os !== 'undefined' ? '' : '/'));
+  },
+
+  close() {
+    document.getElementById('fp-modal').classList.remove('open');
+    this._resolve = null;
+  },
+
+  confirm() {
+    if (this._selected && this._resolve) {
+      this._resolve(this._selected);
+    }
+    this.close();
+  },
+
+  async _browse(path) {
+    const data = await API.browse(path, this._type);
+    if (data.error) return;
+    this._current = data.current;
+    document.getElementById('fp-breadcrumb').textContent = data.current;
+
+    const list = document.getElementById('fp-list');
+    list.innerHTML = '';
+
+    // Up directory
+    if (data.parent) {
+      const item = this._makeItem('📂', '..', data.parent, 'dir');
+      item.querySelector('.fp-name').style.color = 'var(--t3)';
+      item.addEventListener('click', () => this._browse(data.parent));
+      list.appendChild(item);
+    }
+
+    // For dir picker, add "Select this folder" at top
+    if (this._type === 'dir') {
+      const sel = document.createElement('div');
+      sel.className = 'fp-list-item';
+      sel.style.background = 'var(--blue-light)';
+      sel.innerHTML = `<span class="fp-icon">✓</span>
+        <span class="fp-name" style="color:var(--blue);font-weight:600">Select "${data.current.split('/').pop() || data.current}"</span>`;
+      sel.addEventListener('click', () => {
+        this._selected = data.current;
+        document.getElementById('fp-selected-path').textContent = data.current;
+      });
+      list.appendChild(sel);
+    }
+
+    for (const entry of data.entries) {
+      const icon = entry.type === 'dir' ? '📁' : this._fileIcon(entry.ext);
+      const item = this._makeItem(icon, entry.name, entry.path, entry.type);
+      item.addEventListener('click', () => {
+        if (entry.type === 'dir') {
+          if (this._type === 'dir') this._selected = entry.path;
+          this._browse(entry.path);
+        } else {
+          this._selected = entry.path;
+          document.getElementById('fp-selected-path').textContent = entry.path;
+          list.querySelectorAll('.fp-list-item').forEach(i => i.classList.remove('selected'));
+          item.classList.add('selected');
+        }
+      });
+      list.appendChild(item);
+    }
+  },
+
+  _makeItem(icon, name, path, type) {
+    const el = document.createElement('div');
+    el.className = 'fp-list-item';
+    el.innerHTML = `<span class="fp-icon">${icon}</span>
+      <span class="fp-name ${type}">${name}</span>`;
+    return el;
+  },
+
+  _fileIcon(ext) {
+    const m = {'.json':'📄','.sv':'📄','.v':'📄','.xlsx':'📊','.pdf':'📕','.txt':'📃','.md':'📃','.vdb':'🗃️'};
+    return m[ext] || '📄';
+  },
+};
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   FORM FIELDS RENDERER
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+const Fields = {
+  render(field, skillId) {
+    const val = State.get(skillId, field.id) ?? field.def ?? '';
+    const err = State.errors[skillId]?.[field.id];
+
+    const wrap = document.createElement('div');
+    wrap.className = 'form-group';
+    wrap.dataset.field = field.id;
+
+    if (field.type !== 'toggle') {
+      const lbl = document.createElement('div');
+      lbl.className = 'form-label';
+      lbl.innerHTML = field.label + (field.required ? ' <span class="form-required">*</span>' : '');
+      wrap.appendChild(lbl);
+    }
+
+    let input;
+    switch (field.type) {
+      case 'text':   input = this._text(field, val, skillId, err); break;
+      case 'number': input = this._number(field, val, skillId); break;
+      case 'select': input = this._select(field, val, skillId); break;
+      case 'chips':  input = this._chips(field, val, skillId); break;
+      case 'toggle': input = this._toggle(field, val, skillId); break;
+      case 'file':   input = this._filePicker(field, val, skillId, 'both'); break;
+      case 'dir':    input = this._filePicker(field, val, skillId, 'dir'); break;
+      default:       input = this._text(field, val, skillId, err);
+    }
+    wrap.appendChild(input);
+
+    if (field.hint && field.type !== 'toggle') {
+      const hint = document.createElement('div');
+      hint.className = 'form-hint';
+      hint.textContent = field.hint;
+      wrap.appendChild(hint);
+    }
+    if (err) {
+      const e = document.createElement('div');
+      e.className = 'form-error-msg';
+      e.textContent = err;
+      wrap.appendChild(e);
+    }
+    return wrap;
+  },
+
+  _text(field, val, skillId, err) {
+    const el = document.createElement('input');
+    el.type = 'text';
+    el.className = 'form-input' + (err ? ' error' : '');
+    el.placeholder = field.placeholder || '';
+    el.value = val;
+    if (field.mono) el.dataset.mono = '1';
+    el.addEventListener('input', () => State.set(skillId, field.id, el.value));
+    return el;
+  },
+
+  _number(field, val, skillId) {
+    const wrap = document.createElement('div');
+    wrap.className = 'num-input-wrap';
+    const minus = document.createElement('button');
+    minus.className = 'num-btn'; minus.textContent = '−'; minus.type = 'button';
+    const inp = document.createElement('input');
+    inp.type = 'number'; inp.className = 'form-input num-input';
+    inp.min = field.min ?? 0; inp.max = field.max ?? 9999;
+    inp.value = val !== '' ? val : (field.def ?? 1);
+    const plus = document.createElement('button');
+    plus.className = 'num-btn'; plus.textContent = '+'; plus.type = 'button';
+    minus.addEventListener('click', () => { inp.value = Math.max(field.min??0, +inp.value-1); State.set(skillId, field.id, +inp.value); });
+    plus.addEventListener('click',  () => { inp.value = Math.min(field.max??9999, +inp.value+1); State.set(skillId, field.id, +inp.value); });
+    inp.addEventListener('input', () => State.set(skillId, field.id, +inp.value));
+    wrap.append(minus, inp, plus);
+    State.set(skillId, field.id, +inp.value);
+    return wrap;
+  },
+
+  _select(field, val, skillId) {
+    const el = document.createElement('select');
+    el.className = 'form-select';
+    for (const opt of field.options) {
+      const o = document.createElement('option');
+      o.value = opt.v ?? opt; o.textContent = opt.l ?? opt;
+      if ((val || field.def) === o.value) o.selected = true;
+      el.appendChild(o);
+    }
+    el.addEventListener('change', () => State.set(skillId, field.id, el.value));
+    State.set(skillId, field.id, el.value);
+    return el;
+  },
+
+  _chips(field, val, skillId) {
+    const selected = new Set(Array.isArray(val) ? val : []);
+    const wrap = document.createElement('div');
+    wrap.className = 'chip-group';
+    for (const opt of field.options) {
+      const chip = document.createElement('div');
+      chip.className = 'chip' + (selected.has(opt) ? ' selected' : '');
+      chip.textContent = opt;
+      chip.addEventListener('click', () => {
+        chip.classList.toggle('selected');
+        if (chip.classList.contains('selected')) selected.add(opt);
+        else selected.delete(opt);
+        State.set(skillId, field.id, [...selected]);
+      });
+      wrap.appendChild(chip);
+    }
+    return wrap;
+  },
+
+  _toggle(field, val, skillId) {
+    const isOn = val !== undefined ? val : (field.def ?? false);
+    const wrap = document.createElement('div');
+    wrap.className = 'toggle-wrap';
+    const track = document.createElement('div');
+    track.className = 'toggle-track' + (isOn ? ' on' : '');
+    const thumb = document.createElement('div'); thumb.className = 'toggle-thumb';
+    track.appendChild(thumb);
+    const lbl = document.createElement('div');
+    lbl.innerHTML = `<div style="font-size:13px;font-weight:500;color:var(--t2)">${field.label}</div>` +
+      (field.hint ? `<div class="form-hint" style="margin:0">${field.hint}</div>` : '');
+    wrap.append(track, lbl);
+    let on = isOn;
+    wrap.addEventListener('click', () => {
+      on = !on;
+      track.classList.toggle('on', on);
+      State.set(skillId, field.id, on);
+    });
+    State.set(skillId, field.id, isOn);
+    return wrap;
+  },
+
+  _filePicker(field, val, skillId, type) {
+    const wrap = document.createElement('div');
+    wrap.className = 'file-picker';
+    const inp = document.createElement('input');
+    inp.type = 'text';
+    inp.className = 'form-input file-picker-path';
+    inp.placeholder = field.placeholder || (type === 'dir' ? '/path/to/directory' : '/path/to/file');
+    inp.value = val || '';
+    inp.setAttribute('data-mono', '1');
+    inp.addEventListener('input', () => State.set(skillId, field.id, inp.value));
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'file-picker-btn';
+    btn.innerHTML = `<span>${type === 'dir' ? '📁' : '📄'}</span> Browse`;
+    btn.addEventListener('click', () => {
+      const startPath = inp.value || (State.get(skillId, 'output_dir') || '');
+      FilePicker.open(type, (path) => {
+        inp.value = path;
+        State.set(skillId, field.id, path);
+      });
+    });
+    wrap.append(inp, btn);
+    return wrap;
+  },
+};
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   WIZARD
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+const Wizard = {
+  _skill: null,
+  _step: 0,
+  _steps: [],
+
+  open(skillId) {
+    this._skill = SKILL_MAP[skillId];
+    this._step  = 0;
+    this._steps = this._skill.steps;
+    App.setView('wizard');
+    this._renderHeader();
+    this._renderAllSteps();
+    this._renderFooter();
+    this._showStep(0, 'right');
+  },
+
+  _renderHeader() {
+    const s = this._skill;
+    const header = document.getElementById('wizard-header');
+
+    // Dep strip
+    const depsHtml = s.deps.length ? `
+      <div class="dep-strip">
+        <span class="dep-label">Requires:</span>
+        ${s.deps.map(d => {
+          const ds = State.runState[d];
+          const met = ds?.status === 'success';
+          return `<span class="dep-chip ${met?'met':'unmet'}">${SKILL_MAP[d].tag} ${SKILL_MAP[d].name} ${met?'✓':'✗'}</span>`;
+        }).join('')}
+      </div>` : '';
+
+    // Step indicator
+    const nodes = this._steps.map((st, i) => {
+      const cls = i < this._step ? 'done' : i === this._step ? 'current' : 'future';
+      const connector = i < this._steps.length-1
+        ? `<div class="step-connector ${i < this._step ? 'done' : ''}"></div>` : '';
+      return `<div class="step-node">
+        <div class="step-circle ${cls}">${i < this._step ? '✓' : i+1}</div>
+        <div class="step-label ${i === this._step ? 'current' : ''}">${st.title}</div>
+      </div>${connector}`;
+    }).join('');
+
+    header.innerHTML = `
+      <div class="wizard-skill-tag">${s.tag} — ${s.id.toUpperCase()}</div>
+      <div class="wizard-skill-name">${s.name}</div>
+      <div class="wizard-skill-desc">${s.desc}</div>
+      ${depsHtml}
+      <div class="step-indicator" id="step-indicator">${nodes}</div>`;
+  },
+
+  _renderAllSteps() {
+    const wrap = document.getElementById('wizard-steps-wrap');
+    wrap.innerHTML = '';
+    const s = this._skill;
+    const depsUnmet = s.deps.some(d => State.runState[d]?.status !== 'success');
+
+    for (let i = 0; i < this._steps.length; i++) {
+      const step = this._steps[i];
+      const isLast = i === this._steps.length - 1;
+      const div = document.createElement('div');
+      div.className = 'wizard-step hidden-right';
+      div.id = `wstep-${i}`;
+
+      const titleEl = document.createElement('div');
+      titleEl.className = 'step-title';
+      titleEl.textContent = step.title;
+      div.appendChild(titleEl);
+
+      const descEl = document.createElement('div');
+      descEl.className = 'step-desc';
+      descEl.textContent = step.desc;
+      div.appendChild(descEl);
+
+      // Dep warning on first step
+      if (i === 0 && depsUnmet) {
+        const warn = document.createElement('div');
+        warn.className = 'dep-warning';
+        const missing = s.deps.filter(d => State.runState[d]?.status !== 'success')
+          .map(d => `${SKILL_MAP[d].tag} ${SKILL_MAP[d].name}`).join(', ');
+        warn.innerHTML = `<span class="dep-warning-icon">⚠️</span>
+          <div class="dep-warning-text">
+            This skill requires <strong>${missing}</strong> to complete successfully first.
+            You can fill in the form but the Run button will be disabled.
+          </div>`;
+        div.appendChild(warn);
+      }
+
+      // Fields
+      if (isLast) {
+        // Review step
+        this._renderReview(div, s);
+      } else {
+        const fields = step.fields || [];
+        // Group fields in pairs where possible for layout
+        let i2 = 0;
+        while (i2 < fields.length) {
+          const f = fields[i2];
+          const next = fields[i2+1];
+          // Put toggles in pairs
+          if (f.type === 'toggle' && next && next.type === 'toggle') {
+            div.appendChild(Fields.render(f, s.id));
+            div.appendChild(Fields.render(next, s.id));
+            i2 += 2;
+          } else {
+            div.appendChild(Fields.render(f, s.id));
+            i2++;
+          }
+        }
+      }
+
+      wrap.appendChild(div);
+    }
+  },
+
+  _renderReview(div, skill) {
+    div.innerHTML += `<div style="margin-bottom:16px;font-size:13px;color:var(--t3)">
+      Review your configuration below, then click Run to start the skill.</div>`;
+
+    // Render each non-last step's fields as a review section
+    for (let si = 0; si < this._steps.length - 1; si++) {
+      const step = this._steps[si];
+      const sec = document.createElement('div');
+      sec.className = 'review-section';
+      sec.innerHTML = `<div class="review-section-header">${step.title}</div>`;
+      for (const f of step.fields || []) {
+        const val = State.get(skill.id, f.id);
+        let displayVal = val;
+        if (Array.isArray(val)) displayVal = val.length ? val.join(', ') : '—';
+        else if (typeof val === 'boolean') displayVal = val ? 'Yes' : 'No';
+        else if (val === null || val === undefined || val === '') displayVal = null;
+        const row = document.createElement('div');
+        row.className = 'review-row';
+        row.innerHTML = `<div class="review-key">${f.label}</div>
+          <div class="review-val${!displayVal ? ' empty' : ''}">${displayVal || 'Not set'}</div>`;
+        sec.appendChild(row);
+      }
+      div.appendChild(sec);
+    }
+  },
+
+  _renderFooter() {
+    const footer = document.getElementById('wizard-footer');
+    footer.innerHTML = '';
+
+    const back = document.createElement('button');
+    back.className = 'btn btn-secondary';
+    back.textContent = '← Back';
+    back.id = 'wiz-back';
+    back.addEventListener('click', () => this.prevStep());
+
+    const spacer = document.createElement('div');
+    spacer.className = 'wf-spacer';
+
+    const isLast = this._step === this._steps.length - 1;
+    const depsUnmet = this._skill.deps.some(d => State.runState[d]?.status !== 'success');
+
+    let action;
+    if (isLast) {
+      action = document.createElement('button');
+      action.id = 'wiz-run';
+      action.className = 'btn btn-run';
+      action.innerHTML = `▶ Run ${this._skill.name}`;
+      if (depsUnmet) { action.disabled = true; action.title = 'Complete dependencies first'; }
+      action.addEventListener('click', () => this._runSkill());
+    } else {
+      action = document.createElement('button');
+      action.className = 'btn btn-primary';
+      action.innerHTML = 'Continue →';
+      action.addEventListener('click', () => this.nextStep());
+    }
+
+    if (this._step === 0) back.style.visibility = 'hidden';
+    footer.append(back, spacer, action);
+  },
+
+  nextStep() {
+    if (this._step < this._steps.length - 1) {
+      this._showStep(this._step + 1, 'right');
+      this._step++;
+      this._renderHeader();
+      this._renderFooter();
+    }
+  },
+
+  prevStep() {
+    if (this._step > 0) {
+      this._showStep(this._step - 1, 'left');
+      this._step--;
+      this._renderHeader();
+      this._renderFooter();
+    }
+  },
+
+  _showStep(idx, dir) {
+    const steps = document.querySelectorAll('.wizard-step');
+    steps.forEach((el, i) => {
+      el.classList.remove('hidden-left', 'hidden-right');
+      if (i === idx) {
+        // Show this one
+      } else if (i < idx) {
+        el.classList.add('hidden-left');
+      } else {
+        el.classList.add('hidden-right');
+      }
+    });
+    // Re-render review if showing last
+    if (idx === this._steps.length - 1) {
+      const lastDiv = document.getElementById(`wstep-${idx}`);
+      lastDiv.innerHTML = `<div class="step-title">${this._steps[idx].title}</div>
+        <div class="step-desc">${this._steps[idx].desc}</div>`;
+      this._renderReview(lastDiv, this._skill);
+    }
+  },
+
+  async _runSkill() {
+    const btn = document.getElementById('wiz-run');
+    btn.disabled = true;
+    btn.innerHTML = '<div class="spinner"></div> Starting…';
+
+    const params = State.formData[this._skill.id] || {};
+    const data = await API.run(this._skill.id, params);
+
+    if (data.error) {
+      btn.disabled = false;
+      btn.innerHTML = `▶ Run ${this._skill.name}`;
+      alert(`Could not start: ${data.error}`);
+      return;
+    }
+
+    Terminal.startStream(data.run_id, this._skill.name);
+    btn.innerHTML = `⟳ Running…`;
+
+    // Poll to re-enable after done
+    const poll = setInterval(async () => {
+      const st = await API.status();
+      const s = st.skills[this._skill.id];
+      if (s.status !== 'running') {
+        clearInterval(poll);
+        btn.disabled = false;
+        btn.innerHTML = `▶ Run ${this._skill.name}`;
+        Sidebar.refreshAll();
+        // Refresh header dep chips
+        this._renderHeader();
+        this._renderFooter();
+      }
+    }, 1500);
+  },
+};
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SIDEBAR
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+const Sidebar = {
+  render() {
+    const groups = {
+      1: document.getElementById('skill-list-1'),
+      2: document.getElementById('skill-list-2'),
+      3: document.getElementById('skill-list-3'),
+    };
+    for (const [g, el] of Object.entries(groups)) {
+      el.innerHTML = '';
+      for (const sid of SKILL_GROUPS[g]) {
+        const skill = SKILL_MAP[sid];
+        const rs = State.runState[sid] || {};
+        const status = rs.status || 'idle';
+        const dm = !rs.deps_met && status === 'idle';
+        const item = document.createElement('div');
+        item.className = 'sb-item' + (State.active === sid ? ' active' : '') + (dm ? ' disabled' : '');
+        item.id = `sb-${sid}`;
+        item.innerHTML = `
+          <div class="sb-icon" style="background:${skill.color}22">${skill.icon}</div>
+          <div style="flex:1;min-width:0">
+            <div class="sb-item-name">${skill.tag} ${skill.name}</div>
+          </div>
+          <div class="sb-dot ${status}"></div>`;
+        item.addEventListener('click', () => App.navigate(sid));
+        el.appendChild(item);
+      }
+    }
+    this._updateDash();
+  },
+
+  _updateDash() {
+    const d = document.getElementById('nav-dash');
+    if (State.active === 'dash') d.classList.add('active');
+    else d.classList.remove('active');
+  },
+
+  async refreshAll() {
+    const data = await API.status();
+    for (const [sid, s] of Object.entries(data.skills)) {
+      State.runState[sid] = s;
+    }
+    this.render();
+    Dashboard.refresh();
+  },
+
+  setActive(id) {
+    document.querySelectorAll('.sb-item').forEach(el => el.classList.remove('active'));
+    const el = document.getElementById(id === 'dash' ? 'nav-dash' : `sb-${id}`);
+    if (el) el.classList.add('active');
+    this._updateDash();
+  },
+};
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   DASHBOARD
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+const Dashboard = {
+  render() {
+    const grid = document.getElementById('dash-grid');
+    grid.innerHTML = '';
+    for (const skill of SKILLS) {
+      const rs = State.runState[skill.id] || {};
+      const status = rs.status || 'idle';
+      const depsUnmet = skill.deps.some(d => State.runState[d]?.status !== 'success');
+      const card = document.createElement('div');
+      card.className = 'skill-card' + (depsUnmet && status === 'idle' ? ' disabled' : '');
+      card.innerHTML = `
+        <div class="skill-card-bar ${status}"></div>
+        <div class="skill-card-body">
+          <div class="skill-card-icon" style="background:${skill.color}18;font-size:20px">${skill.icon}</div>
+          <div class="skill-card-tag">${skill.tag}</div>
+          <div class="skill-card-name">${skill.name}</div>
+          <div class="skill-card-desc">${skill.desc}</div>
+          <div class="skill-card-footer">
+            <span class="skill-card-status ${status}">${this._statusLabel(status)}</span>
+            <span class="skill-card-open">Open →</span>
+          </div>
+        </div>`;
+      card.addEventListener('click', () => App.navigate(skill.id));
+      grid.appendChild(card);
+    }
+    this._updateProgress();
+  },
+
+  refresh() {
+    this.render();
+  },
+
+  _statusLabel(s) {
+    return {idle:'Not started',success:'Complete',error:'Error',running:'Running',pending:'Waiting'}[s] || s;
+  },
+
+  _updateProgress() {
+    const done = SKILLS.filter(s => State.runState[s.id]?.status === 'success').length;
+    const pct = Math.round(done/SKILLS.length*100);
+    document.getElementById('progress-fill').style.width = pct + '%';
+    document.getElementById('progress-count').textContent = `${done} / ${SKILLS.length}`;
+  },
+};
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MAIN APP
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+const App = {
+  async init() {
+    State.restore();
+    await Sidebar.refreshAll();
+    Dashboard.render();
+    this.navigate('dash');
+
+    // Poll every 4s
+    setInterval(() => Sidebar.refreshAll(), 4000);
+
+    // Theme
+    const t = localStorage.getItem('dv-theme') || 'light';
+    document.documentElement.dataset.theme = t;
+    document.getElementById('theme-icon').textContent = t === 'dark' ? '☀️' : '🌙';
+  },
+
+  navigate(id) {
+    State.active = id;
+    Sidebar.setActive(id);
+
+    if (id === 'dash') {
+      this.setView('dash');
+      document.getElementById('main-title').textContent = 'Dashboard';
+      document.getElementById('main-sub').textContent = 'DV Verification Flow';
+    } else {
+      const skill = SKILL_MAP[id];
+      document.getElementById('main-title').textContent = `${skill.tag} — ${skill.name}`;
+      document.getElementById('main-sub').textContent = '';
+      Wizard.open(id);
+    }
+  },
+
+  setView(name) {
+    document.querySelectorAll('.view').forEach(v => {
+      v.classList.toggle('hidden', v.id !== `view-${name}`);
+    });
+  },
+
+  toggleTheme() {
+    const cur = document.documentElement.dataset.theme;
+    const next = cur === 'dark' ? 'light' : 'dark';
+    document.documentElement.dataset.theme = next;
+    localStorage.setItem('dv-theme', next);
+    document.getElementById('theme-icon').textContent = next === 'dark' ? '☀️' : '🌙';
+  },
+
+  async resetAll() {
+    if (!confirm('Reset all skill statuses to idle? This does not delete any files.')) return;
+    await API.resetAll();
+    await Sidebar.refreshAll();
+    Dashboard.render();
+  },
+};
+
+// Boot
+document.addEventListener('DOMContentLoaded', () => App.init());
+</script>
+</body>
+</html>

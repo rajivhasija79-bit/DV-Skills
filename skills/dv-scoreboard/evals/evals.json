@@ -1,0 +1,154 @@
+{
+  "skill_name": "dv-scoreboard",
+  "skill_version": "1.0",
+  "description": "Evals for S8 dv-scoreboard: scoreboard implementation, ref model, functional coverage, CHK_ID reporting, SVA deduplication",
+
+  "test_cases": [
+
+    {
+      "id": "s8_eval_1_apb_uart_full",
+      "name": "APB-UART: full scoreboard + ref model from testplan + S5/S7 data",
+      "description": "4 testplan rows (2 Procedural, 1 Both, 1 Assertion-only). 1 SVA row skipped. Tests: analysis_imp per VIP, RAL mirror check, data compare task, ref model analysis port wiring, coverage model, CHK_ID in report_phase.",
+      "input": {
+        "project_name": "apb_uart",
+        "tb_data": {
+          "project_name": "apb_uart",
+          "unique_vips": [
+            {"vip_name": "apb_vip",  "protocol": "APB",  "data_width": 32, "addr_width": 32, "role": "slave"},
+            {"vip_name": "uart_vip", "protocol": "UART", "data_width": 1,  "addr_width": 0,  "role": "master"}
+          ],
+          "ral": {
+            "reg_block_class": "apb_uart_reg_block",
+            "register_bus_vip": "apb_vip",
+            "registers": [{"name": "UART_CTRL"}, {"name": "UART_STATUS"}]
+          },
+          "env": {"env_class": "apb_uart_env", "env_cfg_class": "apb_uart_env_cfg",
+                  "virtual_seqr_class": "apb_uart_virtual_seqr"},
+          "base_test": {"base_test_class": "apb_uart_base_test"}
+        },
+        "sb_config": {
+          "style": "in_order",
+          "trigger": "auto",
+          "ref_model_type": "sv_stub",
+          "skip_sva_duplicates": true
+        },
+        "testplan_rows": [
+          {
+            "feature": "APB Register", "subfeature": "Read",
+            "checker_id": "CHK_UART_APB_PROTOCOL_001", "checker_type": "Assertion",
+            "milestone": "DV-I", "testcase_description": ""
+          },
+          {
+            "feature": "APB Register", "subfeature": "Write",
+            "checker_id": "CHK_UART_REG_CTRL_WRITE_001", "checker_type": "Procedural",
+            "milestone": "DV-I",
+            "testcase_description": "DUT Config: default\nStimulus: APB write UART_CTRL\nChecks: UART_CTRL readback\nPass Criteria: readback == written value"
+          },
+          {
+            "feature": "UART TX", "subfeature": "Data Integrity",
+            "checker_id": "CHK_UART_TX_DATA_INTEGRITY_001", "checker_type": "Both",
+            "milestone": "DV-C",
+            "testcase_description": "DUT Config: UART_CTRL.TX_EN=1\nStimulus: send 0xA5\nChecks: TXD byte matches\nPass Criteria: received == sent"
+          },
+          {
+            "feature": "UART TX", "subfeature": "FIFO Not Full",
+            "checker_id": "CHK_UART_TX_FIFO_001", "checker_type": "Procedural",
+            "milestone": "DV-C",
+            "testcase_description": "DUT Config: default\nStimulus: 10 consecutive TX\nChecks: STATUS.TX_FULL never asserts\nPass Criteria: TX_FULL == 0 throughout"
+          }
+        ]
+      },
+      "output_dir": "/tmp/s8_eval/apb_uart/dv",
+      "assertions": [
+        {
+          "id": "a1",
+          "description": "CHK_UART_APB_PROTOCOL_001 skipped (it is Assertion type in dv_assertions_data.json)",
+          "check": "apb_uart_scoreboard.sv does NOT contain CHK_UART_APB_PROTOCOL_001 as a check task"
+        },
+        {
+          "id": "a2",
+          "description": "analysis_imp_decl macros and handles for apb_vip and uart_vip plus expected",
+          "check": "scoreboard.sv contains uvm_analysis_imp_decl(_apb_vip) AND uvm_analysis_imp_decl(_uart_vip) AND uvm_analysis_imp_decl(_expected)"
+        },
+        {
+          "id": "a3",
+          "description": "write_apb_vip() performs RAL mirror comparison for reads",
+          "check": "write_apb_vip contains ral.default_map.get_reg_by_offset AND get_mirrored_value AND _chk_reg_read"
+        },
+        {
+          "id": "a4",
+          "description": "Check tasks generated for Procedural/Both rows",
+          "check": "_chk_chk_uart_reg_ctrl_write_001 task exists AND _chk_chk_uart_tx_data_integrity_001 task exists AND _chk_chk_uart_tx_fifo_001 task exists"
+        },
+        {
+          "id": "a5",
+          "description": "m_cov_ap sends sb_transaction on every passing check",
+          "check": "scoreboard.sv contains m_cov_ap.write(sb_txn) inside _chk_data_compare AND _chk_reg_read"
+        },
+        {
+          "id": "a6",
+          "description": "report_phase prints CHK_ID-mapped table",
+          "check": "scoreboard.sv contains Scoreboard Report AND m_pass_cnt AND m_fail_cnt AND [PASS] All scoreboard checks"
+        },
+        {
+          "id": "a7",
+          "description": "Reference model has analysis_imp for uart_vip (stimulus) and m_sb_ap to scoreboard",
+          "check": "ref_model.sv contains uvm_analysis_imp AND uart_vip_seq_item AND m_sb_ap"
+        },
+        {
+          "id": "a8",
+          "description": "predict() function has RAL read stubs and NEEDS_ENGINEER_REVIEW tag",
+          "check": "ref_model.sv contains predict AND NEEDS_ENGINEER_REVIEW"
+        },
+        {
+          "id": "a9",
+          "description": "Functional coverage model is uvm_subscriber of sb_transaction with covergroups per feature",
+          "check": "functional_coverage.sv contains extends uvm_subscriber AND sb_transaction AND cg_apb_register AND cg_uart_tx"
+        },
+        {
+          "id": "a10",
+          "description": "dv_scoreboard_data.json has correct check count and skipped SVA count",
+          "check": "dv_scoreboard_data.json summary.total_checks == 3 AND summary.skipped_in_sva == 1"
+        }
+      ]
+    },
+
+    {
+      "id": "s8_eval_2_design_questions",
+      "name": "S8 asks design analysis questions before generating code",
+      "description": "When dv_tb_data.json is available but no S7 data and no answers given, S8 must run design analysis, print analysis summary, and ask all Q1-Q9 in ONE message before writing any file.",
+      "input": {
+        "project_name": "data_gw",
+        "tb_data": {
+          "project_name": "data_gw",
+          "unique_vips": [
+            {"vip_name": "ahb_vip",   "protocol": "AHB-Lite", "data_width": 32},
+            {"vip_name": "axi4s_vip", "protocol": "AXI4-Stream","data_width": 64},
+            {"vip_name": "spi_vip",   "protocol": "SPI",       "data_width": 8}
+          ],
+          "ral": {"reg_block_class": "data_gw_reg_block", "register_bus_vip": "ahb_vip"}
+        },
+        "testplan_rows": [],
+        "sb_config": null
+      },
+      "output_dir": "/tmp/s8_eval/data_gw/dv",
+      "assertions": [
+        {
+          "id": "a1",
+          "description": "Skill prints design analysis summary before asking questions",
+          "check": "output contains 'Data flows detected' AND 'Reference model assessment'"
+        },
+        {
+          "id": "a2",
+          "description": "All 9 design questions presented in ONE message with Q1-Q9 labels",
+          "check": "output contains [Q1] AND [Q2] AND [Q3] AND [Q4] AND [Q5] AND [Q6] AND [Q7] AND [Q8] AND [Q9] in single response"
+        },
+        {
+          "id": "a3",
+          "description": "No .sv files generated before user answers questions",
+          "check": "no .sv files exist in output_dir before user response"
+        }
+      ]
+    }
+  ]
+}

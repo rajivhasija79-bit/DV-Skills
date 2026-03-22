@@ -62,6 +62,12 @@ DEPS = {
         ("datetime",  None,       "stdlib"),
         ("re",        None,       "stdlib"),
     ],
+    "s8": [
+        ("json",      None,       "stdlib"),
+        ("pathlib",   None,       "stdlib"),
+        ("datetime",  None,       "stdlib"),
+        ("re",        None,       "stdlib"),
+    ],
 }
 
 ALL_DEPS = {pkg: install for skill_deps in DEPS.values()
@@ -87,7 +93,7 @@ def install_dep(package):
 
 def main():
     parser = argparse.ArgumentParser(description="DV Skills environment checker")
-    parser.add_argument("--skill", choices=["s1","s2","s3","s4","s5","s6","s7","all"], default="all",
+    parser.add_argument("--skill", choices=["s1","s2","s3","s4","s5","s6","s7","s8","all"], default="all",
                         help="Which skill to check dependencies for")
     parser.add_argument("--install", action="store_true",
                         help="Auto-install missing pip packages")

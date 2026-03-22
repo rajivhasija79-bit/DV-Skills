@@ -294,6 +294,20 @@ def post_project_config():
 
 # ── Project Actions ────────────────────────────────────────────────────────
 
+# ── Bash script directory ─────────────────────────────────────────────────
+BASH_SCRIPTS_DIR = BASE_DIR / "scripts"
+BASH_SCRIPTS_DIR.mkdir(exist_ok=True)
+
+# Section ID  →  demo action key (fallback when bash script missing)
+SECTION_TO_ACTION = {
+    "identity":   "init_project",
+    "workspace":  "setup_workspace",
+    "tools":      "verify_tools",
+    "guidelines": "validate_docs",
+    "dut":        "gen_dut_config",
+    "sim":        "gen_sim_defaults",
+}
+
 PROJECT_ACTION_DEMOS = {
     "init_project": [
         "Initializing DV project structure…",
@@ -386,40 +400,99 @@ def _fmt(s: str, params: dict) -> str:
         return s
 
 
-@app.route("/api/project-action/<action_id>", methods=["POST"])
-def run_project_action(action_id):
-    if action_id not in PROJECT_ACTION_DEMOS:
-        return jsonify({"error": "Unknown action"}), 404
+@app.route("/api/project-action/<section_id>", methods=["POST"])
+def run_project_action(section_id):
+    if section_id not in SECTION_TO_ACTION:
+        return jsonify({"error": f"Unknown section: {section_id}"}), 404
 
-    params = request.get_json() or {}
-    merged = {**load_project_config(), **params}
-    run_id = f"proj_{action_id}_{int(time.time())}_{uuid.uuid4().hex[:6]}"
+    params  = request.get_json() or {}
+    merged  = {**load_project_config(), **params}
+    run_id  = f"proj_{section_id}_{int(time.time())}_{uuid.uuid4().hex[:6]}"
 
     with _runs_lock:
         _runs[run_id] = {
-            "skill_id": f"proj_{action_id}", "params": merged,
+            "skill_id": f"proj_{section_id}", "params": merged,
             "lines": [], "status": "running", "exit_code": None,
             "started_at": time.time(), "finished_at": None,
         }
 
-    threading.Thread(
-        target=_run_project_action_demo,
-        args=(action_id, run_id, merged), daemon=True
-    ).start()
+    script = BASH_SCRIPTS_DIR / f"run_chipagent_{section_id}.bash"
+    if script.exists():
+        threading.Thread(
+            target=_run_bash_script,
+            args=(section_id, run_id, merged, script), daemon=True
+        ).start()
+    else:
+        # Graceful fallback — demo mode with a warning
+        action_id = SECTION_TO_ACTION[section_id]
+        threading.Thread(
+            target=_run_project_action_demo,
+            args=(section_id, action_id, run_id, merged), daemon=True
+        ).start()
+
     return jsonify({"run_id": run_id, "status": "started"})
 
 
-def _run_project_action_demo(action_id: str, run_id: str, params: dict):
+def _run_bash_script(section_id: str, run_id: str, params: dict, script: Path):
+    """Execute run_chipagent_<section_id>.bash with project config as env vars."""
+    # Build environment: inherit process env, inject project config as UPPER_CASE vars
+    env = {**os.environ}
+    for k, v in params.items():
+        if v is not None:
+            env[k.upper()] = str(v)
+
+    _add_line(run_id, "system",
+              f"▶  run_chipagent_{section_id}.bash")
+    _add_line(run_id, "system",
+              f"   {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    _add_line(run_id, "system",
+              f"   Script : {script}")
+    _add_line(run_id, "system",
+              f"   Working: {script.parent}")
+
+    try:
+        proc = subprocess.Popen(
+            ["bash", str(script)],
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+            text=True, bufsize=1, env=env,
+            cwd=str(script.parent),
+        )
+        with _runs_lock:
+            if run_id in _runs:
+                _runs[run_id]["process"] = proc
+
+        import select as _select
+        while True:
+            r, _, _ = _select.select([proc.stdout, proc.stderr], [], [], 0.1)
+            for stream in r:
+                line = stream.readline()
+                if line:
+                    t = "stdout" if stream is proc.stdout else "stderr"
+                    _add_line(run_id, t, line.rstrip())
+            if proc.poll() is not None:
+                for line in proc.stdout: _add_line(run_id, "stdout", line.rstrip())
+                for line in proc.stderr: _add_line(run_id, "stderr", line.rstrip())
+                break
+
+        _finish_run(run_id, f"proj_{section_id}", proc.returncode)
+
+    except Exception as exc:
+        _add_line(run_id, "stderr", f"Failed to execute script: {exc}")
+        _finish_run(run_id, f"proj_{section_id}", 1)
+
+
+def _run_project_action_demo(section_id: str, action_id: str, run_id: str, params: dict):
+    """Fallback demo when bash script is absent."""
     import random
-    _add_line(run_id, "system", f"▶  Project Action — {action_id.replace('_', ' ').title()}")
-    _add_line(run_id, "system", f"   {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    steps = PROJECT_ACTION_DEMOS.get(action_id, ["Running…", "✓ Done"])
-    for step in steps:
+    _add_line(run_id, "system",
+              f"▶  {action_id.replace('_',' ').title()}  [demo — run_chipagent_{section_id}.bash not found]")
+    _add_line(run_id, "system",
+              f"   {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    for step in PROJECT_ACTION_DEMOS.get(action_id, ["Running…", "✓ Done"]):
         time.sleep(random.uniform(0.28, 0.65))
         text = _fmt(step, params)
-        t = "success" if text.startswith("✓") else "stdout"
-        _add_line(run_id, t, text)
-    _finish_run(run_id, f"proj_{action_id}", 0)
+        _add_line(run_id, "success" if text.startswith("✓") else "stdout", text)
+    _finish_run(run_id, f"proj_{section_id}", 0)
 
 
 @app.route("/api/browse")

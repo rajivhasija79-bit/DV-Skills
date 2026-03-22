@@ -1299,7 +1299,7 @@ const ProjectSettings = {
     State.projectConfig = {...this._cfg};
 
     this._setSectionState(sectionId, 'running');
-    const r = await fetch(`/api/project-action/${ac.actionId}`, {
+    const r = await fetch(`/api/project-action/${sectionId}`, {
       method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify(this._cfg)
     });

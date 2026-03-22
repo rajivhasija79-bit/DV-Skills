@@ -16,10 +16,10 @@ from pathlib import Path
 
 from flask import Flask, Response, jsonify, render_template, request, stream_with_context
 
-app = Flask(__name__)
-
 # ── Paths ────────────────────────────────────────────────────────────────────
-BASE_DIR  = Path(__file__).parent
+BASE_DIR  = Path(__file__).resolve().parent
+
+app = Flask(__name__, template_folder=str(BASE_DIR / "templates"))
 RUNS_DIR  = BASE_DIR / "runs"
 RUNS_DIR.mkdir(exist_ok=True)
 

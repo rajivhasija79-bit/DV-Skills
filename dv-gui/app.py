@@ -16,10 +16,16 @@ from pathlib import Path
 
 from flask import Flask, Response, jsonify, render_template, request, stream_with_context
 
-app = Flask(__name__)
-
 # ── Paths ────────────────────────────────────────────────────────────────────
-BASE_DIR  = Path(__file__).parent
+# Resolve BASE_DIR from __file__ so the app works regardless of the
+# working directory the user launches it from (e.g. repo root vs dv-gui/).
+BASE_DIR  = Path(__file__).resolve().parent
+
+app = Flask(
+    __name__,
+    template_folder=str(BASE_DIR / "templates"),
+    static_folder=str(BASE_DIR / "static") if (BASE_DIR / "static").exists() else None,
+)
 RUNS_DIR  = BASE_DIR / "runs"
 RUNS_DIR.mkdir(exist_ok=True)
 

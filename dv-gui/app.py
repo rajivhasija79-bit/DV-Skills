@@ -92,9 +92,23 @@ SKILL_DEMO_STEPS = {
 }
 
 # ── State ─────────────────────────────────────────────────────────────────────
-STATUS_FILE = RUNS_DIR / "skill_status.json"
+STATUS_FILE         = RUNS_DIR / "skill_status.json"
+PROJECT_CONFIG_FILE = RUNS_DIR / "project_config.json"
 _runs: dict = {}        # run_id → run dict
 _runs_lock  = threading.Lock()
+
+
+def load_project_config() -> dict:
+    if PROJECT_CONFIG_FILE.exists():
+        try:
+            return json.loads(PROJECT_CONFIG_FILE.read_text())
+        except Exception:
+            pass
+    return {}
+
+
+def save_project_config_file(cfg: dict):
+    PROJECT_CONFIG_FILE.write_text(json.dumps(cfg, indent=2))
 
 
 def _default_status():
@@ -266,6 +280,18 @@ def reset_all():
     return jsonify({"status": "reset"})
 
 
+@app.route("/api/project-config", methods=["GET"])
+def get_project_config():
+    return jsonify(load_project_config())
+
+
+@app.route("/api/project-config", methods=["POST"])
+def post_project_config():
+    cfg = request.get_json() or {}
+    save_project_config_file(cfg)
+    return jsonify({"status": "saved"})
+
+
 @app.route("/api/browse")
 def browse():
     path        = request.args.get("path", os.path.expanduser("~"))
@@ -330,6 +356,9 @@ def _finish_run(run_id: str, skill_id: str, exit_code: int):
 
 
 def _execute_skill(skill_id: str, run_id: str, params: dict):
+    # Merge saved project config as base; explicit params override
+    merged = {**load_project_config(), **params}
+    params = merged
     project = params.get("project_name", "project")
     _add_line(run_id, "system", f"▶  Starting {skill_id.upper()} — project: {project}")
     _add_line(run_id, "system", f"   {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")

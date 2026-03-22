@@ -1,1125 +1,648 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DV Skills</title>
-<script>
-  // Prevent flash of wrong theme
-  (function(){
-    const t = localStorage.getItem('dv-theme') || 'light';
-    document.documentElement.dataset.theme = t;
-  })();
-</script>
+<script>(function(){document.documentElement.dataset.theme=localStorage.getItem('dv-theme')||'dark';})();</script>
 <style>
 /* ═══════════════════════════════════════════════════════════════════════════
-   DV SKILLS — Apple-quality design system
+   DV SKILLS — Dark Luxurious Glassmorphism Design System
    ═══════════════════════════════════════════════════════════════════════════ */
-
 :root {
-  /* Accent */
-  --blue:        #007AFF;
-  --blue-hover:  #0066D6;
-  --blue-light:  rgba(0,122,255,.10);
-  --blue-ring:   rgba(0,122,255,.30);
+  /* ── Void palette ── */
+  --void:        #04040E;
+  --bg:          #07071A;
+  --bg-1:        #0C0C22;
+  --bg-2:        #11112A;
 
-  /* Status */
-  --green:   #34C759;
-  --red:     #FF3B30;
-  --orange:  #FF9F0A;
-  --purple:  #AF52DE;
+  /* ── Glass surfaces ── */
+  --glass:       rgba(255,255,255,.045);
+  --glass-2:     rgba(255,255,255,.07);
+  --glass-3:     rgba(255,255,255,.10);
+  --glass-border: rgba(255,255,255,.09);
+  --glass-border-s: rgba(255,255,255,.16);
 
-  /* Surfaces */
-  --bg:          #F2F2F7;
-  --surface:     #FFFFFF;
-  --surface-2:   #F9F9FB;
-  --sidebar-bg:  rgba(242,242,247,.85);
-  --terminal-bg: #0D0D0F;
+  /* ── Neon accents ── */
+  --indigo:      #6366F1;
+  --indigo-soft: #818CF8;
+  --indigo-dim:  rgba(99,102,241,.14);
+  --indigo-mid:  rgba(99,102,241,.30);
+  --violet:      #A78BFA;
+  --cyan:        #22D3EE;
 
-  /* Text */
-  --t1:  #1D1D1F;
-  --t2:  #3C3C43;
-  --t3:  #8E8E93;
-  --t4:  #AEAEB2;
+  /* ── Status neons ── */
+  --green:   #10B981;
+  --green-d: rgba(16,185,129,.18);
+  --red:     #F43F5E;
+  --red-d:   rgba(244,63,94,.18);
+  --orange:  #F59E0B;
+  --blue:    #60A5FA;
 
-  /* Borders */
-  --border:   rgba(0,0,0,.08);
-  --border-s: rgba(0,0,0,.15);
+  /* ── Text ── */
+  --t1: rgba(255,255,255,.95);
+  --t2: rgba(255,255,255,.72);
+  --t3: rgba(255,255,255,.42);
+  --t4: rgba(255,255,255,.20);
 
-  /* Shadow */
-  --sh-xs: 0 1px 2px rgba(0,0,0,.06);
-  --sh-sm: 0 2px 8px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
-  --sh-md: 0 4px 16px rgba(0,0,0,.10), 0 2px 4px rgba(0,0,0,.06);
-  --sh-lg: 0 12px 40px rgba(0,0,0,.12), 0 4px 12px rgba(0,0,0,.08);
-  --sh-xl: 0 24px 64px rgba(0,0,0,.16), 0 8px 24px rgba(0,0,0,.10);
+  /* ── Borders ── */
+  --border:   rgba(255,255,255,.07);
+  --border-s: rgba(255,255,255,.13);
 
-  /* Radius */
-  --r-xs: 4px;  --r-sm: 6px;  --r-md: 10px;
-  --r-lg: 14px; --r-xl: 20px; --r-pill: 999px;
+  /* ── Glows ── */
+  --glow-indigo: 0 0 30px rgba(99,102,241,.45), 0 0 80px rgba(99,102,241,.15);
+  --glow-green:  0 0 22px rgba(16,185,129,.45);
+  --glow-red:    0 0 22px rgba(244,63,94,.45);
+  --glow-soft:   0 0 40px rgba(99,102,241,.12);
 
-  /* Type */
-  --font:  -apple-system, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
-  --mono:  "SF Mono", "Fira Code", "JetBrains Mono", "Menlo", monospace;
+  /* ── Shadows ── */
+  --sh-xs: 0 2px 8px  rgba(0,0,0,.5);
+  --sh-sm: 0 4px 20px rgba(0,0,0,.55);
+  --sh-md: 0 8px 36px rgba(0,0,0,.60), 0 0 0 1px rgba(255,255,255,.05);
+  --sh-lg: 0 16px 56px rgba(0,0,0,.70), 0 0 0 1px rgba(255,255,255,.06);
+  --sh-xl: 0 24px 80px rgba(0,0,0,.80), 0 0 60px rgba(99,102,241,.10);
 
-  /* Motion */
-  --ease:    cubic-bezier(.25,.46,.45,.94);
-  --spring:  cubic-bezier(.34,1.56,.64,1);
-  --fast:    120ms;
-  --normal:  220ms;
-  --slow:    380ms;
+  /* ── Neumorphic ── */
+  --neu:    5px 5px 14px rgba(0,0,0,.65), -2px -2px 7px rgba(255,255,255,.025);
+  --neu-in: inset 3px 3px 8px rgba(0,0,0,.60), inset -2px -2px 5px rgba(255,255,255,.02);
 
-  /* Layout */
-  --sidebar-w: 240px;
-  --header-h:  52px;
+  /* ── Radius ── */
+  --r-xs:4px; --r-sm:7px; --r-md:11px; --r-lg:15px; --r-xl:22px; --r-pill:999px;
+
+  /* ── Type ── */
+  --font: -apple-system,"SF Pro Display","Helvetica Neue",Arial,sans-serif;
+  --mono: "SF Mono","Fira Code","JetBrains Mono","Menlo",monospace;
+
+  /* ── Motion ── */
+  --ease:   cubic-bezier(.25,.46,.45,.94);
+  --spring: cubic-bezier(.34,1.56,.64,1);
+  --fast:   130ms; --normal:230ms; --slow:400ms;
+
+  /* ── Layout ── */
+  --sidebar-w: 248px;
+  --header-h:  56px;
 }
 
-[data-theme="dark"] {
-  --bg:         #000000;
-  --surface:    #1C1C1E;
-  --surface-2:  #2C2C2E;
-  --sidebar-bg: rgba(22,22,26,.9);
-  --t1:  #F5F5F7;
-  --t2:  #EBEBF5;
-  --t3:  #8E8E93;
-  --t4:  #48484A;
-  --border:   rgba(255,255,255,.08);
-  --border-s: rgba(255,255,255,.16);
-  --sh-sm: 0 2px 8px rgba(0,0,0,.4);
-  --sh-md: 0 4px 16px rgba(0,0,0,.5);
-  --sh-lg: 0 12px 40px rgba(0,0,0,.6);
+[data-theme="light"] {
+  --void:       #F0F0F8;
+  --bg:         #F2F2FA;
+  --bg-1:       #FFFFFF;
+  --bg-2:       #F7F7FF;
+  --glass:      rgba(255,255,255,.80);
+  --glass-2:    rgba(255,255,255,.92);
+  --glass-3:    rgba(255,255,255,.98);
+  --glass-border: rgba(99,102,241,.18);
+  --glass-border-s: rgba(99,102,241,.30);
+  --t1: #0F0F1A; --t2: #2A2A40; --t3: #6B6B85; --t4: #AEAEC0;
+  --border: rgba(0,0,0,.08); --border-s: rgba(0,0,0,.15);
+  --sh-xs: 0 2px 8px rgba(0,0,0,.08);
+  --sh-sm: 0 4px 20px rgba(0,0,0,.10);
+  --sh-md: 0 8px 36px rgba(0,0,0,.12);
+  --sh-lg: 0 16px 56px rgba(0,0,0,.15);
+  --sh-xl: 0 24px 80px rgba(0,0,0,.20);
+  --neu: 4px 4px 10px rgba(0,0,0,.12), -2px -2px 6px rgba(255,255,255,.8);
+  --neu-in: inset 2px 2px 6px rgba(0,0,0,.10), inset -1px -1px 4px rgba(255,255,255,.7);
 }
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
 
-html, body {
-  height: 100%;
-  font-family: var(--font);
-  background: var(--bg);
-  color: var(--t1);
-  font-size: 14px;
-  -webkit-font-smoothing: antialiased;
-  overflow: hidden;
+html,body {
+  height:100%; font-family:var(--font);
+  background:var(--void); color:var(--t1);
+  font-size:14px; -webkit-font-smoothing:antialiased;
+  overflow:hidden;
+}
+
+/* Ambient background nebula */
+body::before {
+  content:''; position:fixed; inset:0; z-index:0; pointer-events:none;
+  background:
+    radial-gradient(ellipse 70% 55% at 15% 25%, rgba(99,102,241,.10) 0%, transparent 60%),
+    radial-gradient(ellipse 55% 45% at 85% 75%, rgba(167,139,250,.07) 0%, transparent 55%),
+    radial-gradient(ellipse 40% 30% at 50% 50%, rgba(34,211,238,.04) 0%, transparent 50%);
 }
 
 /* ── App shell ────────────────────────────────────────────────────────────── */
-#app {
-  display: flex;
-  height: 100vh;
-  overflow: hidden;
-}
+#app { display:flex; height:100vh; overflow:hidden; position:relative; z-index:1; }
 
 /* ── Sidebar ──────────────────────────────────────────────────────────────── */
 #sidebar {
-  width: var(--sidebar-w);
-  flex-shrink: 0;
-  background: var(--sidebar-bg);
-  backdrop-filter: saturate(180%) blur(20px);
-  -webkit-backdrop-filter: saturate(180%) blur(20px);
-  border-right: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  z-index: 10;
+  width:var(--sidebar-w); flex-shrink:0; position:relative; z-index:20;
+  background:rgba(6,6,18,.85);
+  backdrop-filter:blur(40px) saturate(180%);
+  -webkit-backdrop-filter:blur(40px) saturate(180%);
+  border-right:1px solid var(--glass-border);
+  display:flex; flex-direction:column; overflow:hidden;
+  box-shadow:4px 0 40px rgba(0,0,0,.5), inset -1px 0 0 rgba(99,102,241,.08);
+}
+[data-theme="light"] #sidebar {
+  background:rgba(240,240,250,.88);
+  box-shadow:4px 0 30px rgba(0,0,0,.12);
 }
 
 .sb-header {
-  height: var(--header-h);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 14px 0 16px;
-  border-bottom: 1px solid var(--border);
-  flex-shrink: 0;
+  height:var(--header-h); display:flex; align-items:center;
+  justify-content:space-between; padding:0 14px 0 16px;
+  border-bottom:1px solid var(--glass-border); flex-shrink:0;
 }
-.sb-brand {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 15px;
-  font-weight: 600;
-  letter-spacing: -.01em;
-  color: var(--t1);
-}
+.sb-brand { display:flex; align-items:center; gap:9px; font-size:15px; font-weight:700; letter-spacing:-.02em; color:var(--t1); }
 .sb-brand-icon {
-  width: 28px; height: 28px;
-  background: var(--blue);
-  border-radius: 7px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 14px;
-  box-shadow: var(--sh-xs);
+  width:30px; height:30px; border-radius:8px;
+  background:linear-gradient(135deg,var(--indigo),var(--violet));
+  display:flex; align-items:center; justify-content:center; font-size:15px;
+  box-shadow:0 4px 14px rgba(99,102,241,.5);
 }
 .sb-theme-btn {
-  width: 28px; height: 28px;
-  border: none; background: transparent;
-  color: var(--t3);
-  cursor: pointer;
-  border-radius: var(--r-sm);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 15px;
-  transition: background var(--fast) var(--ease), color var(--fast) var(--ease);
+  width:30px; height:30px; border:none;
+  background:var(--glass); color:var(--t3); cursor:pointer;
+  border-radius:var(--r-sm); display:flex; align-items:center; justify-content:center; font-size:15px;
+  transition:all var(--fast) var(--ease); border:1px solid var(--glass-border);
 }
-.sb-theme-btn:hover { background: var(--border); color: var(--t1); }
+.sb-theme-btn:hover { background:var(--glass-2); color:var(--t1); }
 
-.sb-scroll { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 8px 0; }
-.sb-scroll::-webkit-scrollbar { width: 4px; }
-.sb-scroll::-webkit-scrollbar-thumb { background: var(--border-s); border-radius: 2px; }
+.sb-scroll { flex:1; overflow-y:auto; overflow-x:hidden; padding:8px 0; }
+.sb-scroll::-webkit-scrollbar { width:3px; }
+.sb-scroll::-webkit-scrollbar-thumb { background:rgba(99,102,241,.25); border-radius:2px; }
 
 .sb-section-label {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: .04em;
-  text-transform: uppercase;
-  color: var(--t3);
-  padding: 12px 16px 4px;
+  font-size:10.5px; font-weight:700; letter-spacing:.07em; text-transform:uppercase;
+  color:var(--t4); padding:14px 16px 5px;
 }
 
 .sb-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 7px 12px 7px 14px;
-  margin: 1px 8px;
-  border-radius: var(--r-md);
-  cursor: pointer;
-  transition: background var(--fast) var(--ease);
-  user-select: none;
-  position: relative;
+  display:flex; align-items:center; gap:10px;
+  padding:8px 12px 8px 14px; margin:1px 8px;
+  border-radius:var(--r-md); cursor:pointer;
+  transition:all var(--fast) var(--ease); user-select:none;
+  border:1px solid transparent;
 }
-.sb-item:hover { background: var(--border); }
+.sb-item:hover { background:var(--glass); border-color:var(--glass-border); }
 .sb-item.active {
-  background: var(--blue);
-  color: white;
+  background:var(--indigo-dim);
+  border-color:var(--indigo-mid);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08), 0 0 20px rgba(99,102,241,.12);
 }
-.sb-item.active .sb-item-name { color: white; }
-.sb-item.active .sb-badge { background: rgba(255,255,255,.25); color: white; }
-.sb-item.disabled { opacity: .45; pointer-events: none; }
+.sb-item.active .sb-item-name { color:var(--indigo-soft); }
+.sb-item.disabled { opacity:.35; pointer-events:none; }
 
 .sb-icon {
-  width: 28px; height: 28px;
-  border-radius: 7px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 14px;
-  flex-shrink: 0;
-  transition: transform var(--fast) var(--spring);
+  width:28px; height:28px; border-radius:7px;
+  display:flex; align-items:center; justify-content:center; font-size:14px;
+  flex-shrink:0; transition:transform var(--fast) var(--spring);
 }
-.sb-item:hover .sb-icon { transform: scale(1.08); }
-.sb-item.active .sb-icon { transform: scale(1.0); }
+.sb-item:hover .sb-icon { transform:scale(1.08); }
 
-.sb-item-name {
-  flex: 1;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--t1);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.sb-item-sub {
-  font-size: 11px;
-  color: var(--t3);
-  margin-top: 1px;
-}
+.sb-item-name { flex:1; font-size:13px; font-weight:500; color:var(--t2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
-.sb-badge {
-  font-size: 10px;
-  font-weight: 600;
-  padding: 2px 7px;
-  border-radius: var(--r-pill);
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-.sb-badge.idle     { background: var(--surface-2); color: var(--t4); }
-.sb-badge.success  { background: rgba(52,199,89,.15); color: var(--green); }
-.sb-badge.error    { background: rgba(255,59,48,.12); color: var(--red); }
-.sb-badge.running  { background: rgba(0,122,255,.12); color: var(--blue); }
-.sb-badge.pending  { background: var(--surface-2); color: var(--t4); }
+.sb-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+.sb-dot.idle    { background:var(--t4); }
+.sb-dot.success { background:var(--green); box-shadow:0 0 6px rgba(16,185,129,.6); }
+.sb-dot.error   { background:var(--red);   box-shadow:0 0 6px rgba(244,63,94,.6); }
+.sb-dot.running { background:var(--indigo-soft); animation:pulse 1.2s ease-in-out infinite; }
+.sb-dot.pending { background:transparent; border:1.5px solid var(--t4); }
 
-.sb-dot {
-  width: 7px; height: 7px; border-radius: 50%;
-  flex-shrink: 0;
-}
-.sb-dot.idle     { background: var(--t4); }
-.sb-dot.success  { background: var(--green); }
-.sb-dot.error    { background: var(--red); }
-.sb-dot.running  { background: var(--blue); animation: pulse 1.2s ease-in-out infinite; }
-.sb-dot.pending  { background: transparent; border: 1.5px solid var(--t4); }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.8)} }
 
-@keyframes pulse {
-  0%,100% { opacity:1; transform:scale(1); }
-  50% { opacity:.6; transform:scale(.85); }
-}
-
-.sb-footer {
-  padding: 10px 12px;
-  border-top: 1px solid var(--border);
-  flex-shrink: 0;
-}
+.sb-footer { padding:10px 12px; border-top:1px solid var(--glass-border); flex-shrink:0; }
 .sb-reset-btn {
-  width: 100%;
-  padding: 7px;
-  border: 1px solid var(--border-s);
-  background: transparent;
-  color: var(--t3);
-  font-family: var(--font);
-  font-size: 12px;
-  border-radius: var(--r-md);
-  cursor: pointer;
-  transition: all var(--fast) var(--ease);
+  width:100%; padding:8px; border:1px solid var(--glass-border);
+  background:var(--glass); color:var(--t3); font-family:var(--font); font-size:12px;
+  border-radius:var(--r-md); cursor:pointer; transition:all var(--fast) var(--ease);
 }
-.sb-reset-btn:hover { background: var(--border); color: var(--t1); }
+.sb-reset-btn:hover { background:var(--glass-2); color:var(--t1); border-color:var(--glass-border-s); }
 
 /* ── Main panel ───────────────────────────────────────────────────────────── */
-#main {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  min-width: 0;
-}
+#main { flex:1; display:flex; flex-direction:column; overflow:hidden; min-width:0; background:var(--bg); }
 
 .main-header {
-  height: var(--header-h);
-  display: flex;
-  align-items: center;
-  padding: 0 24px;
-  border-bottom: 1px solid var(--border);
-  background: var(--surface);
-  flex-shrink: 0;
-  gap: 12px;
+  height:var(--header-h); display:flex; align-items:center; padding:0 28px;
+  border-bottom:1px solid var(--glass-border);
+  background:rgba(7,7,26,.75);
+  backdrop-filter:blur(24px);
+  flex-shrink:0; gap:12px; position:relative; z-index:5;
 }
-.main-header h1 {
-  font-size: 17px;
-  font-weight: 600;
-  letter-spacing: -.01em;
-  color: var(--t1);
-  flex: 1;
-}
-.main-header-sub {
-  font-size: 13px;
-  color: var(--t3);
-}
+[data-theme="light"] .main-header { background:rgba(240,240,250,.85); }
+.main-header h1 { font-size:18px; font-weight:700; letter-spacing:-.025em; color:var(--t1); flex:1; }
+.main-header-sub { font-size:13px; color:var(--t3); }
 
-.main-body {
-  flex: 1;
-  overflow: hidden;
-  position: relative;
-}
+.main-body { flex:1; overflow-y:auto; overflow-x:hidden; }
+.main-body::-webkit-scrollbar { width:5px; }
+.main-body::-webkit-scrollbar-thumb { background:rgba(99,102,241,.2); border-radius:3px; }
 
-/* ── Views ────────────────────────────────────────────────────────────────── */
-.view {
-  position: absolute;
-  inset: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
-  transition: opacity var(--normal) var(--ease), transform var(--normal) var(--ease);
-}
-.view.hidden {
-  opacity: 0;
-  pointer-events: none;
-  transform: translateX(12px);
-}
-.view::-webkit-scrollbar { width: 6px; }
-.view::-webkit-scrollbar-thumb { background: var(--border-s); border-radius: 3px; }
+.view.hidden { display:none !important; }
 
 /* ── Dashboard ────────────────────────────────────────────────────────────── */
-#view-dash {
-  padding: 28px 28px 100px;
-}
-
 .dash-hero {
-  margin-bottom: 28px;
+  background:var(--glass); border:1px solid var(--glass-border);
+  border-radius:var(--r-xl); padding:28px 32px; margin-bottom:24px;
+  backdrop-filter:blur(16px);
+  box-shadow:var(--sh-sm), inset 0 1px 0 rgba(255,255,255,.07);
+  position:relative; overflow:hidden;
 }
-.dash-hero h2 {
-  font-size: 28px;
-  font-weight: 700;
-  letter-spacing: -.02em;
-  color: var(--t1);
-  margin-bottom: 6px;
+.dash-hero::before {
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background:radial-gradient(ellipse 60% 80% at 90% 50%, rgba(99,102,241,.07), transparent);
 }
-.dash-hero p {
-  font-size: 15px;
-  color: var(--t3);
-  line-height: 1.5;
-}
+.dash-hero h2 { font-size:24px; font-weight:700; letter-spacing:-.03em; margin-bottom:8px; color:var(--t1); }
+.dash-hero p  { font-size:14px; color:var(--t2); line-height:1.65; }
 
 .dash-progress {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 28px;
-  background: var(--surface);
-  border-radius: var(--r-lg);
-  padding: 14px 18px;
-  box-shadow: var(--sh-sm);
-  border: 1px solid var(--border);
+  display:flex; align-items:center; gap:14px; margin-top:18px;
 }
-.dash-progress-label { font-size: 13px; color: var(--t3); white-space: nowrap; }
-.dash-progress-bar {
-  flex: 1;
-  height: 6px;
-  background: var(--border-s);
-  border-radius: var(--r-pill);
-  overflow: hidden;
-}
-.dash-progress-fill {
-  height: 100%;
-  background: var(--green);
-  border-radius: var(--r-pill);
-  transition: width var(--slow) var(--ease);
-}
-.dash-progress-count { font-size: 13px; font-weight: 600; color: var(--t1); white-space: nowrap; }
+.dash-progress-label { font-size:12px; color:var(--t3); white-space:nowrap; font-weight:600; letter-spacing:.03em; text-transform:uppercase; }
+.dash-progress-bar { flex:1; height:5px; background:rgba(255,255,255,.07); border-radius:var(--r-pill); overflow:hidden; }
+.dash-progress-fill { height:100%; background:linear-gradient(90deg,var(--indigo),var(--violet)); border-radius:var(--r-pill); transition:width .6s var(--ease); box-shadow:0 0 12px rgba(99,102,241,.5); }
+.dash-progress-count { font-size:12px; color:var(--t3); white-space:nowrap; font-weight:600; }
 
-.dash-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 14px;
-}
+.dash-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:16px; }
 
 .skill-card {
-  background: var(--surface);
-  border-radius: var(--r-lg);
-  border: 1px solid var(--border);
-  box-shadow: var(--sh-sm);
-  cursor: pointer;
-  transition: transform var(--normal) var(--ease), box-shadow var(--normal) var(--ease);
-  overflow: hidden;
-  position: relative;
+  border-radius:var(--r-lg); overflow:hidden; cursor:pointer;
+  background:var(--glass);
+  border:1px solid var(--glass-border);
+  backdrop-filter:blur(20px);
+  transition:all var(--normal) var(--ease);
+  box-shadow:var(--sh-sm), inset 0 1px 0 rgba(255,255,255,.06);
+  position:relative;
+}
+.skill-card::after {
+  content:''; position:absolute; inset:0; pointer-events:none; border-radius:var(--r-lg);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.04);
 }
 .skill-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--sh-md);
+  background:var(--glass-2); border-color:var(--indigo-mid);
+  transform:translateY(-3px);
+  box-shadow:var(--sh-md), var(--glow-soft), inset 0 1px 0 rgba(255,255,255,.08);
 }
-.skill-card:active { transform: translateY(0); }
-.skill-card.disabled { opacity: .55; cursor: not-allowed; }
-.skill-card.disabled:hover { transform: none; box-shadow: var(--sh-sm); }
+.skill-card.disabled { opacity:.35; pointer-events:none; }
 
-.skill-card-bar {
-  height: 3px;
-  background: var(--t4);
-}
-.skill-card-bar.success { background: var(--green); }
-.skill-card-bar.error   { background: var(--red); }
-.skill-card-bar.running { background: var(--blue);
-  background: linear-gradient(90deg, var(--blue) 0%, #5AC8FA 100%);
-  animation: shimmer 1.4s linear infinite;
-  background-size: 200%;
-}
-@keyframes shimmer { 0%{background-position:200%} 100%{background-position:-200%} }
+.skill-card-bar { height:3px; width:100%; position:relative; overflow:hidden; }
+.skill-card-bar.idle    { background:rgba(255,255,255,.07); }
+.skill-card-bar.success { background:linear-gradient(90deg,var(--green),#34D399); box-shadow:0 0 10px rgba(16,185,129,.5); }
+.skill-card-bar.error   { background:linear-gradient(90deg,var(--red),#FB7185);   box-shadow:0 0 10px rgba(244,63,94,.5); }
+.skill-card-bar.running { background:linear-gradient(90deg,var(--indigo),var(--violet)); animation:shimmer 1.5s ease-in-out infinite; }
+@keyframes shimmer { 0%,100%{opacity:1} 50%{opacity:.6} }
 
-.skill-card-body { padding: 16px; }
-.skill-card-icon {
-  width: 38px; height: 38px;
-  border-radius: 10px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 18px;
-  margin-bottom: 10px;
+.skill-card-body { padding:18px; }
+.skill-card-icon { width:38px; height:38px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:18px; margin-bottom:10px; }
+.skill-card-tag  { font-size:11px; font-weight:700; color:var(--t4); letter-spacing:.07em; text-transform:uppercase; margin-bottom:3px; }
+.skill-card-name { font-size:15px; font-weight:700; color:var(--t1); margin-bottom:5px; letter-spacing:-.01em; }
+.skill-card-desc { font-size:12.5px; color:var(--t3); line-height:1.55; margin-bottom:14px; }
+.skill-card-footer { display:flex; align-items:center; justify-content:space-between; }
+.skill-card-status { font-size:11.5px; font-weight:600; padding:3px 9px; border-radius:var(--r-pill); }
+.skill-card-status.idle    { background:rgba(255,255,255,.07); color:var(--t4); }
+.skill-card-status.success { background:var(--green-d); color:var(--green); }
+.skill-card-status.error   { background:var(--red-d);   color:var(--red); }
+.skill-card-status.running { background:var(--indigo-dim); color:var(--indigo-soft); }
+.skill-card-open { font-size:12px; color:var(--t4); transition:color var(--fast); }
+.skill-card:hover .skill-card-open { color:var(--indigo-soft); }
+
+/* ── Project Settings ─────────────────────────────────────────────────────── */
+.proj-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+@media (max-width:900px) { .proj-grid { grid-template-columns:1fr; } }
+
+.proj-section {
+  border-radius:var(--r-xl); padding:24px;
+  background:var(--glass);
+  border:1px solid var(--glass-border);
+  backdrop-filter:blur(20px);
+  box-shadow:var(--sh-sm), inset 0 1px 0 rgba(255,255,255,.07);
+  transition:border-color var(--normal);
 }
-.skill-card-tag {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: .04em;
-  text-transform: uppercase;
-  color: var(--t3);
-  margin-bottom: 2px;
+.proj-section:hover { border-color:var(--glass-border-s); }
+
+.proj-section-icon { font-size:20px; margin-bottom:10px; display:block; }
+.proj-section-title {
+  font-size:13px; font-weight:700; color:var(--t1); letter-spacing:.01em;
+  margin-bottom:4px; display:flex; align-items:center; gap:8px;
 }
-.skill-card-name {
-  font-size: 15px;
-  font-weight: 600;
-  letter-spacing: -.01em;
-  color: var(--t1);
-  margin-bottom: 4px;
+.proj-section-title .ps-badge {
+  font-size:10px; font-weight:600; padding:2px 8px; border-radius:var(--r-pill);
+  background:var(--indigo-dim); color:var(--indigo-soft); border:1px solid var(--indigo-mid);
 }
-.skill-card-desc {
-  font-size: 12px;
-  color: var(--t3);
-  line-height: 1.45;
-  margin-bottom: 12px;
+.proj-section-desc { font-size:12px; color:var(--t3); margin-bottom:20px; line-height:1.5; }
+.proj-section-full { grid-column:1/-1; }
+
+/* Tool selector */
+.tool-selector { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:16px; }
+.tool-card {
+  padding:14px 12px; border-radius:var(--r-lg); cursor:pointer;
+  background:rgba(255,255,255,.03); border:1px solid var(--glass-border);
+  text-align:center; transition:all var(--normal) var(--ease);
+  box-shadow:var(--neu);
 }
-.skill-card-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+.tool-card:hover { background:var(--glass); border-color:var(--indigo-mid); }
+.tool-card.selected {
+  background:var(--indigo-dim); border-color:var(--indigo-soft);
+  box-shadow:0 0 0 1px var(--indigo-mid), var(--glow-soft);
 }
-.skill-card-status {
-  font-size: 11px;
-  font-weight: 600;
-  padding: 3px 9px;
-  border-radius: var(--r-pill);
+.tool-card-icon { font-size:22px; margin-bottom:6px; }
+.tool-card-name { font-size:12.5px; font-weight:700; color:var(--t1); margin-bottom:2px; }
+.tool-card-ver  { font-size:11px; color:var(--t3); }
+
+/* DUT chips row */
+.proj-chips { display:flex; flex-wrap:wrap; gap:7px; }
+.proj-chip {
+  padding:5px 13px; border-radius:var(--r-pill);
+  border:1px solid var(--glass-border); background:var(--glass);
+  font-size:13px; color:var(--t3); cursor:pointer;
+  transition:all var(--fast) var(--ease); user-select:none;
 }
-.skill-card-status.idle    { background: var(--surface-2); color: var(--t4); }
-.skill-card-status.success { background: rgba(52,199,89,.12); color: var(--green); }
-.skill-card-status.error   { background: rgba(255,59,48,.10); color: var(--red); }
-.skill-card-status.running { background: rgba(0,122,255,.10); color: var(--blue); }
-.skill-card-status.pending { background: var(--surface-2); color: var(--t4); }
-.skill-card-open {
-  font-size: 12px;
-  color: var(--blue);
-  font-weight: 500;
-  text-decoration: none;
+.proj-chip:hover { border-color:var(--indigo-mid); color:var(--indigo-soft); }
+.proj-chip.sel { background:var(--indigo-dim); border-color:var(--indigo-soft); color:var(--indigo-soft); }
+
+/* Save bar */
+.proj-save-bar {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:16px 24px; border-radius:var(--r-xl);
+  background:var(--glass); border:1px solid var(--indigo-mid);
+  box-shadow:0 0 30px rgba(99,102,241,.12);
+  backdrop-filter:blur(16px);
 }
+.proj-save-bar-msg { font-size:13px; color:var(--t2); }
+.proj-saved-pill {
+  display:inline-flex; align-items:center; gap:6px;
+  padding:5px 12px; border-radius:var(--r-pill);
+  background:var(--green-d); color:var(--green); font-size:12.5px; font-weight:600;
+  animation:fadeIn .3s var(--ease);
+}
+@keyframes fadeIn { from{opacity:0;transform:scale(.9)} to{opacity:1;transform:none} }
 
 /* ── Wizard ───────────────────────────────────────────────────────────────── */
-#view-wizard {
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-}
-
 .wizard-header {
-  padding: 20px 28px 0;
-  flex-shrink: 0;
-}
-.wizard-skill-tag {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: .06em;
-  text-transform: uppercase;
-  color: var(--t3);
-  margin-bottom: 4px;
-}
-.wizard-skill-name {
-  font-size: 24px;
-  font-weight: 700;
-  letter-spacing: -.02em;
-  color: var(--t1);
-  margin-bottom: 4px;
-}
-.wizard-skill-desc {
-  font-size: 14px;
-  color: var(--t3);
-  line-height: 1.5;
-  margin-bottom: 18px;
+  flex-shrink:0; padding:28px 36px 0;
+  border-bottom:1px solid var(--glass-border);
+  background:rgba(7,7,26,.6); backdrop-filter:blur(20px);
 }
 
-/* Dependency strip */
-.dep-strip {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-wrap: wrap;
-  margin-bottom: 16px;
-}
-.dep-label { font-size: 12px; color: var(--t3); }
-.dep-chip {
-  font-size: 11px;
-  font-weight: 600;
-  padding: 3px 9px;
-  border-radius: var(--r-pill);
-}
-.dep-chip.met   { background: rgba(52,199,89,.12); color: var(--green); }
-.dep-chip.unmet { background: rgba(255,59,48,.10); color: var(--red); }
+.wizard-skill-tag  { font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--indigo-soft); margin-bottom:3px; }
+.wizard-skill-name { font-size:22px; font-weight:700; letter-spacing:-.025em; color:var(--t1); margin-bottom:4px; }
+.wizard-skill-desc { font-size:13.5px; color:var(--t3); line-height:1.55; margin-bottom:16px; }
+
+.dep-strip { display:flex; align-items:center; gap:8px; margin-bottom:14px; flex-wrap:wrap; }
+.dep-label { font-size:11px; color:var(--t4); font-weight:600; text-transform:uppercase; letter-spacing:.04em; }
+.dep-chip  { font-size:11.5px; font-weight:600; padding:3px 10px; border-radius:var(--r-pill); border:1px solid; }
+.dep-chip.met   { background:var(--green-d); color:var(--green); border-color:rgba(16,185,129,.3); }
+.dep-chip.unmet { background:var(--red-d);   color:var(--red);   border-color:rgba(244,63,94,.3); }
 
 /* Step indicator */
-.step-indicator {
-  display: flex;
-  align-items: center;
-  gap: 0;
-  margin-bottom: 20px;
-}
-.step-node {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 5px;
-}
+.step-indicator { display:flex; align-items:center; padding-bottom:18px; }
+.step-node { display:flex; flex-direction:column; align-items:center; gap:5px; position:relative; }
 .step-circle {
-  width: 26px; height: 26px;
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 12px;
-  font-weight: 600;
-  font-family: var(--mono);
-  transition: all var(--normal) var(--ease);
+  width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+  font-size:12px; font-weight:700; transition:all var(--normal) var(--ease); flex-shrink:0;
+  border:1.5px solid var(--glass-border); background:var(--glass); color:var(--t3);
 }
-.step-circle.done { background: var(--blue); color: white; }
-.step-circle.current {
-  background: var(--surface);
-  color: var(--blue);
-  border: 2px solid var(--blue);
-  box-shadow: 0 0 0 3px var(--blue-ring);
-}
-.step-circle.future { background: var(--border-s); color: var(--t4); }
-.step-label {
-  font-size: 10px;
-  font-weight: 500;
-  color: var(--t3);
-  white-space: nowrap;
-}
-.step-label.current { color: var(--blue); font-weight: 600; }
-.step-connector {
-  flex: 1;
-  height: 2px;
-  background: var(--border-s);
-  min-width: 20px;
-  max-width: 60px;
-  margin: 0 4px;
-  margin-bottom: 20px;
-  transition: background var(--normal) var(--ease);
-}
-.step-connector.done { background: var(--blue); }
+.step-circle.current { background:var(--indigo); border-color:var(--indigo); color:#fff; box-shadow:var(--glow-indigo); }
+.step-circle.done    { background:var(--green-d); border-color:var(--green); color:var(--green); }
+.step-label { font-size:11px; color:var(--t3); white-space:nowrap; font-weight:500; }
+.step-label.current { color:var(--indigo-soft); font-weight:700; }
+.step-connector { flex:1; height:1.5px; background:var(--glass-border); margin:0 6px; min-width:24px; align-self:flex-start; margin-top:13px; }
+.step-connector.done { background:var(--green); box-shadow:0 0 8px rgba(16,185,129,.4); }
 
-/* Step content */
-.wizard-steps-wrap {
-  flex: 1;
-  overflow: hidden;
-  position: relative;
-  min-height: 0;
-}
-.wizard-step {
-  position: absolute;
-  inset: 0;
-  overflow-y: auto;
-  padding: 0 28px 120px;
-  transition: transform var(--normal) var(--ease), opacity var(--normal) var(--ease);
-}
-.wizard-step::-webkit-scrollbar { width: 5px; }
-.wizard-step::-webkit-scrollbar-thumb { background: var(--border-s); border-radius: 3px; }
-.wizard-step.hidden-left  { transform: translateX(-28px); opacity: 0; pointer-events: none; }
-.wizard-step.hidden-right { transform: translateX(28px);  opacity: 0; pointer-events: none; }
+.wizard-steps-wrap { flex:1; overflow-y:auto; overflow-x:hidden; position:relative; }
+.wizard-steps-wrap::-webkit-scrollbar { width:5px; }
+.wizard-steps-wrap::-webkit-scrollbar-thumb { background:rgba(99,102,241,.2); }
 
-.step-title {
-  font-size: 19px;
-  font-weight: 600;
-  letter-spacing: -.01em;
-  color: var(--t1);
-  margin-bottom: 4px;
-  padding-top: 4px;
-}
-.step-desc {
-  font-size: 13px;
-  color: var(--t3);
-  margin-bottom: 22px;
-  line-height: 1.5;
-}
+.wizard-step { padding:32px 36px; transition:all var(--normal) var(--ease); }
+.wizard-step.hidden-left  { display:none; }
+.wizard-step.hidden-right { display:none; }
 
-/* Dep warning banner */
+.step-title { font-size:19px; font-weight:700; color:var(--t1); margin-bottom:5px; letter-spacing:-.02em; }
+.step-desc  { font-size:13.5px; color:var(--t3); margin-bottom:24px; line-height:1.6; }
+
 .dep-warning {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  background: rgba(255,159,10,.08);
-  border: 1px solid rgba(255,159,10,.25);
-  border-radius: var(--r-md);
-  padding: 12px 14px;
-  margin-bottom: 20px;
+  display:flex; gap:12px; padding:14px 16px;
+  background:rgba(244,63,94,.07); border:1px solid rgba(244,63,94,.25);
+  border-radius:var(--r-lg); margin-bottom:20px;
 }
-.dep-warning-icon { font-size: 18px; flex-shrink: 0; }
-.dep-warning-text { font-size: 13px; color: var(--t2); line-height: 1.5; }
-.dep-warning strong { color: var(--orange); }
+.dep-warning-icon { font-size:18px; flex-shrink:0; }
+.dep-warning-text { font-size:13px; color:var(--t2); line-height:1.55; }
 
-/* Wizard footer */
 .wizard-footer {
-  position: fixed;
-  bottom: 0;
-  right: 0;
-  left: var(--sidebar-w);
-  background: var(--surface);
-  border-top: 1px solid var(--border);
-  padding: 14px 28px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  z-index: 5;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  flex-shrink:0; display:flex; align-items:center; padding:16px 36px;
+  border-top:1px solid var(--glass-border); background:rgba(7,7,26,.7);
+  backdrop-filter:blur(16px); gap:10px;
 }
-.wf-spacer { flex: 1; }
+.wf-spacer { flex:1; }
 
-/* ── Form elements ────────────────────────────────────────────────────────── */
-.form-group {
-  margin-bottom: 20px;
-}
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-@media (max-width: 640px) { .form-row { grid-template-columns: 1fr; } }
+/* ── Form Fields ──────────────────────────────────────────────────────────── */
+.form-group { margin-bottom:20px; }
+.form-row-2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
 
 .form-label {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--t2);
-  margin-bottom: 6px;
+  font-size:12.5px; font-weight:600; color:var(--t2);
+  margin-bottom:7px; display:block; letter-spacing:.01em;
 }
-.form-required {
-  color: var(--red);
-  font-size: 11px;
-}
+.form-required { color:var(--indigo-soft); margin-left:2px; }
+.form-hint { font-size:12px; color:var(--t4); margin-top:5px; line-height:1.5; }
+.form-error-msg { font-size:12px; color:var(--red); margin-top:5px; animation:fadeIn var(--fast) var(--ease); }
 
-.form-input {
-  width: 100%;
-  height: 36px;
-  padding: 0 11px;
-  background: var(--surface);
-  border: 1px solid var(--border-s);
-  border-radius: var(--r-md);
-  font-family: var(--font);
-  font-size: 14px;
-  color: var(--t1);
-  outline: none;
-  transition: border-color var(--fast) var(--ease), box-shadow var(--fast) var(--ease);
-  -webkit-appearance: none;
+.form-input, .form-select {
+  width:100%; height:38px; padding:0 13px;
+  background:rgba(0,0,0,.30);
+  border:1px solid var(--glass-border-s);
+  border-radius:var(--r-md); font-family:var(--font); font-size:13.5px;
+  color:var(--t1); outline:none; transition:all var(--fast) var(--ease);
+  box-shadow:var(--neu-in);
 }
-.form-input:focus {
-  border-color: var(--blue);
-  box-shadow: 0 0 0 3px var(--blue-ring);
+[data-theme="light"] .form-input, [data-theme="light"] .form-select {
+  background:rgba(255,255,255,.8);
 }
-.form-input.error {
-  border-color: var(--red);
-  box-shadow: 0 0 0 3px rgba(255,59,48,.20);
+.form-input::placeholder { color:var(--t4); }
+.form-input:focus, .form-select:focus {
+  border-color:var(--indigo);
+  box-shadow:0 0 0 3px rgba(99,102,241,.18), var(--neu-in);
+  background:rgba(0,0,0,.40);
 }
-.form-input[data-mono] { font-family: var(--mono); font-size: 13px; }
+.form-input.error { border-color:var(--red); box-shadow:0 0 0 3px rgba(244,63,94,.15); }
+.form-select { cursor:pointer; appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='rgba(255,255,255,.35)' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 13px center; padding-right:32px; }
+[data-theme="light"] .form-select { background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='rgba(0,0,0,.4)' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E"); }
 
-.form-select {
-  width: 100%;
-  height: 36px;
-  padding: 0 32px 0 11px;
-  background: var(--surface);
-  border: 1px solid var(--border-s);
-  border-radius: var(--r-md);
-  font-family: var(--font);
-  font-size: 14px;
-  color: var(--t1);
-  outline: none;
-  cursor: pointer;
-  -webkit-appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238E8E93' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 11px center;
-  transition: border-color var(--fast) var(--ease), box-shadow var(--fast) var(--ease);
-}
-.form-select:focus { border-color: var(--blue); box-shadow: 0 0 0 3px var(--blue-ring); }
+textarea.form-input { height:auto; padding:10px 13px; resize:vertical; min-height:80px; }
 
-.form-hint {
-  font-size: 11.5px;
-  color: var(--t3);
-  margin-top: 5px;
-  line-height: 1.4;
-}
-.form-error-msg {
-  font-size: 11.5px;
-  color: var(--red);
-  margin-top: 5px;
-  animation: slideIn var(--fast) var(--ease);
-}
-@keyframes slideIn { from { transform: translateY(-3px); opacity:0; } to { transform: none; opacity:1; } }
-
-/* File / dir picker */
-.file-picker {
-  display: flex;
-  gap: 8px;
-  align-items: stretch;
-}
-.file-picker-path {
-  flex: 1;
-  font-family: var(--mono);
-  font-size: 12.5px;
-}
+/* File picker field */
+.file-picker { display:flex; gap:8px; }
+.file-picker-path { flex:1; font-family:var(--mono); font-size:12.5px; }
 .file-picker-btn {
-  height: 36px;
-  padding: 0 13px;
-  background: var(--surface-2);
-  border: 1px solid var(--border-s);
-  border-radius: var(--r-md);
-  font-family: var(--font);
-  font-size: 13px;
-  color: var(--t2);
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background var(--fast) var(--ease);
-  display: flex; align-items: center; gap: 5px;
+  height:38px; padding:0 14px; background:var(--glass); border:1px solid var(--glass-border-s);
+  border-radius:var(--r-md); font-family:var(--font); font-size:13px; color:var(--t2);
+  cursor:pointer; white-space:nowrap; transition:all var(--fast) var(--ease);
+  display:flex; align-items:center; gap:5px; box-shadow:var(--neu);
 }
-.file-picker-btn:hover { background: var(--border); }
+.file-picker-btn:hover { background:var(--glass-2); border-color:var(--indigo-mid); color:var(--indigo-soft); }
 
 /* Toggle */
-.toggle-wrap {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  cursor: pointer;
-  user-select: none;
-}
+.toggle-wrap { display:flex; align-items:center; gap:11px; cursor:pointer; user-select:none; }
 .toggle-track {
-  width: 44px; height: 26px;
-  background: var(--border-s);
-  border-radius: var(--r-pill);
-  position: relative;
-  transition: background var(--normal) var(--ease);
-  flex-shrink: 0;
+  width:46px; height:26px; background:rgba(255,255,255,.12); border-radius:var(--r-pill);
+  position:relative; transition:background var(--normal) var(--ease); flex-shrink:0;
+  box-shadow:var(--neu-in);
 }
-.toggle-track.on { background: var(--green); }
+.toggle-track.on { background:var(--indigo); box-shadow:0 0 16px rgba(99,102,241,.45); }
 .toggle-thumb {
-  position: absolute;
-  top: 3px; left: 3px;
-  width: 20px; height: 20px;
-  background: white;
-  border-radius: 50%;
-  box-shadow: 0 1px 3px rgba(0,0,0,.3);
-  transition: transform var(--normal) var(--spring);
+  position:absolute; top:3px; left:3px; width:20px; height:20px;
+  background:white; border-radius:50%;
+  box-shadow:0 2px 6px rgba(0,0,0,.4);
+  transition:transform var(--normal) var(--spring);
 }
-.toggle-track.on .toggle-thumb { transform: translateX(18px); }
-.toggle-label { font-size: 14px; color: var(--t1); }
+.toggle-track.on .toggle-thumb { transform:translateX(20px); }
+.toggle-label-text { font-size:13.5px; font-weight:500; color:var(--t2); }
 
-/* Chips multi-select */
-.chip-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 7px;
-}
+/* Chips */
+.chip-group { display:flex; flex-wrap:wrap; gap:7px; }
 .chip {
-  padding: 5px 12px;
-  border-radius: var(--r-pill);
-  border: 1px solid var(--border-s);
-  background: var(--surface);
-  font-size: 13px;
-  color: var(--t2);
-  cursor: pointer;
-  transition: all var(--fast) var(--ease);
-  user-select: none;
+  padding:5px 13px; border-radius:var(--r-pill); border:1px solid var(--glass-border-s);
+  background:var(--glass); font-size:13px; color:var(--t3);
+  cursor:pointer; transition:all var(--fast) var(--ease); user-select:none;
 }
-.chip:hover { border-color: var(--blue); color: var(--blue); }
-.chip.selected {
-  background: var(--blue);
-  border-color: var(--blue);
-  color: white;
-}
+.chip:hover { border-color:var(--indigo-mid); color:var(--indigo-soft); }
+.chip.selected { background:var(--indigo-dim); border-color:var(--indigo-soft); color:var(--indigo-soft); }
 
-/* Number input */
-.num-input-wrap { display: flex; align-items: center; gap: 8px; }
+/* Number */
+.num-input-wrap { display:flex; align-items:center; gap:9px; }
 .num-btn {
-  width: 28px; height: 28px;
-  border: 1px solid var(--border-s);
-  background: var(--surface-2);
-  border-radius: var(--r-sm);
-  cursor: pointer;
-  font-size: 16px;
-  color: var(--t2);
-  display: flex; align-items: center; justify-content: center;
-  transition: background var(--fast);
-  flex-shrink: 0;
+  width:30px; height:30px; border:1px solid var(--glass-border-s); background:var(--glass);
+  border-radius:var(--r-sm); cursor:pointer; font-size:17px; color:var(--t2);
+  display:flex; align-items:center; justify-content:center;
+  transition:all var(--fast); box-shadow:var(--neu);
 }
-.num-btn:hover { background: var(--border); }
-.num-input {
-  width: 70px;
-  height: 36px;
-  text-align: center;
-}
+.num-btn:hover { background:var(--glass-2); border-color:var(--indigo-mid); color:var(--indigo-soft); }
+.num-input { width:72px; height:38px; text-align:center; }
 
-/* Review section */
-.review-section {
-  background: var(--surface-2);
-  border-radius: var(--r-lg);
-  border: 1px solid var(--border);
-  overflow: hidden;
-  margin-bottom: 16px;
-}
-.review-section-header {
-  padding: 10px 16px;
-  background: var(--border);
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: .02em;
-  text-transform: uppercase;
-  color: var(--t3);
-}
-.review-row {
-  display: flex;
-  padding: 9px 16px;
-  border-bottom: 1px solid var(--border);
-  gap: 16px;
-}
-.review-row:last-child { border-bottom: none; }
-.review-key {
-  width: 160px;
-  font-size: 13px;
-  color: var(--t3);
-  flex-shrink: 0;
-}
-.review-val {
-  font-size: 13px;
-  color: var(--t1);
-  font-family: var(--mono);
-  word-break: break-all;
-}
-.review-val.empty { color: var(--t4); font-family: var(--font); font-style: italic; }
+/* Review */
+.review-section { background:var(--glass); border-radius:var(--r-lg); border:1px solid var(--glass-border); overflow:hidden; margin-bottom:14px; }
+.review-section-header { padding:9px 16px; background:rgba(99,102,241,.08); font-size:11.5px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:var(--indigo-soft); }
+.review-row { display:flex; padding:9px 16px; border-bottom:1px solid var(--border); gap:16px; }
+.review-row:last-child { border-bottom:none; }
+.review-key { width:160px; font-size:13px; color:var(--t3); flex-shrink:0; }
+.review-val { font-size:13px; color:var(--t1); font-family:var(--mono); word-break:break-all; }
+.review-val.empty { color:var(--t4); font-family:var(--font); font-style:italic; }
 
 /* ── Buttons ──────────────────────────────────────────────────────────────── */
 .btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  height: 36px;
-  padding: 0 16px;
-  border-radius: var(--r-md);
-  font-family: var(--font);
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  border: none;
-  outline: none;
-  transition: all var(--fast) var(--ease);
-  white-space: nowrap;
-  user-select: none;
+  display:inline-flex; align-items:center; justify-content:center; gap:7px;
+  height:38px; padding:0 18px; border-radius:var(--r-md); font-family:var(--font);
+  font-size:14px; font-weight:600; cursor:pointer; border:none; outline:none;
+  transition:all var(--fast) var(--ease); white-space:nowrap; user-select:none; letter-spacing:.01em;
 }
-.btn:active { transform: scale(.97); }
-.btn:disabled { opacity: .4; pointer-events: none; }
+.btn:active { transform:scale(.97); }
+.btn:disabled { opacity:.4; pointer-events:none; }
 
 .btn-primary {
-  background: var(--blue);
-  color: white;
-  box-shadow: 0 1px 3px rgba(0,122,255,.35);
+  background:linear-gradient(135deg,#4F46E5,var(--indigo));
+  color:#fff; box-shadow:0 4px 20px rgba(99,102,241,.45);
 }
-.btn-primary:hover { background: var(--blue-hover); }
+.btn-primary:hover { background:linear-gradient(135deg,#4338CA,#4F46E5); box-shadow:0 6px 28px rgba(99,102,241,.6); }
 
 .btn-run {
-  background: var(--green);
-  color: white;
-  height: 40px;
-  padding: 0 22px;
-  font-size: 15px;
-  font-weight: 600;
-  box-shadow: 0 2px 8px rgba(52,199,89,.35);
+  background:linear-gradient(135deg,#059669,var(--green));
+  color:#fff; height:42px; padding:0 24px; font-size:15px;
+  box-shadow:0 4px 20px rgba(16,185,129,.45);
 }
-.btn-run:hover { background: #28b84e; }
+.btn-run:hover { box-shadow:0 6px 30px rgba(16,185,129,.6); }
 
 .btn-secondary {
-  background: var(--surface-2);
-  color: var(--t2);
-  border: 1px solid var(--border-s);
+  background:var(--glass); color:var(--t2);
+  border:1px solid var(--glass-border-s); box-shadow:var(--neu);
 }
-.btn-secondary:hover { background: var(--border); }
+.btn-secondary:hover { background:var(--glass-2); color:var(--t1); border-color:var(--glass-border-s); }
 
-.btn-ghost {
-  background: transparent;
-  color: var(--blue);
-  padding: 0 10px;
-}
-.btn-ghost:hover { background: var(--blue-light); }
+.btn-ghost { background:transparent; color:var(--indigo-soft); padding:0 12px; }
+.btn-ghost:hover { background:var(--indigo-dim); }
 
-.btn-danger {
-  background: rgba(255,59,48,.10);
-  color: var(--red);
-}
-.btn-danger:hover { background: rgba(255,59,48,.18); }
+.btn-danger { background:var(--red-d); color:var(--red); }
+.btn-danger:hover { background:rgba(244,63,94,.28); }
 
-.btn-sm { height: 30px; padding: 0 12px; font-size: 12.5px; }
+.btn-sm { height:30px; padding:0 12px; font-size:12.5px; }
 
-.spinner {
-  width: 14px; height: 14px;
-  border: 2px solid rgba(255,255,255,.35);
-  border-top-color: white;
-  border-radius: 50%;
-  animation: spin .7s linear infinite;
-}
-.spinner.dark {
-  border-color: rgba(0,122,255,.2);
-  border-top-color: var(--blue);
-}
-@keyframes spin { to { transform: rotate(360deg); } }
+.spinner { width:14px; height:14px; border:2px solid rgba(255,255,255,.25); border-top-color:white; border-radius:50%; animation:spin .7s linear infinite; }
+.spinner.dark { border-color:rgba(99,102,241,.2); border-top-color:var(--indigo); }
+@keyframes spin { to{transform:rotate(360deg)} }
 
-/* ── Terminal panel ───────────────────────────────────────────────────────── */
+/* ── Terminal ─────────────────────────────────────────────────────────────── */
 #terminal-panel {
-  background: var(--terminal-bg);
-  border-top: 1px solid rgba(255,255,255,.08);
-  display: flex;
-  flex-direction: column;
-  flex-shrink: 0;
-  transition: height var(--slow) var(--ease);
-  height: 36px;
-  overflow: hidden;
-  position: relative;
+  background:#04040E; border-top:1px solid rgba(99,102,241,.15);
+  display:flex; flex-direction:column; flex-shrink:0;
+  transition:height var(--slow) var(--ease); height:36px; overflow:hidden; position:relative;
+  box-shadow:0 -4px 30px rgba(0,0,0,.5);
 }
-#terminal-panel.expanded { height: 40vh; }
+#terminal-panel.expanded { height:40vh; }
 
-.term-header {
-  height: 36px;
-  display: flex;
-  align-items: center;
-  padding: 0 14px;
-  gap: 8px;
-  cursor: pointer;
-  flex-shrink: 0;
-}
-.term-title { font-size: 12px; font-weight: 500; color: rgba(255,255,255,.6); flex: 1; }
-.term-badge {
-  font-size: 10px;
-  font-weight: 600;
-  padding: 2px 7px;
-  border-radius: var(--r-pill);
-}
-.term-badge.idle    { background: rgba(255,255,255,.08); color: rgba(255,255,255,.4); }
-.term-badge.running { background: rgba(0,122,255,.3); color: #5AC8FA; }
-.term-badge.success { background: rgba(52,199,89,.25); color: #32D74B; }
-.term-badge.error   { background: rgba(255,59,48,.25); color: #FF453A; }
+.term-header { height:36px; display:flex; align-items:center; padding:0 16px; gap:8px; cursor:pointer; flex-shrink:0; }
+.term-header:hover { background:rgba(99,102,241,.05); }
+.term-title { font-size:12px; font-weight:600; color:rgba(255,255,255,.5); flex:1; letter-spacing:.02em; }
+.term-badge { font-size:10px; font-weight:700; padding:2px 8px; border-radius:var(--r-pill); letter-spacing:.03em; }
+.term-badge.idle    { background:rgba(255,255,255,.06); color:rgba(255,255,255,.3); }
+.term-badge.running { background:rgba(99,102,241,.25); color:#A5B4FC; }
+.term-badge.success { background:rgba(16,185,129,.2);  color:#34D399; }
+.term-badge.error   { background:rgba(244,63,94,.2);   color:#FB7185; }
 
-.term-actions { display: flex; gap: 4px; align-items: center; }
-.term-btn {
-  height: 24px;
-  padding: 0 8px;
-  border: none;
-  background: rgba(255,255,255,.06);
-  color: rgba(255,255,255,.5);
-  border-radius: var(--r-sm);
-  font-size: 11px;
-  cursor: pointer;
-  transition: background var(--fast);
-}
-.term-btn:hover { background: rgba(255,255,255,.12); color: rgba(255,255,255,.8); }
+.term-actions { display:flex; gap:4px; }
+.term-btn { height:22px; padding:0 9px; border:none; background:rgba(255,255,255,.05); color:rgba(255,255,255,.4); border-radius:var(--r-sm); font-size:11px; cursor:pointer; transition:all var(--fast); }
+.term-btn:hover { background:rgba(99,102,241,.2); color:rgba(255,255,255,.8); }
 
-.term-body {
-  flex: 1;
-  overflow-y: auto;
-  padding: 8px 0;
-  opacity: 0;
-  transition: opacity var(--fast) var(--ease) .15s;
-}
-#terminal-panel.expanded .term-body { opacity: 1; }
-.term-body::-webkit-scrollbar { width: 4px; }
-.term-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); }
+.term-body { flex:1; overflow-y:auto; padding:6px 0; opacity:0; transition:opacity var(--fast) var(--ease) .15s; }
+#terminal-panel.expanded .term-body { opacity:1; }
+.term-body::-webkit-scrollbar { width:3px; }
+.term-body::-webkit-scrollbar-thumb { background:rgba(99,102,241,.2); }
 
-.term-line {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  padding: 1.5px 16px;
-  font-family: var(--mono);
-  font-size: 12.5px;
-  line-height: 1.65;
-}
-.term-ts {
-  font-size: 10px;
-  color: rgba(255,255,255,.2);
-  flex-shrink: 0;
-  min-width: 52px;
-}
-.term-text { white-space: pre-wrap; word-break: break-word; }
-.term-line.stdout .term-text { color: #E5E5EA; }
-.term-line.stderr .term-text { color: #FF9F0A; }
-.term-line.system .term-text { color: #64D2FF; font-style: italic; }
-.term-line.success .term-text { color: #32D74B; }
-.term-line.exit-fail .term-text { color: #FF453A; }
+.term-line { display:flex; align-items:baseline; gap:10px; padding:1.5px 18px; font-family:var(--mono); font-size:12.5px; line-height:1.7; }
+.term-ts { font-size:10px; color:rgba(255,255,255,.18); flex-shrink:0; min-width:54px; }
+.term-text { white-space:pre-wrap; word-break:break-word; }
+.term-line.stdout  .term-text { color:#E2E8F0; }
+.term-line.stderr  .term-text { color:#F59E0B; }
+.term-line.system  .term-text { color:#818CF8; font-style:italic; }
+.term-line.success .term-text { color:#34D399; }
+.term-line.exit-fail .term-text { color:#FB7185; }
 
 /* ── File picker modal ────────────────────────────────────────────────────── */
 #fp-modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity var(--normal) var(--ease);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  position:fixed; inset:0; background:rgba(0,0,0,.7);
+  display:flex; align-items:center; justify-content:center;
+  z-index:1000; opacity:0; pointer-events:none;
+  transition:opacity var(--normal) var(--ease);
+  backdrop-filter:blur(8px);
 }
-#fp-modal.open { opacity: 1; pointer-events: all; }
+#fp-modal.open { opacity:1; pointer-events:all; }
 
 .fp-window {
-  width: min(560px, 92vw);
-  background: var(--surface);
-  border-radius: var(--r-xl);
-  box-shadow: var(--sh-xl);
-  overflow: hidden;
-  transform: scale(.95) translateY(8px);
-  transition: transform var(--normal) var(--spring);
+  width:min(560px,92vw);
+  background:rgba(10,10,25,.95);
+  border:1px solid var(--glass-border-s);
+  border-radius:var(--r-xl); box-shadow:var(--sh-xl), 0 0 0 1px rgba(99,102,241,.1);
+  overflow:hidden; transform:scale(.94) translateY(12px);
+  transition:transform var(--normal) var(--spring);
+  backdrop-filter:blur(40px);
 }
-#fp-modal.open .fp-window { transform: none; }
+#fp-modal.open .fp-window { transform:none; }
 
-.fp-header {
-  padding: 14px 18px;
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.fp-header h3 { font-size: 15px; font-weight: 600; flex: 1; }
-.fp-breadcrumb {
-  font-size: 12px;
-  color: var(--t3);
-  font-family: var(--mono);
-  background: var(--surface-2);
-  border-radius: var(--r-sm);
-  padding: 4px 9px;
-  max-width: 320px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  direction: rtl;
-  text-align: left;
-}
-.fp-list {
-  max-height: 340px;
-  overflow-y: auto;
-  padding: 6px;
-}
-.fp-list::-webkit-scrollbar { width: 4px; }
-.fp-list::-webkit-scrollbar-thumb { background: var(--border-s); }
-.fp-list-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 11px;
-  border-radius: var(--r-md);
-  cursor: pointer;
-  transition: background var(--fast);
-}
-.fp-list-item:hover { background: var(--blue-light); }
-.fp-list-item.selected { background: var(--blue-light); }
-.fp-icon { font-size: 16px; flex-shrink: 0; width: 22px; text-align: center; }
-.fp-name { font-size: 13.5px; color: var(--t1); flex: 1; }
-.fp-name.dir { font-weight: 500; }
-.fp-size { font-size: 11px; color: var(--t3); }
-.fp-footer {
-  padding: 12px 16px;
-  border-top: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.fp-selected-path {
-  flex: 1;
-  font-size: 12px;
-  font-family: var(--mono);
-  color: var(--t3);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
+.fp-header { padding:16px 18px; border-bottom:1px solid var(--glass-border); display:flex; align-items:center; gap:10px; }
+.fp-header h3 { font-size:15px; font-weight:700; flex:1; color:var(--t1); }
+.fp-breadcrumb { font-size:11.5px; color:var(--t3); font-family:var(--mono); background:var(--glass); border:1px solid var(--glass-border); border-radius:var(--r-sm); padding:4px 9px; max-width:280px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; direction:rtl; text-align:left; }
+.fp-list { max-height:340px; overflow-y:auto; padding:6px; }
+.fp-list::-webkit-scrollbar { width:3px; }
+.fp-list::-webkit-scrollbar-thumb { background:rgba(99,102,241,.2); }
+.fp-list-item { display:flex; align-items:center; gap:10px; padding:8px 11px; border-radius:var(--r-md); cursor:pointer; transition:background var(--fast); }
+.fp-list-item:hover { background:var(--indigo-dim); }
+.fp-list-item.selected { background:var(--indigo-dim); }
+.fp-icon { font-size:16px; flex-shrink:0; width:22px; text-align:center; }
+.fp-name { font-size:13.5px; color:var(--t1); flex:1; }
+.fp-name.dir { font-weight:600; color:var(--indigo-soft); }
+.fp-footer { padding:12px 16px; border-top:1px solid var(--glass-border); display:flex; align-items:center; gap:10px; }
+.fp-selected-path { flex:1; font-size:12px; font-family:var(--mono); color:var(--t3); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 
 /* ── Misc ─────────────────────────────────────────────────────────────────── */
-.badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 11px;
-  font-weight: 600;
-  padding: 2px 8px;
-  border-radius: var(--r-pill);
-}
-.divider { height: 1px; background: var(--border); margin: 20px 0; }
-.empty-state {
-  padding: 48px 24px;
-  text-align: center;
-  color: var(--t3);
-}
-.empty-state .es-icon { font-size: 40px; margin-bottom: 12px; }
-.empty-state h3 { font-size: 16px; font-weight: 600; color: var(--t2); margin-bottom: 6px; }
-.empty-state p { font-size: 13px; line-height: 1.5; }
+.divider { height:1px; background:var(--glass-border); margin:22px 0; }
+.empty-state { padding:56px 24px; text-align:center; color:var(--t3); }
+.empty-state .es-icon { font-size:44px; margin-bottom:14px; }
+.empty-state h3 { font-size:17px; font-weight:700; color:var(--t2); margin-bottom:7px; }
+.empty-state p { font-size:13px; line-height:1.6; }
 
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
-}
+@media (prefers-reduced-motion:reduce) { *,*::before,*::after { transition-duration:.01ms !important; animation-duration:.01ms !important; } }
 </style>
 </head>
 <body>
-
 <div id="app">
   <!-- Sidebar -->
   <aside id="sidebar">
@@ -1128,16 +651,27 @@ html, body {
         <div class="sb-brand-icon">⚡</div>
         DV Skills
       </div>
-      <button class="sb-theme-btn" onclick="App.toggleTheme()" title="Toggle dark mode">
-        <span id="theme-icon">🌙</span>
+      <button class="sb-theme-btn" onclick="App.toggleTheme()" title="Toggle theme">
+        <span id="theme-icon">☀️</span>
       </button>
     </div>
     <div class="sb-scroll">
-      <div class="sb-section-label">Navigation</div>
+      <!-- Project Settings -->
+      <div class="sb-section-label">Project</div>
+      <div class="sb-item" id="nav-project" onclick="App.navigate('project')">
+        <div class="sb-icon" style="background:linear-gradient(135deg,rgba(99,102,241,.2),rgba(167,139,250,.15))">⚙️</div>
+        <div><div class="sb-item-name">Project Settings</div></div>
+        <div class="sb-dot" id="proj-dot" style="background:var(--t4)"></div>
+      </div>
+
+      <!-- Dashboard -->
+      <div class="sb-section-label" style="margin-top:4px">Overview</div>
       <div class="sb-item" id="nav-dash" onclick="App.navigate('dash')">
-        <div class="sb-icon" style="background:rgba(0,122,255,.12)">⊞</div>
+        <div class="sb-icon" style="background:rgba(96,165,250,.15)">⊞</div>
         <div><div class="sb-item-name">Dashboard</div></div>
       </div>
+
+      <!-- Skills -->
       <div class="sb-section-label" style="margin-top:4px">Verification Flow</div>
       <div id="skill-list-1"></div>
       <div class="sb-section-label" style="margin-top:4px">Implementation</div>
@@ -1157,41 +691,50 @@ html, body {
       <div class="main-header-sub" id="main-sub"></div>
     </div>
     <div class="main-body">
-      <!-- Dashboard -->
+
+      <!-- ── Dashboard ──────────────────────────────────────────────────── -->
       <div class="view" id="view-dash">
         <div style="padding:28px 28px 8px">
           <div class="dash-hero">
             <h2>DV Verification Flow</h2>
             <p>A 10-skill pipeline from specification extraction to coverage sign-off.<br>
                Complete skills in order — each skill builds on the previous outputs.</p>
-          </div>
-          <div class="dash-progress" id="dash-progress">
-            <span class="dash-progress-label">Overall progress</span>
-            <div class="dash-progress-bar"><div class="dash-progress-fill" id="progress-fill" style="width:0%"></div></div>
-            <span class="dash-progress-count" id="progress-count">0 / 10</span>
+            <div class="dash-progress">
+              <span class="dash-progress-label">Pipeline Progress</span>
+              <div class="dash-progress-bar"><div class="dash-progress-fill" id="progress-fill" style="width:0%"></div></div>
+              <span class="dash-progress-count" id="progress-count">0 / 10</span>
+            </div>
           </div>
         </div>
         <div class="dash-grid" style="padding:0 28px 100px" id="dash-grid"></div>
       </div>
 
-      <!-- Wizard -->
-      <div class="view hidden" id="view-wizard">
+      <!-- ── Project Settings ───────────────────────────────────────────── -->
+      <div class="view hidden" id="view-project">
+        <div style="padding:28px 28px 100px" id="proj-content">
+          <!-- Rendered by ProjectSettings.render() -->
+        </div>
+      </div>
+
+      <!-- ── Wizard ─────────────────────────────────────────────────────── -->
+      <div class="view hidden" id="view-wizard" style="display:flex;flex-direction:column;height:100%">
         <div class="wizard-header" id="wizard-header"></div>
         <div class="wizard-steps-wrap" id="wizard-steps-wrap"></div>
         <div class="wizard-footer" id="wizard-footer"></div>
       </div>
-    </div>
+
+    </div><!-- /main-body -->
   </main>
-</div>
+</div><!-- /app -->
 
 <!-- Terminal -->
 <div id="terminal-panel">
   <div class="term-header" onclick="Terminal.toggle()">
-    <span style="font-size:11px;color:rgba(255,255,255,.35)">▶</span>
-    <span class="term-title" id="term-title">Terminal</span>
+    <span style="font-size:10px;color:rgba(99,102,241,.5);font-weight:700;letter-spacing:.08em">TERMINAL</span>
+    <span class="term-title" id="term-title">Ready</span>
     <span class="term-badge idle" id="term-badge">Idle</span>
     <div class="term-actions" onclick="event.stopPropagation()">
-      <button class="term-btn" id="term-cancel-btn" style="display:none" onclick="Terminal.cancel()">Cancel</button>
+      <button class="term-btn" id="term-cancel-btn" style="display:none" onclick="Terminal.cancel()">■ Cancel</button>
       <button class="term-btn" onclick="Terminal.clear()">Clear</button>
     </div>
   </div>
@@ -1220,360 +763,220 @@ html, body {
 /* ═══════════════════════════════════════════════════════════════════════════
    SKILL DEFINITIONS
    ═══════════════════════════════════════════════════════════════════════════ */
-
 const SKILLS = [
-  {
-    id:'s1', tag:'S1', name:'Spec Extraction', group:1,
-    color:'#007AFF', icon:'📋',
-    desc:'Extract VIP interfaces, protocols, and register map from specification documents.',
-    deps:[],
+  { id:'s1',tag:'S1',name:'Spec Extraction',group:1,color:'#6366F1',icon:'📋',
+    desc:'Extract VIP interfaces, protocols, and register map from specification documents.',deps:[],
     steps:[
-      { title:'Project Setup', desc:'Name your project and provide the specification document.',
-        fields:[
-          {id:'project_name', label:'Project Name', type:'text', placeholder:'e.g., apb_uart',
-           hint:'Lowercase, underscore-separated. Used for all generated file names.', required:true},
-          {id:'spec_file', label:'Specification Document', type:'file', accept:'.pdf,.docx,.txt,.md',
-           hint:'PDF, Word document, or text specification file describing the DUT.'},
-          {id:'output_dir', label:'Output Directory', type:'dir', placeholder:'./dv',
-           hint:'Where to write dv_spec_data.json and extracted interface files.', required:true},
-        ]},
-      { title:'Protocol Detection', desc:'Select the protocols present in your design.',
-        fields:[
-          {id:'protocols', label:'Expected Protocols', type:'chips',
-           options:['APB','AHB','AHB-Lite','AXI4','AXI4-Stream','SPI','I2C','UART','TileLink','Custom'],
-           hint:'Used to guide interface extraction and VIP selection.'},
-          {id:'extract_ral', label:'Extract Register Map', type:'toggle', def:true,
-           hint:'Parse register definitions and generate a RAL-ready register map.'},
-          {id:'extract_clocks', label:'Extract Clock Domains', type:'toggle', def:true,
-           hint:'Identify and document clock domain crossings.'},
-        ]},
+      { title:'Project Setup',desc:'Name your project and provide the specification document.',fields:[
+        {id:'project_name',label:'Project Name',type:'text',placeholder:'e.g., apb_uart',hint:'Lowercase, underscore-separated.',required:true},
+        {id:'spec_file',label:'Specification Document',type:'file',accept:'.pdf,.docx,.txt,.md',hint:'PDF, Word, or text specification describing the DUT.'},
+        {id:'output_dir',label:'Output Directory',type:'dir',placeholder:'./dv',hint:'Where to write dv_spec_data.json.',required:true},
+      ]},
+      { title:'Protocol Detection',desc:'Select the protocols present in your design.',fields:[
+        {id:'protocols',label:'Expected Protocols',type:'chips',options:['APB','AHB','AHB-Lite','AXI4','AXI4-Stream','SPI','I2C','UART','TileLink','Custom'],hint:'Guides interface extraction and VIP selection.'},
+        {id:'extract_ral',label:'Extract Register Map',type:'toggle',def:true,hint:'Parse register definitions and generate a RAL-ready register map.'},
+        {id:'extract_clocks',label:'Extract Clock Domains',type:'toggle',def:true,hint:'Identify and document clock domain crossings.'},
+      ]},
     ]},
 
-  {
-    id:'s2', tag:'S2', name:'Testplan', group:1,
-    color:'#5856D6', icon:'📝',
-    desc:'Generate a structured verification testplan with CHK_IDs, milestones, and coverage targets.',
-    deps:['s1'],
+  { id:'s2',tag:'S2',name:'Testplan',group:1,color:'#8B5CF6',icon:'📝',
+    desc:'Generate a structured verification testplan with CHK_IDs, milestones, and coverage targets.',deps:['s1'],
     steps:[
-      { title:'Project & Sources', desc:'Set your project name and link the specification data from S1.',
-        fields:[
-          {id:'project_name', label:'Project Name', type:'text', placeholder:'e.g., apb_uart',
-           hint:'Must match the name used in S1.', required:true},
-          {id:'spec_data', label:'S1 Spec Data (dv_spec_data.json)', type:'file', accept:'.json',
-           hint:'Output from S1 — provides VIP interfaces and register map.', inherit:{skill:'s1',field:'output_dir'}},
-          {id:'output_dir', label:'Output Directory', type:'dir', placeholder:'./dv',
-           hint:'Where to write testplan.xlsx and dv_testplan_data.json.', required:true},
-        ]},
-      { title:'Testplan Options', desc:'Choose the output format and milestone structure.',
-        fields:[
-          {id:'format', label:'Output Format', type:'select',
-           options:[{v:'both',l:'Excel + JSON (recommended)'},{v:'xlsx',l:'Excel only'},{v:'json',l:'JSON only'}],
-           def:'both'},
-          {id:'milestone', label:'Target Milestone', type:'select',
-           options:[{v:'all',l:'All milestones (DV-I, DV-C, DV-F)'},{v:'DV-I',l:'DV-I only'},{v:'DV-C',l:'DV-C only'},{v:'DV-F',l:'DV-F only'}],
-           def:'all'},
-        ]},
+      { title:'Project & Sources',desc:'Set your project name and link the specification data from S1.',fields:[
+        {id:'project_name',label:'Project Name',type:'text',placeholder:'e.g., apb_uart',required:true},
+        {id:'spec_data',label:'S1 Spec Data (dv_spec_data.json)',type:'file',accept:'.json',hint:'Output from S1.'},
+        {id:'output_dir',label:'Output Directory',type:'dir',required:true},
+      ]},
+      { title:'Testplan Options',desc:'Choose the output format and milestone structure.',fields:[
+        {id:'format',label:'Output Format',type:'select',options:[{v:'both',l:'Excel + JSON (recommended)'},{v:'xlsx',l:'Excel only'},{v:'json',l:'JSON only'}],def:'both'},
+        {id:'milestone',label:'Target Milestone',type:'select',options:[{v:'all',l:'All milestones (DV-I, DV-C, DV-F)'},{v:'DV-I',l:'DV-I only'},{v:'DV-C',l:'DV-C only'},{v:'DV-F',l:'DV-F only'}],def:'all'},
+      ]},
     ]},
 
-  {
-    id:'s3', tag:'S3', name:'TB Architecture', group:1,
-    color:'#FF9500', icon:'🏗️',
-    desc:'Design the UVM testbench architecture — agents, env, hierarchy, and VIP deduplication.',
-    deps:['s1','s2'],
+  { id:'s3',tag:'S3',name:'TB Architecture',group:1,color:'#F59E0B',icon:'🏗️',
+    desc:'Design the UVM testbench architecture — agents, env, hierarchy, and VIP deduplication.',deps:['s1','s2'],
     steps:[
-      { title:'Project & Sources', desc:'Link spec and testplan data to drive TB architecture decisions.',
-        fields:[
-          {id:'project_name', label:'Project Name', type:'text', required:true},
-          {id:'spec_data', label:'Spec Data (dv_spec_data.json)', type:'file', accept:'.json', hint:'From S1.'},
-          {id:'testplan_data', label:'Testplan (dv_testplan_data.json)', type:'file', accept:'.json,.xlsx', hint:'From S2.'},
-          {id:'output_dir', label:'Output Directory', type:'dir', required:true},
-        ]},
-      { title:'Architecture Options', desc:'Configure the UVM TB style and component generation.',
-        fields:[
-          {id:'virtual_seqr', label:'Generate Virtual Sequencer', type:'toggle', def:true,
-           hint:'Adds a virtual sequencer with handles to all VIP sequencers.'},
-          {id:'uvm_version', label:'UVM Version', type:'select',
-           options:[{v:'uvm_1.2',l:'UVM 1.2 (recommended)'},{v:'ieee_uvm',l:'IEEE UVM (1800.2)'}], def:'uvm_1.2'},
-        ]},
+      { title:'Project & Sources',desc:'Link spec and testplan data to drive TB architecture decisions.',fields:[
+        {id:'project_name',label:'Project Name',type:'text',required:true},
+        {id:'spec_data',label:'Spec Data (dv_spec_data.json)',type:'file',accept:'.json',hint:'From S1.'},
+        {id:'testplan_data',label:'Testplan (dv_testplan_data.json)',type:'file',accept:'.json,.xlsx',hint:'From S2.'},
+        {id:'output_dir',label:'Output Directory',type:'dir',required:true},
+      ]},
+      { title:'Architecture Options',desc:'Configure the UVM TB style and component generation.',fields:[
+        {id:'virtual_seqr',label:'Generate Virtual Sequencer',type:'toggle',def:true,hint:'Adds a virtual sequencer with handles to all VIP sequencers.'},
+        {id:'uvm_version',label:'UVM Version',type:'select',options:[{v:'uvm_1.2',l:'UVM 1.2 (recommended)'},{v:'ieee_uvm',l:'IEEE UVM (1800.2)'}],def:'uvm_1.2'},
+      ]},
     ]},
 
-  {
-    id:'s4', tag:'S4', name:'RAL Generation', group:1,
-    color:'#FF3B30', icon:'📦',
-    desc:'Generate the UVM Register Abstraction Layer (RAL) from the extracted register map.',
-    deps:['s1'],
+  { id:'s4',tag:'S4',name:'RAL Generation',group:1,color:'#EF4444',icon:'📦',
+    desc:'Generate the UVM Register Abstraction Layer (RAL) from the extracted register map.',deps:['s1'],
     steps:[
-      { title:'Project & Sources', desc:'Configure RAL generation from the S1 register map.',
-        fields:[
-          {id:'project_name', label:'Project Name', type:'text', required:true},
-          {id:'spec_data', label:'Spec Data (dv_spec_data.json)', type:'file', accept:'.json', hint:'From S1 — provides the register map.'},
-          {id:'output_dir', label:'Output Directory', type:'dir', required:true},
-        ]},
-      { title:'RAL Options', desc:'Configure frontdoor/backdoor access and register sequences.',
-        fields:[
-          {id:'frontdoor_access', label:'Enable Frontdoor Access', type:'toggle', def:true,
-           hint:'Generate bus-protocol frontdoor read/write tasks.'},
-          {id:'backdoor_access', label:'Enable Backdoor Access', type:'toggle', def:true,
-           hint:'Generate direct DUT path backdoor access via UVM RAL.'},
-          {id:'gen_reg_sequences', label:'Generate Register Sequences', type:'toggle', def:true,
-           hint:'Generate hw_reset, bit_bash, and reg_access sequences.'},
-        ]},
+      { title:'Project & Sources',desc:'Configure RAL generation from the S1 register map.',fields:[
+        {id:'project_name',label:'Project Name',type:'text',required:true},
+        {id:'spec_data',label:'Spec Data (dv_spec_data.json)',type:'file',accept:'.json',hint:'From S1 — provides the register map.'},
+        {id:'output_dir',label:'Output Directory',type:'dir',required:true},
+      ]},
+      { title:'RAL Options',desc:'Configure frontdoor/backdoor access and register sequences.',fields:[
+        {id:'frontdoor_access',label:'Enable Frontdoor Access',type:'toggle',def:true,hint:'Generate bus-protocol frontdoor read/write tasks.'},
+        {id:'backdoor_access',label:'Enable Backdoor Access',type:'toggle',def:true,hint:'Generate direct DUT path backdoor access via UVM RAL.'},
+        {id:'gen_reg_sequences',label:'Generate Register Sequences',type:'toggle',def:true,hint:'Generate hw_reset, bit_bash, and reg_access sequences.'},
+      ]},
     ]},
 
-  {
-    id:'s5', tag:'S5', name:'TB Scaffold', group:1,
-    color:'#34C759', icon:'🔧',
-    desc:'Generate all UVM TB source files — agents, env, cfg, tests, compile.f, and Makefile.',
-    deps:['s1','s2','s3','s4'],
+  { id:'s5',tag:'S5',name:'TB Scaffold',group:1,color:'#10B981',icon:'🔧',
+    desc:'Generate all UVM TB source files — agents, env, cfg, tests, compile.f, and Makefile.',deps:['s1','s2','s3','s4'],
     steps:[
-      { title:'Project & Sources', desc:'Link all upstream outputs to drive scaffold generation.',
-        fields:[
-          {id:'project_name', label:'Project Name', type:'text', required:true},
-          {id:'tb_arch_data', label:'TB Arch Data (dv_tb_arch_data.json)', type:'file', accept:'.json', hint:'From S3.'},
-          {id:'ral_data', label:'RAL Data (dv_ral_data.json)', type:'file', accept:'.json', hint:'From S4.'},
-          {id:'output_dir', label:'Output Directory', type:'dir', required:true},
-        ]},
-      { title:'Scaffold Options', desc:'Choose optional extensions to include in the generated TB.',
-        fields:[
-          {id:'run_sanity', label:'Run Compilation Sanity Check', type:'toggle', def:false,
-           hint:'After generation, compile + elaborate + run a minimal sanity simulation.'},
-          {id:'include_cov_hooks', label:'Include Coverage Hooks', type:'toggle', def:true,
-           hint:'Add coverage enable/disable plusargs and covergroup template in env.'},
-        ]},
+      { title:'Project & Sources',desc:'Link all upstream outputs to drive scaffold generation.',fields:[
+        {id:'project_name',label:'Project Name',type:'text',required:true},
+        {id:'tb_arch_data',label:'TB Arch Data (dv_tb_arch_data.json)',type:'file',accept:'.json',hint:'From S3.'},
+        {id:'ral_data',label:'RAL Data (dv_ral_data.json)',type:'file',accept:'.json',hint:'From S4.'},
+        {id:'output_dir',label:'Output Directory',type:'dir',required:true},
+      ]},
+      { title:'Scaffold Options',desc:'Choose optional extensions to include in the generated TB.',fields:[
+        {id:'run_sanity',label:'Run Compilation Sanity Check',type:'toggle',def:false,hint:'Compile + elaborate + run a minimal sanity simulation after generation.'},
+        {id:'include_cov_hooks',label:'Include Coverage Hooks',type:'toggle',def:true,hint:'Add coverage enable/disable plusargs and covergroup template in env.'},
+      ]},
     ]},
 
-  {
-    id:'s6', tag:'S6', name:'Sequences', group:2,
-    color:'#5AC8FA', icon:'🎯',
-    desc:'Generate all UVM sequences and test classes from the testplan.',
-    deps:['s5','s2'],
+  { id:'s6',tag:'S6',name:'Sequences',group:2,color:'#22D3EE',icon:'🎯',
+    desc:'Generate all UVM sequences and test classes from the testplan.',deps:['s5','s2'],
     steps:[
-      { title:'Project & Sources', desc:'Provide the TB data and testplan to drive sequence generation.',
-        fields:[
-          {id:'project_name', label:'Project Name', type:'text', required:true},
-          {id:'tb_data', label:'TB Data (dv_tb_data.json)', type:'file', accept:'.json', hint:'From S5.', required:true},
-          {id:'testplan', label:'Testplan', type:'file', accept:'.json,.xlsx',
-           hint:'testplan.xlsx or dv_testplan_data.json from S2.'},
-          {id:'output_dir', label:'Output Directory', type:'dir', required:true},
-        ]},
-      { title:'Generation Options', desc:'Configure sequence generation strategy.',
-        fields:[
-          {id:'gen_random', label:'Generate Random Sequences', type:'toggle', def:true,
-           hint:'Generate randomized virtual sequences with configurable constraints.'},
-          {id:'gen_directed', label:'Generate Directed Sequences', type:'toggle', def:true,
-           hint:'Generate one directed sequence per testplan row.'},
-        ]},
+      { title:'Project & Sources',desc:'Provide the TB data and testplan to drive sequence generation.',fields:[
+        {id:'project_name',label:'Project Name',type:'text',required:true},
+        {id:'tb_data',label:'TB Data (dv_tb_data.json)',type:'file',accept:'.json',hint:'From S5.',required:true},
+        {id:'testplan',label:'Testplan',type:'file',accept:'.json,.xlsx',hint:'testplan.xlsx or dv_testplan_data.json from S2.'},
+        {id:'output_dir',label:'Output Directory',type:'dir',required:true},
+      ]},
+      { title:'Generation Options',desc:'Configure sequence generation strategy.',fields:[
+        {id:'gen_random',label:'Generate Random Sequences',type:'toggle',def:true,hint:'Generate randomized virtual sequences with configurable constraints.'},
+        {id:'gen_directed',label:'Generate Directed Sequences',type:'toggle',def:true,hint:'Generate one directed sequence per testplan row.'},
+      ]},
     ]},
 
-  {
-    id:'s7', tag:'S7', name:'Assertions', group:3,
-    color:'#FF6B35', icon:'✅',
-    desc:'Generate per-interface SVA files, bind modules, cover properties, and assertion checker.',
-    deps:['s5'],
+  { id:'s7',tag:'S7',name:'Assertions',group:3,color:'#F97316',icon:'✅',
+    desc:'Generate per-interface SVA files, bind modules, cover properties, and assertion checker.',deps:['s5'],
     steps:[
-      { title:'Project & Sources', desc:'Link TB data and optionally the testplan for CHK_ID mapping.',
-        fields:[
-          {id:'project_name', label:'Project Name', type:'text', required:true},
-          {id:'tb_data', label:'TB Data (dv_tb_data.json)', type:'file', accept:'.json', hint:'From S5.', required:true},
-          {id:'testplan', label:'Testplan (optional)', type:'file', accept:'.json,.xlsx',
-           hint:'Maps assertion CHK_IDs to testplan features.'},
-          {id:'output_dir', label:'Output Directory', type:'dir', required:true},
-        ]},
-      { title:'Assertion Options', desc:'Configure what assertion artifacts to generate.',
-        fields:[
-          {id:'auto_gen_protocols', label:'Auto-generate Protocol Properties', type:'toggle', def:true,
-           hint:'Generates standard SVA properties for APB/AXI/UART/SPI/I2C etc.'},
-          {id:'gen_bind_module', label:'Generate DUT Bind Module', type:'toggle', def:true,
-           hint:'Creates a bind file that attaches assertion modules to the DUT.'},
-          {id:'gen_assert_checker', label:'Generate Assertion Checker', type:'toggle', def:true,
-           hint:'UVM component that reports CHK_ID pass/fail counts in report_phase.'},
-          {id:'skip_sva_in_sb', label:'Tag SVA checks to skip in Scoreboard', type:'toggle', def:true,
-           hint:'Writes dv_assertions_data.json so S8 scoreboard skips duplicate checks.'},
-        ]},
+      { title:'Project & Sources',desc:'Link TB data and optionally the testplan for CHK_ID mapping.',fields:[
+        {id:'project_name',label:'Project Name',type:'text',required:true},
+        {id:'tb_data',label:'TB Data (dv_tb_data.json)',type:'file',accept:'.json',hint:'From S5.',required:true},
+        {id:'testplan',label:'Testplan (optional)',type:'file',accept:'.json,.xlsx',hint:'Maps assertion CHK_IDs to testplan features.'},
+        {id:'output_dir',label:'Output Directory',type:'dir',required:true},
+      ]},
+      { title:'Assertion Options',desc:'Configure what assertion artifacts to generate.',fields:[
+        {id:'auto_gen_protocols',label:'Auto-generate Protocol Properties',type:'toggle',def:true,hint:'Generates standard SVA properties for APB/AXI/UART/SPI/I2C etc.'},
+        {id:'gen_bind_module',label:'Generate DUT Bind Module',type:'toggle',def:true,hint:'Creates a bind file that attaches assertion modules to the DUT.'},
+        {id:'gen_assert_checker',label:'Generate Assertion Checker',type:'toggle',def:true,hint:'UVM component that reports CHK_ID pass/fail counts in report_phase.'},
+        {id:'skip_sva_in_sb',label:'Tag SVA Checks to Skip in Scoreboard',type:'toggle',def:true,hint:'Writes dv_assertions_data.json so S8 scoreboard skips duplicate checks.'},
+      ]},
     ]},
 
-  {
-    id:'s8', tag:'S8', name:'Scoreboard', group:3,
-    color:'#AF52DE', icon:'⚖️',
-    desc:'Generate scoreboard, reference model, sb_transaction, and functional coverage model.',
-    deps:['s5','s7'],
+  { id:'s8',tag:'S8',name:'Scoreboard',group:3,color:'#A78BFA',icon:'⚖️',
+    desc:'Generate scoreboard, reference model, sb_transaction, and functional coverage model.',deps:['s5','s7'],
     steps:[
-      { title:'Project & Sources', desc:'Link TB data, assertions, and testplan for scoreboard generation.',
-        fields:[
-          {id:'project_name', label:'Project Name', type:'text', required:true},
-          {id:'tb_data', label:'TB Data (dv_tb_data.json)', type:'file', accept:'.json', hint:'From S5.', required:true},
-          {id:'assert_data', label:'Assertions Data (optional)', type:'file', accept:'.json',
-           hint:'dv_assertions_data.json from S7 — used to skip duplicate SVA checks.'},
-          {id:'testplan', label:'Testplan (optional)', type:'file', accept:'.json,.xlsx',
-           hint:'Used to generate per-CHK_ID check stubs in the scoreboard.'},
-          {id:'output_dir', label:'Output Directory', type:'dir', required:true},
-        ]},
-      { title:'Scoreboard Configuration', desc:'Configure scoreboard style and reference model type.',
-        fields:[
-          {id:'style', label:'Scoreboard Style', type:'select',
-           options:[{v:'in_order',l:'In-order (standard)'},{v:'out_of_order',l:'Out-of-order'}], def:'in_order'},
-          {id:'trigger', label:'Comparison Trigger', type:'select',
-           options:[{v:'auto',l:'Auto (on every response)'},{v:'explicit',l:'Explicit (call check_all())'}], def:'auto'},
-          {id:'ref_model_type', label:'Reference Model Type', type:'select',
-           options:[{v:'sv_stub',l:'SV stub (NEEDS_ENGINEER_REVIEW)'},{v:'dpi_c',l:'DPI-C C model'},{v:'none',l:'None (scoreboard only)'}], def:'sv_stub'},
-          {id:'skip_sva_duplicates', label:'Skip SVA-backed Checks', type:'toggle', def:true,
-           hint:'Cross-references dv_assertions_data.json to avoid duplicate verification.'},
-        ]},
+      { title:'Project & Sources',desc:'Link TB data, assertions, and testplan for scoreboard generation.',fields:[
+        {id:'project_name',label:'Project Name',type:'text',required:true},
+        {id:'tb_data',label:'TB Data (dv_tb_data.json)',type:'file',accept:'.json',hint:'From S5.',required:true},
+        {id:'assert_data',label:'Assertions Data (optional)',type:'file',accept:'.json',hint:'dv_assertions_data.json from S7.'},
+        {id:'testplan',label:'Testplan (optional)',type:'file',accept:'.json,.xlsx',hint:'Used to generate per-CHK_ID check stubs.'},
+        {id:'output_dir',label:'Output Directory',type:'dir',required:true},
+      ]},
+      { title:'Scoreboard Configuration',desc:'Configure scoreboard style and reference model type.',fields:[
+        {id:'style',label:'Scoreboard Style',type:'select',options:[{v:'in_order',l:'In-order (standard)'},{v:'out_of_order',l:'Out-of-order'}],def:'in_order'},
+        {id:'trigger',label:'Comparison Trigger',type:'select',options:[{v:'auto',l:'Auto (on every response)'},{v:'explicit',l:'Explicit (call check_all())'}],def:'auto'},
+        {id:'ref_model_type',label:'Reference Model Type',type:'select',options:[{v:'sv_stub',l:'SV stub (NEEDS_ENGINEER_REVIEW)'},{v:'dpi_c',l:'DPI-C C model'},{v:'none',l:'None (scoreboard only)'}],def:'sv_stub'},
+        {id:'skip_sva_duplicates',label:'Skip SVA-backed Checks',type:'toggle',def:true,hint:'Cross-references dv_assertions_data.json to avoid duplicate verification.'},
+      ]},
     ]},
 
-  {
-    id:'s9', tag:'S9', name:'Regression', group:3,
-    color:'#30B0C7', icon:'🔄',
-    desc:'Generate milestone test lists, run parallel regression, parse logs, and generate HTML report.',
-    deps:['s6'],
+  { id:'s9',tag:'S9',name:'Regression',group:3,color:'#34D399',icon:'🔄',
+    desc:'Generate milestone test lists, run parallel regression, parse logs, and generate HTML report.',deps:['s6'],
     steps:[
-      { title:'Project & Sources', desc:'Link sequence data to build regression test lists.',
-        fields:[
-          {id:'project_name', label:'Project Name', type:'text', required:true},
-          {id:'seq_data', label:'Sequences Data (dv_sequences_data.json)', type:'file', accept:'.json', hint:'From S6.'},
-          {id:'output_dir', label:'Output Directory', type:'dir', required:true},
-        ]},
-      { title:'Grid Configuration', desc:'Configure execution environment — local or grid compute.',
-        fields:[
-          {id:'grid_type', label:'Execution Mode', type:'select',
-           options:[{v:'local',l:'Local (ThreadPoolExecutor)'},{v:'LSF',l:'LSF (bsub)'},{v:'SGE',l:'SGE (qsub)'},{v:'Slurm',l:'Slurm (sbatch)'}], def:'local'},
-          {id:'max_jobs', label:'Max Parallel Jobs', type:'number', def:8, min:1, max:128,
-           hint:'Number of concurrent simulation processes.'},
-          {id:'grid_queue', label:'Grid Queue Name', type:'text', placeholder:'normal',
-           hint:'Required when using LSF/SGE/Slurm. Leave blank for local.'},
-        ]},
-      { title:'Seed Configuration', desc:'Set the number of random seeds per milestone.',
-        fields:[
-          {id:'dv_i_seeds', label:'DV-I Seeds', type:'number', def:1, min:1, max:100},
-          {id:'dv_c_seeds', label:'DV-C Seeds', type:'number', def:5, min:1, max:100},
-          {id:'dv_f_seeds', label:'DV-F Seeds', type:'number', def:20, min:1, max:500},
-          {id:'stop_on_fail', label:'Stop on First Failure', type:'toggle', def:false,
-           hint:'By default regression continues even when tests fail.'},
-        ]},
+      { title:'Project & Sources',desc:'Link sequence data to build regression test lists.',fields:[
+        {id:'project_name',label:'Project Name',type:'text',required:true},
+        {id:'seq_data',label:'Sequences Data (dv_sequences_data.json)',type:'file',accept:'.json',hint:'From S6.'},
+        {id:'output_dir',label:'Output Directory',type:'dir',required:true},
+      ]},
+      { title:'Grid Configuration',desc:'Configure execution environment — local or grid compute.',fields:[
+        {id:'grid_type',label:'Execution Mode',type:'select',options:[{v:'local',l:'Local (ThreadPoolExecutor)'},{v:'LSF',l:'LSF (bsub)'},{v:'SGE',l:'SGE (qsub)'},{v:'Slurm',l:'Slurm (sbatch)'}],def:'local'},
+        {id:'max_jobs',label:'Max Parallel Jobs',type:'number',def:8,min:1,max:128,hint:'Number of concurrent simulation processes.'},
+        {id:'grid_queue',label:'Grid Queue Name',type:'text',placeholder:'normal',hint:'Required when using LSF/SGE/Slurm. Leave blank for local.'},
+      ]},
+      { title:'Seed Configuration',desc:'Set the number of random seeds per milestone.',fields:[
+        {id:'dv_i_seeds',label:'DV-I Seeds',type:'number',def:1,min:1,max:100},
+        {id:'dv_c_seeds',label:'DV-C Seeds',type:'number',def:5,min:1,max:100},
+        {id:'dv_f_seeds',label:'DV-F Seeds',type:'number',def:20,min:1,max:500},
+        {id:'stop_on_fail',label:'Stop on First Failure',type:'toggle',def:false,hint:'By default regression continues even when tests fail.'},
+      ]},
     ]},
 
-  {
-    id:'s10', tag:'S10', name:'Coverage Closure', group:3,
-    color:'#FF2D55', icon:'📊',
-    desc:'Analyse code + functional coverage, generate exclusions, test stubs, and sign-off report.',
-    deps:['s7','s9'],
+  { id:'s10',tag:'S10',name:'Coverage Closure',group:3,color:'#FB7185',icon:'📊',
+    desc:'Analyse code + functional coverage, generate exclusions, test stubs, and sign-off report.',deps:['s7','s9'],
     steps:[
-      { title:'Project & Sources', desc:'Link coverage VDB and upstream skill outputs.',
-        fields:[
-          {id:'project_name', label:'Project Name', type:'text', required:true},
-          {id:'vdb_path', label:'Merged VDB (merged.vdb)', type:'dir', hint:'Coverage database from S9 urg merge.', required:true},
-          {id:'reg_data', label:'Regression Data (dv_regression_data.json)', type:'file', accept:'.json', hint:'From S9.'},
-          {id:'assert_data', label:'Assertions Data (dv_assertions_data.json)', type:'file', accept:'.json', hint:'From S7.'},
-          {id:'output_dir', label:'Output Directory', type:'dir', required:true},
-        ]},
-      { title:'Analysis Options', desc:'Configure coverage closure analysis and milestone thresholds.',
-        fields:[
-          {id:'non_interactive', label:'Non-interactive Mode', type:'toggle', def:false,
-           hint:'Auto-accept all suggested exclusions and stubs without prompting.'},
-          {id:'dv_f_line_thr', label:'DV-F Line Coverage Threshold (%)', type:'number', def:99, min:0, max:100},
-          {id:'dv_f_toggle_thr', label:'DV-F Toggle Coverage Threshold (%)', type:'number', def:95, min:0, max:100},
-          {id:'dv_f_func_thr', label:'DV-F Functional Coverage Threshold (%)', type:'number', def:99, min:0, max:100},
-        ]},
+      { title:'Project & Sources',desc:'Link coverage VDB and upstream skill outputs.',fields:[
+        {id:'project_name',label:'Project Name',type:'text',required:true},
+        {id:'vdb_path',label:'Merged VDB (merged.vdb)',type:'dir',hint:'Coverage database from S9 urg merge.',required:true},
+        {id:'reg_data',label:'Regression Data (dv_regression_data.json)',type:'file',accept:'.json',hint:'From S9.'},
+        {id:'assert_data',label:'Assertions Data (dv_assertions_data.json)',type:'file',accept:'.json',hint:'From S7.'},
+        {id:'output_dir',label:'Output Directory',type:'dir',required:true},
+      ]},
+      { title:'Analysis Options',desc:'Configure coverage closure analysis and milestone thresholds.',fields:[
+        {id:'non_interactive',label:'Non-interactive Mode',type:'toggle',def:false,hint:'Auto-accept all suggested exclusions and stubs without prompting.'},
+        {id:'dv_f_line_thr',label:'DV-F Line Coverage Threshold (%)',type:'number',def:99,min:0,max:100},
+        {id:'dv_f_toggle_thr',label:'DV-F Toggle Coverage Threshold (%)',type:'number',def:95,min:0,max:100},
+        {id:'dv_f_func_thr',label:'DV-F Functional Coverage Threshold (%)',type:'number',def:99,min:0,max:100},
+      ]},
     ]},
 ];
 
-const SKILL_MAP = Object.fromEntries(SKILLS.map(s => [s.id, s]));
-
+const SKILL_MAP    = Object.fromEntries(SKILLS.map(s => [s.id, s]));
 const SKILL_GROUPS = { 1:['s1','s2','s3','s4','s5'], 2:['s6'], 3:['s7','s8','s9','s10'] };
 
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   APP STATE
+   STATE
    ═══════════════════════════════════════════════════════════════════════════ */
-
 const State = {
-  active:   null,    // skill id | 'dash'
-  step:     0,
-  runState: Object.fromEntries(SKILLS.map(s => [s.id,
-    {status:'idle', last_run:null, run_id:null, exit_code:null, deps_met:true}])),
+  active: null,
+  runState: Object.fromEntries(SKILLS.map(s => [s.id, {status:'idle',last_run:null,run_id:null,exit_code:null,deps_met:true}])),
   formData: {},
   errors:   {},
   activeRunId: null,
+  projectConfig: {},
 
-  get(skillId, fieldId) {
-    return this.formData[skillId]?.[fieldId];
-  },
-  set(skillId, fieldId, value) {
-    if (!this.formData[skillId]) this.formData[skillId] = {};
-    this.formData[skillId][fieldId] = value;
-    this.persist();
-  },
-  persist() {
-    try { sessionStorage.setItem('dvskills_form', JSON.stringify(this.formData)); } catch(e) {}
-  },
-  restore() {
-    try {
-      const d = sessionStorage.getItem('dvskills_form');
-      if (d) this.formData = JSON.parse(d);
-    } catch(e) {}
-  },
+  get(skillId, fieldId)     { return this.formData[skillId]?.[fieldId]; },
+  set(skillId, fieldId, val){ if(!this.formData[skillId]) this.formData[skillId]={}; this.formData[skillId][fieldId]=val; this.persist(); },
+  persist() { try{ sessionStorage.setItem('dvskills_form', JSON.stringify(this.formData)); }catch(e){} },
+  restore()  { try{ const d=sessionStorage.getItem('dvskills_form'); if(d) this.formData=JSON.parse(d); }catch(e){} },
 };
 
 
 /* ═══════════════════════════════════════════════════════════════════════════
    API
    ═══════════════════════════════════════════════════════════════════════════ */
-
 const API = {
-  async status() {
-    const r = await fetch('/api/status');
-    return r.json();
-  },
-  async run(skillId, params) {
-    const r = await fetch(`/api/run/${skillId}`, {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify(params)
-    });
-    return r.json();
-  },
-  async cancel(runId) {
-    return fetch(`/api/cancel/${runId}`, {method:'POST'});
-  },
-  async reset(skillId) {
-    return fetch(`/api/reset/${skillId}`, {method:'POST'});
-  },
-  async resetAll() {
-    return fetch('/api/reset-all', {method:'POST'});
-  },
-  async browse(path, type='both') {
-    const r = await fetch(`/api/browse?path=${encodeURIComponent(path)}&type=${type}`);
-    return r.json();
-  },
-  stream(runId) {
-    return new EventSource(`/api/stream/${runId}`);
-  },
+  async status()              { return (await fetch('/api/status')).json(); },
+  async run(sid, p)           { const r=await fetch(`/api/run/${sid}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(p)}); return r.json(); },
+  async cancel(rid)           { return fetch(`/api/cancel/${rid}`,{method:'POST'}); },
+  async reset(sid)            { return fetch(`/api/reset/${sid}`,{method:'POST'}); },
+  async resetAll()            { return fetch('/api/reset-all',{method:'POST'}); },
+  async browse(path,type)     { const r=await fetch(`/api/browse?path=${encodeURIComponent(path)}&type=${type||'both'}`); return r.json(); },
+  async getProjectConfig()    { return (await fetch('/api/project-config')).json(); },
+  async saveProjectConfig(cfg){ const r=await fetch('/api/project-config',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(cfg)}); return r.json(); },
+  stream(rid)                 { return new EventSource(`/api/stream/${rid}`); },
 };
 
 
 /* ═══════════════════════════════════════════════════════════════════════════
    TERMINAL
    ═══════════════════════════════════════════════════════════════════════════ */
-
 const Terminal = {
-  _sse: null,
-  _autoScroll: true,
-  _runId: null,
-
-  toggle() {
-    const p = document.getElementById('terminal-panel');
-    p.classList.toggle('expanded');
-  },
-  expand() { document.getElementById('terminal-panel').classList.add('expanded'); },
-  collapse() { document.getElementById('terminal-panel').classList.remove('expanded'); },
-
-  setTitle(t) { document.getElementById('term-title').textContent = t; },
-  setBadge(status, label) {
-    const b = document.getElementById('term-badge');
-    b.className = `term-badge ${status}`;
-    b.textContent = label;
-  },
-
-  clear() { document.getElementById('term-body').innerHTML = ''; },
+  _sse:null, _autoScroll:true, _runId:null,
+  toggle()  { document.getElementById('terminal-panel').classList.toggle('expanded'); },
+  expand()  { document.getElementById('terminal-panel').classList.add('expanded'); },
+  collapse(){ document.getElementById('terminal-panel').classList.remove('expanded'); },
+  setTitle(t){ document.getElementById('term-title').textContent = t; },
+  setBadge(status,label){ const b=document.getElementById('term-badge'); b.className=`term-badge ${status}`; b.textContent=label; },
+  clear(){ document.getElementById('term-body').innerHTML=''; },
 
   appendLine(type, text, ts) {
     const body = document.getElementById('term-body');
@@ -1584,314 +987,406 @@ const Terminal = {
     line.innerHTML = `<span class="term-ts">${hms}</span><span class="term-text"></span>`;
     line.querySelector('.term-text').textContent = text;
     body.appendChild(line);
-
-    // Cap at 5000 lines
-    while (body.children.length > 5000) body.removeChild(body.firstChild);
-
-    if (this._autoScroll) body.scrollTop = body.scrollHeight;
+    while(body.children.length > 5000) body.removeChild(body.firstChild);
+    if(this._autoScroll) body.scrollTop = body.scrollHeight;
   },
 
   startStream(runId, skillName) {
-    this._runId = runId;
-    State.activeRunId = runId;
-    if (this._sse) { this._sse.close(); this._sse = null; }
-
-    this.clear();
-    this.setTitle(`Terminal — ${skillName}`);
-    this.setBadge('running', 'Running');
-    this.expand();
-
-    document.getElementById('term-cancel-btn').style.display = 'inline-flex';
-
+    this._runId = runId; State.activeRunId = runId;
+    if(this._sse){ this._sse.close(); this._sse=null; }
+    this.clear(); this.setTitle(`Running — ${skillName}`); this.setBadge('running','Running'); this.expand();
+    document.getElementById('term-cancel-btn').style.display='inline-flex';
     this._sse = API.stream(runId);
     this._sse.onmessage = (e) => {
       const d = JSON.parse(e.data);
-      if (d.type === 'stdout') this.appendLine('stdout', d.line, d.ts);
-      else if (d.type === 'stderr') this.appendLine('stderr', d.line, d.ts);
-      else if (d.type === 'system') this.appendLine('system', d.line, d.ts);
-      else if (d.type === 'exit') {
-        const ok = d.code === 0;
-        const cls = ok ? 'success' : 'exit-fail';
-        this.appendLine(cls, `Process exited with code ${d.code}`, d.ts);
-        this.setBadge(ok ? 'success' : 'error', ok ? 'Success' : `Error (${d.code})`);
-        document.getElementById('term-cancel-btn').style.display = 'none';
+      if(d.type==='stdout') this.appendLine('stdout',d.line,d.ts);
+      else if(d.type==='stderr') this.appendLine('stderr',d.line,d.ts);
+      else if(d.type==='system') this.appendLine('system',d.line,d.ts);
+      else if(d.type==='exit'){
+        const ok = d.code===0;
+        this.appendLine(ok?'success':'exit-fail',`Process exited with code ${d.code}`,d.ts);
+        this.setBadge(ok?'success':'error', ok?'Success':`Error (${d.code})`);
+        document.getElementById('term-cancel-btn').style.display='none';
         Sidebar.refreshAll();
-      } else if (d.type === 'done') {
-        this._sse.close(); this._sse = null;
-      }
+      } else if(d.type==='done'){ this._sse.close(); this._sse=null; }
     };
-    this._sse.onerror = () => {
-      this.setBadge('error', 'Disconnected');
-      if (this._sse) { this._sse.close(); this._sse = null; }
-    };
-
-    // Auto-scroll tracking
+    this._sse.onerror = () => { this.setBadge('error','Disconnected'); if(this._sse){this._sse.close();this._sse=null;} };
     const body = document.getElementById('term-body');
-    body.addEventListener('scroll', () => {
-      this._autoScroll = body.scrollHeight - body.scrollTop - body.clientHeight < 40;
-    });
+    body.addEventListener('scroll', () => { this._autoScroll = body.scrollHeight-body.scrollTop-body.clientHeight < 40; });
   },
 
-  cancel() {
-    if (this._runId) API.cancel(this._runId);
-  },
+  cancel() { if(this._runId) API.cancel(this._runId); },
 };
 
 
 /* ═══════════════════════════════════════════════════════════════════════════
    FILE PICKER
    ═══════════════════════════════════════════════════════════════════════════ */
-
 const FilePicker = {
-  _resolve: null,
-  _type: 'both',
-  _selected: null,
-  _current: '',
+  _resolve:null, _type:'both', _selected:null, _current:'',
 
   open(type, resolve) {
-    this._type = type;
-    this._resolve = resolve;
-    this._selected = null;
-    const modal = document.getElementById('fp-modal');
-    document.getElementById('fp-title').textContent =
-      type === 'dir' ? 'Choose Directory' : 'Choose File';
+    this._type=type; this._resolve=resolve; this._selected=null;
+    const modal=document.getElementById('fp-modal');
+    document.getElementById('fp-title').textContent = type==='dir' ? 'Choose Directory' : 'Choose File';
     document.getElementById('fp-selected-path').textContent = 'Nothing selected';
     modal.classList.add('open');
-    this._browse(this._current || (typeof os !== 'undefined' ? '' : '/'));
+    this._browse(this._current||'');
   },
-
-  close() {
-    document.getElementById('fp-modal').classList.remove('open');
-    this._resolve = null;
-  },
-
-  confirm() {
-    if (this._selected && this._resolve) {
-      this._resolve(this._selected);
-    }
-    this.close();
-  },
+  close(){ document.getElementById('fp-modal').classList.remove('open'); this._resolve=null; },
+  confirm(){ if(this._selected&&this._resolve) this._resolve(this._selected); this.close(); },
 
   async _browse(path) {
     const data = await API.browse(path, this._type);
-    if (data.error) return;
+    if(data.error) return;
     this._current = data.current;
     document.getElementById('fp-breadcrumb').textContent = data.current;
-
     const list = document.getElementById('fp-list');
     list.innerHTML = '';
 
-    // Up directory
-    if (data.parent) {
-      const item = this._makeItem('📂', '..', data.parent, 'dir');
-      item.querySelector('.fp-name').style.color = 'var(--t3)';
-      item.addEventListener('click', () => this._browse(data.parent));
+    if(data.parent){
+      const item = this._makeItem('📂','.. (up)',data.parent,'dir');
+      item.querySelector('.fp-name').style.opacity='.5';
+      item.addEventListener('click', ()=>this._browse(data.parent));
       list.appendChild(item);
     }
-
-    // For dir picker, add "Select this folder" at top
-    if (this._type === 'dir') {
-      const sel = document.createElement('div');
-      sel.className = 'fp-list-item';
-      sel.style.background = 'var(--blue-light)';
-      sel.innerHTML = `<span class="fp-icon">✓</span>
-        <span class="fp-name" style="color:var(--blue);font-weight:600">Select "${data.current.split('/').pop() || data.current}"</span>`;
-      sel.addEventListener('click', () => {
-        this._selected = data.current;
-        document.getElementById('fp-selected-path').textContent = data.current;
-      });
+    if(this._type==='dir'){
+      const sel=document.createElement('div');
+      sel.className='fp-list-item';
+      sel.style.cssText='background:rgba(99,102,241,.12);border-radius:10px;margin-bottom:4px';
+      sel.innerHTML=`<span class="fp-icon">✓</span><span class="fp-name" style="color:var(--indigo-soft);font-weight:700">Select "${data.current.split('/').pop()||data.current}"</span>`;
+      sel.addEventListener('click',()=>{ this._selected=data.current; document.getElementById('fp-selected-path').textContent=data.current; });
       list.appendChild(sel);
     }
-
-    for (const entry of data.entries) {
-      const icon = entry.type === 'dir' ? '📁' : this._fileIcon(entry.ext);
+    for(const entry of data.entries){
+      const icon = entry.type==='dir' ? '📁' : this._fileIcon(entry.ext);
       const item = this._makeItem(icon, entry.name, entry.path, entry.type);
-      item.addEventListener('click', () => {
-        if (entry.type === 'dir') {
-          if (this._type === 'dir') this._selected = entry.path;
-          this._browse(entry.path);
-        } else {
-          this._selected = entry.path;
-          document.getElementById('fp-selected-path').textContent = entry.path;
-          list.querySelectorAll('.fp-list-item').forEach(i => i.classList.remove('selected'));
-          item.classList.add('selected');
-        }
+      item.addEventListener('click',()=>{
+        if(entry.type==='dir'){ if(this._type==='dir') this._selected=entry.path; this._browse(entry.path); }
+        else { this._selected=entry.path; document.getElementById('fp-selected-path').textContent=entry.path; list.querySelectorAll('.fp-list-item').forEach(i=>i.classList.remove('selected')); item.classList.add('selected'); }
       });
       list.appendChild(item);
     }
   },
 
-  _makeItem(icon, name, path, type) {
-    const el = document.createElement('div');
-    el.className = 'fp-list-item';
-    el.innerHTML = `<span class="fp-icon">${icon}</span>
-      <span class="fp-name ${type}">${name}</span>`;
+  _makeItem(icon,name,path,type){
+    const el=document.createElement('div');
+    el.className='fp-list-item';
+    el.innerHTML=`<span class="fp-icon">${icon}</span><span class="fp-name ${type}">${name}</span>`;
     return el;
   },
-
-  _fileIcon(ext) {
-    const m = {'.json':'📄','.sv':'📄','.v':'📄','.xlsx':'📊','.pdf':'📕','.txt':'📃','.md':'📃','.vdb':'🗃️'};
-    return m[ext] || '📄';
-  },
+  _fileIcon(ext){ return {'.json':'📄','.sv':'📄','.v':'📄','.xlsx':'📊','.pdf':'📕','.txt':'📃','.md':'📃','.vdb':'🗃️'}[ext]||'📄'; },
 };
 
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   FORM FIELDS RENDERER
+   FORM FIELDS
    ═══════════════════════════════════════════════════════════════════════════ */
-
 const Fields = {
   render(field, skillId) {
     const val = State.get(skillId, field.id) ?? field.def ?? '';
     const err = State.errors[skillId]?.[field.id];
-
     const wrap = document.createElement('div');
-    wrap.className = 'form-group';
-    wrap.dataset.field = field.id;
+    wrap.className = 'form-group'; wrap.dataset.field = field.id;
 
-    if (field.type !== 'toggle') {
+    if(field.type !== 'toggle'){
       const lbl = document.createElement('div');
       lbl.className = 'form-label';
       lbl.innerHTML = field.label + (field.required ? ' <span class="form-required">*</span>' : '');
       wrap.appendChild(lbl);
     }
-
     let input;
-    switch (field.type) {
-      case 'text':   input = this._text(field, val, skillId, err); break;
-      case 'number': input = this._number(field, val, skillId); break;
-      case 'select': input = this._select(field, val, skillId); break;
-      case 'chips':  input = this._chips(field, val, skillId); break;
-      case 'toggle': input = this._toggle(field, val, skillId); break;
-      case 'file':   input = this._filePicker(field, val, skillId, 'both'); break;
-      case 'dir':    input = this._filePicker(field, val, skillId, 'dir'); break;
-      default:       input = this._text(field, val, skillId, err);
+    switch(field.type){
+      case 'text':   input=this._text(field,val,skillId,err);     break;
+      case 'number': input=this._number(field,val,skillId);        break;
+      case 'select': input=this._select(field,val,skillId);        break;
+      case 'chips':  input=this._chips(field,val,skillId);         break;
+      case 'toggle': input=this._toggle(field,val,skillId);        break;
+      case 'file':   input=this._filePicker(field,val,skillId,'both'); break;
+      case 'dir':    input=this._filePicker(field,val,skillId,'dir');  break;
+      default:       input=this._text(field,val,skillId,err);
     }
     wrap.appendChild(input);
-
-    if (field.hint && field.type !== 'toggle') {
-      const hint = document.createElement('div');
-      hint.className = 'form-hint';
-      hint.textContent = field.hint;
-      wrap.appendChild(hint);
-    }
-    if (err) {
-      const e = document.createElement('div');
-      e.className = 'form-error-msg';
-      e.textContent = err;
-      wrap.appendChild(e);
-    }
+    if(field.hint && field.type!=='toggle'){ const h=document.createElement('div'); h.className='form-hint'; h.textContent=field.hint; wrap.appendChild(h); }
+    if(err){ const e=document.createElement('div'); e.className='form-error-msg'; e.textContent=err; wrap.appendChild(e); }
     return wrap;
   },
 
-  _text(field, val, skillId, err) {
-    const el = document.createElement('input');
-    el.type = 'text';
-    el.className = 'form-input' + (err ? ' error' : '');
-    el.placeholder = field.placeholder || '';
-    el.value = val;
-    if (field.mono) el.dataset.mono = '1';
-    el.addEventListener('input', () => State.set(skillId, field.id, el.value));
+  _text(field,val,skillId,err){
+    const el=document.createElement('input'); el.type='text'; el.className='form-input'+(err?' error':'');
+    el.placeholder=field.placeholder||''; el.value=val||'';
+    el.addEventListener('input',()=>State.set(skillId,field.id,el.value));
     return el;
   },
-
-  _number(field, val, skillId) {
-    const wrap = document.createElement('div');
-    wrap.className = 'num-input-wrap';
-    const minus = document.createElement('button');
-    minus.className = 'num-btn'; minus.textContent = '−'; minus.type = 'button';
-    const inp = document.createElement('input');
-    inp.type = 'number'; inp.className = 'form-input num-input';
-    inp.min = field.min ?? 0; inp.max = field.max ?? 9999;
-    inp.value = val !== '' ? val : (field.def ?? 1);
-    const plus = document.createElement('button');
-    plus.className = 'num-btn'; plus.textContent = '+'; plus.type = 'button';
-    minus.addEventListener('click', () => { inp.value = Math.max(field.min??0, +inp.value-1); State.set(skillId, field.id, +inp.value); });
-    plus.addEventListener('click',  () => { inp.value = Math.min(field.max??9999, +inp.value+1); State.set(skillId, field.id, +inp.value); });
-    inp.addEventListener('input', () => State.set(skillId, field.id, +inp.value));
-    wrap.append(minus, inp, plus);
-    State.set(skillId, field.id, +inp.value);
+  _number(field,val,skillId){
+    const wrap=document.createElement('div'); wrap.className='num-input-wrap';
+    const minus=document.createElement('button'); minus.className='num-btn'; minus.textContent='−'; minus.type='button';
+    const inp=document.createElement('input'); inp.type='number'; inp.className='form-input num-input';
+    inp.min=field.min??0; inp.max=field.max??9999; inp.value=val!==''?val:(field.def??1);
+    const plus=document.createElement('button'); plus.className='num-btn'; plus.textContent='+'; plus.type='button';
+    minus.addEventListener('click',()=>{ inp.value=Math.max(field.min??0,+inp.value-1); State.set(skillId,field.id,+inp.value); });
+    plus.addEventListener('click',()=>{ inp.value=Math.min(field.max??9999,+inp.value+1); State.set(skillId,field.id,+inp.value); });
+    inp.addEventListener('input',()=>State.set(skillId,field.id,+inp.value));
+    wrap.append(minus,inp,plus);
+    State.set(skillId,field.id,+inp.value);
     return wrap;
   },
-
-  _select(field, val, skillId) {
-    const el = document.createElement('select');
-    el.className = 'form-select';
-    for (const opt of field.options) {
-      const o = document.createElement('option');
-      o.value = opt.v ?? opt; o.textContent = opt.l ?? opt;
-      if ((val || field.def) === o.value) o.selected = true;
-      el.appendChild(o);
-    }
-    el.addEventListener('change', () => State.set(skillId, field.id, el.value));
-    State.set(skillId, field.id, el.value);
+  _select(field,val,skillId){
+    const el=document.createElement('select'); el.className='form-select';
+    for(const opt of field.options){ const o=document.createElement('option'); o.value=opt.v??opt; o.textContent=opt.l??opt; if((val||field.def)===o.value) o.selected=true; el.appendChild(o); }
+    el.addEventListener('change',()=>State.set(skillId,field.id,el.value));
+    State.set(skillId,field.id,el.value);
     return el;
   },
-
-  _chips(field, val, skillId) {
-    const selected = new Set(Array.isArray(val) ? val : []);
-    const wrap = document.createElement('div');
-    wrap.className = 'chip-group';
-    for (const opt of field.options) {
-      const chip = document.createElement('div');
-      chip.className = 'chip' + (selected.has(opt) ? ' selected' : '');
-      chip.textContent = opt;
-      chip.addEventListener('click', () => {
-        chip.classList.toggle('selected');
-        if (chip.classList.contains('selected')) selected.add(opt);
-        else selected.delete(opt);
-        State.set(skillId, field.id, [...selected]);
-      });
+  _chips(field,val,skillId){
+    const selected=new Set(Array.isArray(val)?val:[]);
+    const wrap=document.createElement('div'); wrap.className='chip-group';
+    for(const opt of field.options){
+      const chip=document.createElement('div'); chip.className='chip'+(selected.has(opt)?' selected':''); chip.textContent=opt;
+      chip.addEventListener('click',()=>{ chip.classList.toggle('selected'); if(chip.classList.contains('selected')) selected.add(opt); else selected.delete(opt); State.set(skillId,field.id,[...selected]); });
       wrap.appendChild(chip);
     }
     return wrap;
   },
-
-  _toggle(field, val, skillId) {
-    const isOn = val !== undefined ? val : (field.def ?? false);
-    const wrap = document.createElement('div');
-    wrap.className = 'toggle-wrap';
-    const track = document.createElement('div');
-    track.className = 'toggle-track' + (isOn ? ' on' : '');
-    const thumb = document.createElement('div'); thumb.className = 'toggle-thumb';
+  _toggle(field,val,skillId){
+    const isOn = val!==undefined?val:(field.def??false);
+    const wrap=document.createElement('div'); wrap.className='toggle-wrap';
+    const track=document.createElement('div'); track.className='toggle-track'+(isOn?' on':'');
+    const thumb=document.createElement('div'); thumb.className='toggle-thumb';
     track.appendChild(thumb);
-    const lbl = document.createElement('div');
-    lbl.innerHTML = `<div style="font-size:13px;font-weight:500;color:var(--t2)">${field.label}</div>` +
-      (field.hint ? `<div class="form-hint" style="margin:0">${field.hint}</div>` : '');
-    wrap.append(track, lbl);
-    let on = isOn;
-    wrap.addEventListener('click', () => {
-      on = !on;
-      track.classList.toggle('on', on);
-      State.set(skillId, field.id, on);
-    });
-    State.set(skillId, field.id, isOn);
+    const lbl=document.createElement('div');
+    lbl.innerHTML=`<div class="toggle-label-text">${field.label}</div>`+(field.hint?`<div class="form-hint" style="margin:0">${field.hint}</div>`:'');
+    wrap.append(track,lbl);
+    let on=isOn;
+    wrap.addEventListener('click',()=>{ on=!on; track.classList.toggle('on',on); State.set(skillId,field.id,on); });
+    State.set(skillId,field.id,isOn);
+    return wrap;
+  },
+  _filePicker(field,val,skillId,type){
+    const wrap=document.createElement('div'); wrap.className='file-picker';
+    const inp=document.createElement('input'); inp.type='text'; inp.className='form-input file-picker-path';
+    inp.placeholder=field.placeholder||(type==='dir'?'/path/to/directory':'/path/to/file');
+    inp.value=val||''; inp.setAttribute('data-mono','1');
+    inp.addEventListener('input',()=>State.set(skillId,field.id,inp.value));
+    const btn=document.createElement('button'); btn.type='button'; btn.className='file-picker-btn';
+    btn.innerHTML=`${type==='dir'?'📁':'📄'} Browse`;
+    btn.addEventListener('click',()=>{ FilePicker.open(type,(path)=>{ inp.value=path; State.set(skillId,field.id,path); }); });
+    wrap.append(inp,btn);
+    return wrap;
+  },
+};
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PROJECT SETTINGS
+   ═══════════════════════════════════════════════════════════════════════════ */
+const ProjectSettings = {
+  _cfg: {},
+  _selectedTool: 'vcs',
+
+  async load() {
+    try { this._cfg = await API.getProjectConfig(); } catch(e) { this._cfg={}; }
+    this._selectedTool = this._cfg.eda_tool || 'vcs';
+  },
+
+  get(k)    { return this._cfg[k] || ''; },
+  set(k, v) { this._cfg[k] = v; },
+
+  async save() {
+    this._cfg.eda_tool = this._selectedTool;
+    await API.saveProjectConfig(this._cfg);
+    State.projectConfig = {...this._cfg};
+
+    // Show saved pill
+    const pill = document.getElementById('proj-saved-pill');
+    if(pill){ pill.style.display='inline-flex'; setTimeout(()=>pill.style.display='none', 2800); }
+
+    // Update sidebar dot
+    const hasName = !!(this._cfg.project_name);
+    const dot = document.getElementById('proj-dot');
+    if(dot) dot.style.background = hasName ? 'var(--green)' : 'var(--t4)';
+  },
+
+  render() {
+    const cfg = this._cfg;
+    const el = document.getElementById('proj-content');
+    el.innerHTML = '';
+
+    // ── Header ─────────────────────────────────────────────────────────────
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'margin-bottom:24px';
+    hdr.innerHTML = `
+      <h2 style="font-size:24px;font-weight:800;letter-spacing:-.03em;color:var(--t1);margin-bottom:6px">Project Settings</h2>
+      <p style="font-size:14px;color:var(--t3);line-height:1.6">Configure your DV project once — all skills inherit these settings automatically.</p>`;
+    el.appendChild(hdr);
+
+    // ── Grid ───────────────────────────────────────────────────────────────
+    const grid = document.createElement('div');
+    grid.className = 'proj-grid';
+
+    // 1. Identity
+    grid.appendChild(this._section('🏷️', 'Project Identity', 'Core project identification used across all generated files and reports.', [
+      this._row2(
+        this._field('project_name', 'Project Name', 'text', 'e.g., apb_uart_ss', cfg.project_name||''),
+        this._field('user_name',    'User / Engineer Name', 'text', 'e.g., john.doe', cfg.user_name||'')
+      ),
+      this._fieldFull('github_repo', 'GitHub Repository', 'text', 'e.g., https://github.com/org/apb-uart-dv', cfg.github_repo||''),
+    ]));
+
+    // 2. Workspace
+    grid.appendChild(this._section('📁', 'Workspace', 'Directories and paths used as roots for all skill outputs.', [
+      this._fieldPicker('workspace_dir', 'Workspace Directory', 'dir', cfg.workspace_dir||''),
+      this._fieldPicker('spec_path',     'Specification Path',  'file', cfg.spec_path||''),
+    ]));
+
+    // 3. EDA Tools (full width)
+    const toolSec = this._section('🔧', 'EDA Tools', 'Select your primary simulation/verification tool and provide the install path.', []);
+    toolSec.classList.add('proj-section-full');
+    toolSec.appendChild(this._toolSelector());
+    toolSec.appendChild(this._fieldPicker('eda_tool_path', 'Tool Installation Path', 'dir', cfg.eda_tool_path||''));
+    toolSec.appendChild(this._fieldFull('license_server', 'License Server', 'text', 'e.g., 27000@license-host.domain.com', cfg.license_server||''));
+    grid.appendChild(toolSec);
+
+    // 4. Guidelines
+    grid.appendChild(this._section('📐', 'Guidelines & Standards', 'Path to coding standards and integration guidelines documents.', [
+      this._fieldPicker('coding_guidelines', 'Coding Guidelines', 'file', cfg.coding_guidelines||''),
+      this._fieldPicker('soc_integ_guidelines', 'IP-to-SoC Integration Guidelines', 'file', cfg.soc_integ_guidelines||''),
+    ]));
+
+    // 5. DUT Configuration
+    grid.appendChild(this._section('⚡', 'DUT Configuration', 'Electrical and timing properties of the design under test.', [
+      this._row2(
+        this._field('top_module',  'Top-Level Module',    'text', 'e.g., apb_uart_top',  cfg.top_module||''),
+        this._field('clock_freq',  'Clock Frequency (MHz)','text', 'e.g., 100',           cfg.clock_freq||'')
+      ),
+      this._row2(
+        this._field('timescale',   'Simulation Timescale', 'text', 'e.g., 1ns/1ps',      cfg.timescale||'1ns/1ps'),
+        this._fieldSelect('reset_polarity', 'Reset Polarity',
+          [{v:'active_low',l:'Active Low (negedge)'},{v:'active_high',l:'Active High (posedge)'}],
+          cfg.reset_polarity||'active_low')
+      ),
+    ]));
+
+    // 6. Simulation Defaults
+    grid.appendChild(this._section('🎛️', 'Simulation Defaults', 'Default settings inherited by S9 regression runs and S10 coverage closure.', [
+      this._row2(
+        this._fieldSelect('wave_format', 'Wave Dump Format',
+          [{v:'fsdb',l:'FSDB (Verdi)'},{v:'vpd',l:'VPD (DVE)'},{v:'vcd',l:'VCD (universal)'},{v:'none',l:'No waves'}],
+          cfg.wave_format||'fsdb'),
+        this._fieldSelect('uvm_verbosity', 'Default UVM Verbosity',
+          [{v:'UVM_MEDIUM',l:'UVM_MEDIUM (default)'},{v:'UVM_LOW',l:'UVM_LOW'},{v:'UVM_HIGH',l:'UVM_HIGH'},{v:'UVM_FULL',l:'UVM_FULL'}],
+          cfg.uvm_verbosity||'UVM_MEDIUM')
+      ),
+      this._fieldFull('extra_sim_flags', 'Extra Simulation Flags', 'text',
+        'e.g., +define+SIM +vcs+lic+wait', cfg.extra_sim_flags||''),
+    ]));
+
+    el.appendChild(grid);
+
+    // ── Save bar ───────────────────────────────────────────────────────────
+    const saveBar = document.createElement('div');
+    saveBar.className = 'proj-save-bar'; saveBar.style.marginTop = '24px';
+    saveBar.innerHTML = `
+      <div class="proj-save-bar-msg">
+        <strong style="color:var(--t1)">Settings saved to project_config.json</strong>
+        <span style="display:block;font-size:12px;margin-top:2px;color:var(--t4)">All skills will inherit these values automatically when run.</span>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center">
+        <span class="proj-saved-pill" id="proj-saved-pill" style="display:none">✓ Saved</span>
+        <button class="btn btn-primary" onclick="ProjectSettings.save()">Save Project Settings</button>
+      </div>`;
+    el.appendChild(saveBar);
+
+    // Wire up all inputs
+    this._wireInputs(el);
+  },
+
+  _section(icon, title, desc, children) {
+    const sec = document.createElement('div');
+    sec.className = 'proj-section';
+    sec.innerHTML = `
+      <span class="proj-section-icon">${icon}</span>
+      <div class="proj-section-title">${title}</div>
+      <div class="proj-section-desc">${desc}</div>`;
+    children.forEach(c => { if(c) sec.appendChild(c); });
+    return sec;
+  },
+
+  _row2(a, b) {
+    const row = document.createElement('div');
+    row.className = 'form-row-2';
+    if(a) row.appendChild(a); if(b) row.appendChild(b);
+    return row;
+  },
+
+  _field(key, label, type, placeholder, value) {
+    const g = document.createElement('div'); g.className = 'form-group';
+    g.innerHTML = `<div class="form-label">${label}</div>`;
+    const inp = document.createElement('input');
+    inp.type = type||'text'; inp.className = 'form-input';
+    inp.placeholder = placeholder||''; inp.value = value||'';
+    inp.dataset.cfgKey = key;
+    g.appendChild(inp);
+    return g;
+  },
+
+  _fieldFull(key, label, type, placeholder, value) {
+    const g = this._field(key, label, type, placeholder, value);
+    g.style.gridColumn = '1/-1';
+    return g;
+  },
+
+  _fieldSelect(key, label, options, currentVal) {
+    const g = document.createElement('div'); g.className = 'form-group';
+    g.innerHTML = `<div class="form-label">${label}</div>`;
+    const sel = document.createElement('select'); sel.className = 'form-select'; sel.dataset.cfgKey = key;
+    for(const o of options){ const opt=document.createElement('option'); opt.value=o.v; opt.textContent=o.l; if(o.v===currentVal) opt.selected=true; sel.appendChild(opt); }
+    g.appendChild(sel); return g;
+  },
+
+  _fieldPicker(key, label, type, value) {
+    const g = document.createElement('div'); g.className = 'form-group';
+    g.innerHTML = `<div class="form-label">${label}</div>`;
+    const wrap = document.createElement('div'); wrap.className = 'file-picker';
+    const inp = document.createElement('input'); inp.type='text'; inp.className='form-input file-picker-path';
+    inp.placeholder = type==='dir' ? '/path/to/directory' : '/path/to/file';
+    inp.value = value||''; inp.style.fontFamily='var(--mono)'; inp.style.fontSize='12.5px';
+    inp.dataset.cfgKey = key;
+    const btn = document.createElement('button'); btn.type='button'; btn.className='file-picker-btn';
+    btn.innerHTML = `${type==='dir'?'📁':'📄'} Browse`;
+    btn.addEventListener('click', ()=>{ FilePicker.open(type, (p)=>{ inp.value=p; this._cfg[key]=p; }); });
+    wrap.append(inp, btn); g.appendChild(wrap);
+    return g;
+  },
+
+  _toolSelector() {
+    const tools = [
+      { id:'vcs',    icon:'⚗️',  name:'VCS',    ver:'Synopsys VCS MX' },
+      { id:'questa', icon:'🔬', name:'Questa',  ver:'Siemens Questa' },
+      { id:'xcelium',icon:'🧬', name:'Xcelium', ver:'Cadence Xcelium' },
+    ];
+    const wrap = document.createElement('div'); wrap.className = 'tool-selector'; wrap.style.marginBottom='16px';
+    for(const t of tools){
+      const card = document.createElement('div');
+      card.className = 'tool-card' + (this._selectedTool===t.id ? ' selected' : '');
+      card.innerHTML = `<div class="tool-card-icon">${t.icon}</div><div class="tool-card-name">${t.name}</div><div class="tool-card-ver">${t.ver}</div>`;
+      card.addEventListener('click', ()=>{
+        this._selectedTool = t.id;
+        this._cfg.eda_tool = t.id;
+        wrap.querySelectorAll('.tool-card').forEach(c=>c.classList.remove('selected'));
+        card.classList.add('selected');
+      });
+      wrap.appendChild(card);
+    }
     return wrap;
   },
 
-  _filePicker(field, val, skillId, type) {
-    const wrap = document.createElement('div');
-    wrap.className = 'file-picker';
-    const inp = document.createElement('input');
-    inp.type = 'text';
-    inp.className = 'form-input file-picker-path';
-    inp.placeholder = field.placeholder || (type === 'dir' ? '/path/to/directory' : '/path/to/file');
-    inp.value = val || '';
-    inp.setAttribute('data-mono', '1');
-    inp.addEventListener('input', () => State.set(skillId, field.id, inp.value));
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'file-picker-btn';
-    btn.innerHTML = `<span>${type === 'dir' ? '📁' : '📄'}</span> Browse`;
-    btn.addEventListener('click', () => {
-      const startPath = inp.value || (State.get(skillId, 'output_dir') || '');
-      FilePicker.open(type, (path) => {
-        inp.value = path;
-        State.set(skillId, field.id, path);
-      });
+  _wireInputs(container) {
+    container.querySelectorAll('[data-cfg-key]').forEach(el => {
+      const key = el.dataset.cfgKey;
+      el.addEventListener('input', ()=>{ this._cfg[key] = el.value; });
+      el.addEventListener('change', ()=>{ this._cfg[key] = el.value; });
     });
-    wrap.append(inp, btn);
-    return wrap;
   },
 };
 
@@ -1899,141 +1394,72 @@ const Fields = {
 /* ═══════════════════════════════════════════════════════════════════════════
    WIZARD
    ═══════════════════════════════════════════════════════════════════════════ */
-
 const Wizard = {
-  _skill: null,
-  _step: 0,
-  _steps: [],
+  _skill:null, _step:0, _steps:[],
 
   open(skillId) {
-    this._skill = SKILL_MAP[skillId];
-    this._step  = 0;
-    this._steps = this._skill.steps;
+    this._skill=SKILL_MAP[skillId]; this._step=0; this._steps=this._skill.steps;
     App.setView('wizard');
-    this._renderHeader();
-    this._renderAllSteps();
-    this._renderFooter();
-    this._showStep(0, 'right');
+    this._renderHeader(); this._renderAllSteps(); this._renderFooter(); this._showStep(0,'right');
   },
 
   _renderHeader() {
     const s = this._skill;
-    const header = document.getElementById('wizard-header');
-
-    // Dep strip
-    const depsHtml = s.deps.length ? `
-      <div class="dep-strip">
-        <span class="dep-label">Requires:</span>
-        ${s.deps.map(d => {
-          const ds = State.runState[d];
-          const met = ds?.status === 'success';
-          return `<span class="dep-chip ${met?'met':'unmet'}">${SKILL_MAP[d].tag} ${SKILL_MAP[d].name} ${met?'✓':'✗'}</span>`;
-        }).join('')}
-      </div>` : '';
-
-    // Step indicator
-    const nodes = this._steps.map((st, i) => {
-      const cls = i < this._step ? 'done' : i === this._step ? 'current' : 'future';
-      const connector = i < this._steps.length-1
-        ? `<div class="step-connector ${i < this._step ? 'done' : ''}"></div>` : '';
-      return `<div class="step-node">
-        <div class="step-circle ${cls}">${i < this._step ? '✓' : i+1}</div>
-        <div class="step-label ${i === this._step ? 'current' : ''}">${st.title}</div>
-      </div>${connector}`;
+    const depsHtml = s.deps.length ? `<div class="dep-strip"><span class="dep-label">Requires:</span>${s.deps.map(d=>{const ds=State.runState[d];const met=ds?.status==='success';return `<span class="dep-chip ${met?'met':'unmet'}">${SKILL_MAP[d].tag} ${SKILL_MAP[d].name} ${met?'✓':'✗'}</span>`;}).join('')}</div>` : '';
+    const nodes = this._steps.map((st,i)=>{
+      const cls = i<this._step?'done':i===this._step?'current':'future';
+      const conn = i<this._steps.length-1 ? `<div class="step-connector ${i<this._step?'done':''}"></div>` : '';
+      return `<div class="step-node"><div class="step-circle ${cls}">${i<this._step?'✓':i+1}</div><div class="step-label ${i===this._step?'current':''}">${st.title}</div></div>${conn}`;
     }).join('');
-
-    header.innerHTML = `
+    document.getElementById('wizard-header').innerHTML = `
       <div class="wizard-skill-tag">${s.tag} — ${s.id.toUpperCase()}</div>
       <div class="wizard-skill-name">${s.name}</div>
       <div class="wizard-skill-desc">${s.desc}</div>
       ${depsHtml}
-      <div class="step-indicator" id="step-indicator">${nodes}</div>`;
+      <div class="step-indicator">${nodes}</div>`;
   },
 
   _renderAllSteps() {
     const wrap = document.getElementById('wizard-steps-wrap');
     wrap.innerHTML = '';
     const s = this._skill;
-    const depsUnmet = s.deps.some(d => State.runState[d]?.status !== 'success');
+    const depsUnmet = s.deps.some(d=>State.runState[d]?.status!=='success');
 
-    for (let i = 0; i < this._steps.length; i++) {
+    for(let i=0; i<this._steps.length; i++){
       const step = this._steps[i];
-      const isLast = i === this._steps.length - 1;
+      const isLast = i===this._steps.length-1;
       const div = document.createElement('div');
-      div.className = 'wizard-step hidden-right';
-      div.id = `wstep-${i}`;
+      div.className='wizard-step hidden-right'; div.id=`wstep-${i}`;
+      div.innerHTML=`<div class="step-title">${step.title}</div><div class="step-desc">${step.desc}</div>`;
 
-      const titleEl = document.createElement('div');
-      titleEl.className = 'step-title';
-      titleEl.textContent = step.title;
-      div.appendChild(titleEl);
-
-      const descEl = document.createElement('div');
-      descEl.className = 'step-desc';
-      descEl.textContent = step.desc;
-      div.appendChild(descEl);
-
-      // Dep warning on first step
-      if (i === 0 && depsUnmet) {
-        const warn = document.createElement('div');
-        warn.className = 'dep-warning';
-        const missing = s.deps.filter(d => State.runState[d]?.status !== 'success')
-          .map(d => `${SKILL_MAP[d].tag} ${SKILL_MAP[d].name}`).join(', ');
-        warn.innerHTML = `<span class="dep-warning-icon">⚠️</span>
-          <div class="dep-warning-text">
-            This skill requires <strong>${missing}</strong> to complete successfully first.
-            You can fill in the form but the Run button will be disabled.
-          </div>`;
+      if(i===0 && depsUnmet){
+        const warn=document.createElement('div'); warn.className='dep-warning';
+        const missing=s.deps.filter(d=>State.runState[d]?.status!=='success').map(d=>`${SKILL_MAP[d].tag} ${SKILL_MAP[d].name}`).join(', ');
+        warn.innerHTML=`<span class="dep-warning-icon">⚠️</span><div class="dep-warning-text">This skill requires <strong>${missing}</strong> to complete successfully first. You can fill in the form but the Run button will be disabled.</div>`;
         div.appendChild(warn);
       }
 
-      // Fields
-      if (isLast) {
-        // Review step
-        this._renderReview(div, s);
-      } else {
-        const fields = step.fields || [];
-        // Group fields in pairs where possible for layout
-        let i2 = 0;
-        while (i2 < fields.length) {
-          const f = fields[i2];
-          const next = fields[i2+1];
-          // Put toggles in pairs
-          if (f.type === 'toggle' && next && next.type === 'toggle') {
-            div.appendChild(Fields.render(f, s.id));
-            div.appendChild(Fields.render(next, s.id));
-            i2 += 2;
-          } else {
-            div.appendChild(Fields.render(f, s.id));
-            i2++;
-          }
-        }
-      }
+      if(isLast){ this._renderReview(div, s); }
+      else { for(const f of step.fields||[]) div.appendChild(Fields.render(f, s.id)); }
 
       wrap.appendChild(div);
     }
   },
 
   _renderReview(div, skill) {
-    div.innerHTML += `<div style="margin-bottom:16px;font-size:13px;color:var(--t3)">
-      Review your configuration below, then click Run to start the skill.</div>`;
-
-    // Render each non-last step's fields as a review section
-    for (let si = 0; si < this._steps.length - 1; si++) {
-      const step = this._steps[si];
-      const sec = document.createElement('div');
-      sec.className = 'review-section';
-      sec.innerHTML = `<div class="review-section-header">${step.title}</div>`;
-      for (const f of step.fields || []) {
-        const val = State.get(skill.id, f.id);
-        let displayVal = val;
-        if (Array.isArray(val)) displayVal = val.length ? val.join(', ') : '—';
-        else if (typeof val === 'boolean') displayVal = val ? 'Yes' : 'No';
-        else if (val === null || val === undefined || val === '') displayVal = null;
-        const row = document.createElement('div');
-        row.className = 'review-row';
-        row.innerHTML = `<div class="review-key">${f.label}</div>
-          <div class="review-val${!displayVal ? ' empty' : ''}">${displayVal || 'Not set'}</div>`;
+    div.innerHTML += `<div style="margin-bottom:18px;font-size:13.5px;color:var(--t3)">Review your configuration below, then click Run to start the skill.</div>`;
+    for(let si=0; si<this._steps.length-1; si++){
+      const step=this._steps[si];
+      const sec=document.createElement('div'); sec.className='review-section';
+      sec.innerHTML=`<div class="review-section-header">${step.title}</div>`;
+      for(const f of step.fields||[]){
+        let val=State.get(skill.id,f.id);
+        let dv=val;
+        if(Array.isArray(val)) dv=val.length?val.join(', '):'—';
+        else if(typeof val==='boolean') dv=val?'Yes':'No';
+        else if(val===null||val===undefined||val==='') dv=null;
+        const row=document.createElement('div'); row.className='review-row';
+        row.innerHTML=`<div class="review-key">${f.label}</div><div class="review-val${!dv?' empty':''}">${dv||'Not set'}</div>`;
         sec.appendChild(row);
       }
       div.appendChild(sec);
@@ -2043,109 +1469,55 @@ const Wizard = {
   _renderFooter() {
     const footer = document.getElementById('wizard-footer');
     footer.innerHTML = '';
-
     const back = document.createElement('button');
-    back.className = 'btn btn-secondary';
-    back.textContent = '← Back';
-    back.id = 'wiz-back';
-    back.addEventListener('click', () => this.prevStep());
+    back.className='btn btn-secondary'; back.textContent='← Back'; back.id='wiz-back';
+    back.addEventListener('click',()=>this.prevStep());
 
-    const spacer = document.createElement('div');
-    spacer.className = 'wf-spacer';
-
-    const isLast = this._step === this._steps.length - 1;
-    const depsUnmet = this._skill.deps.some(d => State.runState[d]?.status !== 'success');
-
+    const isLast = this._step===this._steps.length-1;
+    const depsUnmet = this._skill.deps.some(d=>State.runState[d]?.status!=='success');
     let action;
-    if (isLast) {
-      action = document.createElement('button');
-      action.id = 'wiz-run';
-      action.className = 'btn btn-run';
-      action.innerHTML = `▶ Run ${this._skill.name}`;
-      if (depsUnmet) { action.disabled = true; action.title = 'Complete dependencies first'; }
-      action.addEventListener('click', () => this._runSkill());
+    if(isLast){
+      action=document.createElement('button'); action.id='wiz-run'; action.className='btn btn-run';
+      action.innerHTML=`▶ Run ${this._skill.name}`;
+      if(depsUnmet){ action.disabled=true; action.title='Complete dependencies first'; }
+      action.addEventListener('click',()=>this._runSkill());
     } else {
-      action = document.createElement('button');
-      action.className = 'btn btn-primary';
-      action.innerHTML = 'Continue →';
-      action.addEventListener('click', () => this.nextStep());
+      action=document.createElement('button'); action.className='btn btn-primary';
+      action.innerHTML='Continue →'; action.addEventListener('click',()=>this.nextStep());
     }
-
-    if (this._step === 0) back.style.visibility = 'hidden';
-    footer.append(back, spacer, action);
+    if(this._step===0) back.style.visibility='hidden';
+    const spacer=document.createElement('div'); spacer.className='wf-spacer';
+    footer.append(back,spacer,action);
   },
 
-  nextStep() {
-    if (this._step < this._steps.length - 1) {
-      this._showStep(this._step + 1, 'right');
-      this._step++;
-      this._renderHeader();
-      this._renderFooter();
-    }
-  },
+  nextStep(){ if(this._step<this._steps.length-1){ this._showStep(this._step+1,'right'); this._step++; this._renderHeader(); this._renderFooter(); } },
+  prevStep(){ if(this._step>0){ this._showStep(this._step-1,'left'); this._step--; this._renderHeader(); this._renderFooter(); } },
 
-  prevStep() {
-    if (this._step > 0) {
-      this._showStep(this._step - 1, 'left');
-      this._step--;
-      this._renderHeader();
-      this._renderFooter();
-    }
-  },
-
-  _showStep(idx, dir) {
-    const steps = document.querySelectorAll('.wizard-step');
-    steps.forEach((el, i) => {
-      el.classList.remove('hidden-left', 'hidden-right');
-      if (i === idx) {
-        // Show this one
-      } else if (i < idx) {
-        el.classList.add('hidden-left');
-      } else {
-        el.classList.add('hidden-right');
-      }
+  _showStep(idx) {
+    document.querySelectorAll('.wizard-step').forEach((el,i)=>{
+      el.classList.remove('hidden-left','hidden-right');
+      if(i<idx) el.classList.add('hidden-left');
+      else if(i>idx) el.classList.add('hidden-right');
     });
-    // Re-render review if showing last
-    if (idx === this._steps.length - 1) {
-      const lastDiv = document.getElementById(`wstep-${idx}`);
-      lastDiv.innerHTML = `<div class="step-title">${this._steps[idx].title}</div>
-        <div class="step-desc">${this._steps[idx].desc}</div>`;
+    if(idx===this._steps.length-1){
+      const lastDiv=document.getElementById(`wstep-${idx}`);
+      lastDiv.innerHTML=`<div class="step-title">${this._steps[idx].title}</div><div class="step-desc">${this._steps[idx].desc}</div>`;
       this._renderReview(lastDiv, this._skill);
     }
   },
 
   async _runSkill() {
-    const btn = document.getElementById('wiz-run');
-    btn.disabled = true;
-    btn.innerHTML = '<div class="spinner"></div> Starting…';
-
-    const params = State.formData[this._skill.id] || {};
+    const btn=document.getElementById('wiz-run');
+    btn.disabled=true; btn.innerHTML='<div class="spinner"></div> Starting…';
+    const params = {...(State.projectConfig||{}), ...(State.formData[this._skill.id]||{})};
     const data = await API.run(this._skill.id, params);
-
-    if (data.error) {
-      btn.disabled = false;
-      btn.innerHTML = `▶ Run ${this._skill.name}`;
-      alert(`Could not start: ${data.error}`);
-      return;
-    }
-
+    if(data.error){ btn.disabled=false; btn.innerHTML=`▶ Run ${this._skill.name}`; alert(`Could not start: ${data.error}`); return; }
     Terminal.startStream(data.run_id, this._skill.name);
-    btn.innerHTML = `⟳ Running…`;
-
-    // Poll to re-enable after done
-    const poll = setInterval(async () => {
-      const st = await API.status();
-      const s = st.skills[this._skill.id];
-      if (s.status !== 'running') {
-        clearInterval(poll);
-        btn.disabled = false;
-        btn.innerHTML = `▶ Run ${this._skill.name}`;
-        Sidebar.refreshAll();
-        // Refresh header dep chips
-        this._renderHeader();
-        this._renderFooter();
-      }
-    }, 1500);
+    btn.innerHTML='⟳ Running…';
+    const poll=setInterval(async()=>{
+      const st=await API.status(); const s=st.skills[this._skill.id];
+      if(s.status!=='running'){ clearInterval(poll); btn.disabled=false; btn.innerHTML=`▶ Run ${this._skill.name}`; Sidebar.refreshAll(); this._renderHeader(); this._renderFooter(); }
+    },1500);
   },
 };
 
@@ -2153,57 +1525,37 @@ const Wizard = {
 /* ═══════════════════════════════════════════════════════════════════════════
    SIDEBAR
    ═══════════════════════════════════════════════════════════════════════════ */
-
 const Sidebar = {
   render() {
-    const groups = {
-      1: document.getElementById('skill-list-1'),
-      2: document.getElementById('skill-list-2'),
-      3: document.getElementById('skill-list-3'),
-    };
-    for (const [g, el] of Object.entries(groups)) {
-      el.innerHTML = '';
-      for (const sid of SKILL_GROUPS[g]) {
-        const skill = SKILL_MAP[sid];
-        const rs = State.runState[sid] || {};
-        const status = rs.status || 'idle';
-        const dm = !rs.deps_met && status === 'idle';
-        const item = document.createElement('div');
-        item.className = 'sb-item' + (State.active === sid ? ' active' : '') + (dm ? ' disabled' : '');
-        item.id = `sb-${sid}`;
-        item.innerHTML = `
-          <div class="sb-icon" style="background:${skill.color}22">${skill.icon}</div>
-          <div style="flex:1;min-width:0">
-            <div class="sb-item-name">${skill.tag} ${skill.name}</div>
-          </div>
-          <div class="sb-dot ${status}"></div>`;
-        item.addEventListener('click', () => App.navigate(sid));
+    const groups = {1:document.getElementById('skill-list-1'),2:document.getElementById('skill-list-2'),3:document.getElementById('skill-list-3')};
+    for(const [g,el] of Object.entries(groups)){
+      el.innerHTML='';
+      for(const sid of SKILL_GROUPS[g]){
+        const skill=SKILL_MAP[sid]; const rs=State.runState[sid]||{}; const status=rs.status||'idle';
+        const dm=!rs.deps_met&&status==='idle';
+        const item=document.createElement('div');
+        item.className='sb-item'+(State.active===sid?' active':'')+(dm?' disabled':'');
+        item.id=`sb-${sid}`;
+        item.innerHTML=`<div class="sb-icon" style="background:${skill.color}22">${skill.icon}</div><div style="flex:1;min-width:0"><div class="sb-item-name">${skill.tag} ${skill.name}</div></div><div class="sb-dot ${status}"></div>`;
+        item.addEventListener('click',()=>App.navigate(sid));
         el.appendChild(item);
       }
     }
-    this._updateDash();
+    this._highlightActive();
   },
 
-  _updateDash() {
-    const d = document.getElementById('nav-dash');
-    if (State.active === 'dash') d.classList.add('active');
-    else d.classList.remove('active');
+  _highlightActive() {
+    document.querySelectorAll('.sb-item').forEach(el=>el.classList.remove('active'));
+    const id = State.active;
+    if(id==='dash'){ document.getElementById('nav-dash')?.classList.add('active'); }
+    else if(id==='project'){ document.getElementById('nav-project')?.classList.add('active'); }
+    else { document.getElementById(`sb-${id}`)?.classList.add('active'); }
   },
 
   async refreshAll() {
     const data = await API.status();
-    for (const [sid, s] of Object.entries(data.skills)) {
-      State.runState[sid] = s;
-    }
-    this.render();
-    Dashboard.refresh();
-  },
-
-  setActive(id) {
-    document.querySelectorAll('.sb-item').forEach(el => el.classList.remove('active'));
-    const el = document.getElementById(id === 'dash' ? 'nav-dash' : `sb-${id}`);
-    if (el) el.classList.add('active');
-    this._updateDash();
+    for(const [sid,s] of Object.entries(data.skills)) State.runState[sid]=s;
+    this.render(); Dashboard.refresh();
   },
 };
 
@@ -2211,112 +1563,107 @@ const Sidebar = {
 /* ═══════════════════════════════════════════════════════════════════════════
    DASHBOARD
    ═══════════════════════════════════════════════════════════════════════════ */
-
 const Dashboard = {
   render() {
     const grid = document.getElementById('dash-grid');
     grid.innerHTML = '';
-    for (const skill of SKILLS) {
-      const rs = State.runState[skill.id] || {};
-      const status = rs.status || 'idle';
-      const depsUnmet = skill.deps.some(d => State.runState[d]?.status !== 'success');
-      const card = document.createElement('div');
-      card.className = 'skill-card' + (depsUnmet && status === 'idle' ? ' disabled' : '');
-      card.innerHTML = `
+    for(const skill of SKILLS){
+      const rs=State.runState[skill.id]||{}; const status=rs.status||'idle';
+      const depsUnmet=skill.deps.some(d=>State.runState[d]?.status!=='success');
+      const card=document.createElement('div');
+      card.className='skill-card'+(depsUnmet&&status==='idle'?' disabled':'');
+      card.innerHTML=`
         <div class="skill-card-bar ${status}"></div>
         <div class="skill-card-body">
-          <div class="skill-card-icon" style="background:${skill.color}18;font-size:20px">${skill.icon}</div>
+          <div class="skill-card-icon" style="background:${skill.color}18">${skill.icon}</div>
           <div class="skill-card-tag">${skill.tag}</div>
           <div class="skill-card-name">${skill.name}</div>
           <div class="skill-card-desc">${skill.desc}</div>
           <div class="skill-card-footer">
-            <span class="skill-card-status ${status}">${this._statusLabel(status)}</span>
+            <span class="skill-card-status ${status}">${this._label(status)}</span>
             <span class="skill-card-open">Open →</span>
           </div>
         </div>`;
-      card.addEventListener('click', () => App.navigate(skill.id));
+      card.addEventListener('click',()=>App.navigate(skill.id));
       grid.appendChild(card);
     }
-    this._updateProgress();
+    this._progress();
   },
-
-  refresh() {
-    this.render();
-  },
-
-  _statusLabel(s) {
-    return {idle:'Not started',success:'Complete',error:'Error',running:'Running',pending:'Waiting'}[s] || s;
-  },
-
-  _updateProgress() {
-    const done = SKILLS.filter(s => State.runState[s.id]?.status === 'success').length;
-    const pct = Math.round(done/SKILLS.length*100);
-    document.getElementById('progress-fill').style.width = pct + '%';
-    document.getElementById('progress-count').textContent = `${done} / ${SKILLS.length}`;
+  refresh(){ this.render(); },
+  _label(s){ return {idle:'Not started',success:'Complete',error:'Error',running:'Running',pending:'Waiting'}[s]||s; },
+  _progress(){
+    const done=SKILLS.filter(s=>State.runState[s.id]?.status==='success').length;
+    document.getElementById('progress-fill').style.width=(done/SKILLS.length*100)+'%';
+    document.getElementById('progress-count').textContent=`${done} / ${SKILLS.length}`;
   },
 };
 
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   MAIN APP
+   APP
    ═══════════════════════════════════════════════════════════════════════════ */
-
 const App = {
   async init() {
     State.restore();
+    await ProjectSettings.load();
+    State.projectConfig = {...ProjectSettings._cfg};
     await Sidebar.refreshAll();
     Dashboard.render();
     this.navigate('dash');
-
-    // Poll every 4s
-    setInterval(() => Sidebar.refreshAll(), 4000);
-
-    // Theme
-    const t = localStorage.getItem('dv-theme') || 'light';
+    setInterval(()=>Sidebar.refreshAll(), 4000);
+    const t = localStorage.getItem('dv-theme')||'dark';
     document.documentElement.dataset.theme = t;
-    document.getElementById('theme-icon').textContent = t === 'dark' ? '☀️' : '🌙';
+    document.getElementById('theme-icon').textContent = t==='dark'?'☀️':'🌙';
+
+    // Sidebar project dot
+    const dot = document.getElementById('proj-dot');
+    if(dot && ProjectSettings._cfg.project_name) dot.style.background='var(--green)';
   },
 
   navigate(id) {
     State.active = id;
-    Sidebar.setActive(id);
+    Sidebar._highlightActive();
 
-    if (id === 'dash') {
+    if(id==='dash'){
       this.setView('dash');
-      document.getElementById('main-title').textContent = 'Dashboard';
-      document.getElementById('main-sub').textContent = 'DV Verification Flow';
+      document.getElementById('main-title').textContent='Dashboard';
+      document.getElementById('main-sub').textContent='DV Verification Flow';
+    } else if(id==='project'){
+      this.setView('project');
+      document.getElementById('main-title').textContent='Project Settings';
+      document.getElementById('main-sub').textContent='Global configuration for all skills';
+      ProjectSettings.render();
     } else {
-      const skill = SKILL_MAP[id];
-      document.getElementById('main-title').textContent = `${skill.tag} — ${skill.name}`;
-      document.getElementById('main-sub').textContent = '';
+      const skill=SKILL_MAP[id];
+      document.getElementById('main-title').textContent=`${skill.tag} — ${skill.name}`;
+      document.getElementById('main-sub').textContent='';
       Wizard.open(id);
     }
   },
 
   setView(name) {
-    document.querySelectorAll('.view').forEach(v => {
-      v.classList.toggle('hidden', v.id !== `view-${name}`);
-    });
+    document.querySelectorAll('.view').forEach(v=>v.classList.toggle('hidden', v.id!==`view-${name}`));
+    if(name==='wizard'){
+      const w=document.getElementById('view-wizard');
+      w.style.display='flex'; w.style.flexDirection='column'; w.style.height='100%';
+    }
   },
 
   toggleTheme() {
     const cur = document.documentElement.dataset.theme;
-    const next = cur === 'dark' ? 'light' : 'dark';
-    document.documentElement.dataset.theme = next;
-    localStorage.setItem('dv-theme', next);
-    document.getElementById('theme-icon').textContent = next === 'dark' ? '☀️' : '🌙';
+    const next = cur==='dark'?'light':'dark';
+    document.documentElement.dataset.theme=next;
+    localStorage.setItem('dv-theme',next);
+    document.getElementById('theme-icon').textContent=next==='dark'?'☀️':'🌙';
   },
 
   async resetAll() {
-    if (!confirm('Reset all skill statuses to idle? This does not delete any files.')) return;
-    await API.resetAll();
-    await Sidebar.refreshAll();
-    Dashboard.render();
+    if(!confirm('Reset all skill statuses to idle? This does not delete any files.')) return;
+    await API.resetAll(); await Sidebar.refreshAll(); Dashboard.render();
   },
 };
 
-// Boot
-document.addEventListener('DOMContentLoaded', () => App.init());
+document.addEventListener('DOMContentLoaded', ()=>App.init());
 </script>
 </body>
 </html>

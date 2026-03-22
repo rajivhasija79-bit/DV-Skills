@@ -876,6 +876,74 @@ def _run_demo(skill_id: str, run_id: str, params: dict):
 HOST = "0.0.0.0"
 PORT = 7437
 
+
+def _free_port(port: int) -> bool:
+    """Try to release a port that is already in use.
+    Returns True if a kill was attempted, False if no process found."""
+    freed = False
+    # fuser -k <port>/tcp  (Linux)
+    result = subprocess.run(
+        ["fuser", "-k", f"{port}/tcp"],
+        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+    )
+    if result.returncode == 0:
+        freed = True
+    # lsof fallback (macOS / Linux)
+    lsof = subprocess.run(
+        ["lsof", "-ti", f"tcp:{port}"],
+        capture_output=True, text=True
+    )
+    for pid in lsof.stdout.strip().splitlines():
+        try:
+            subprocess.run(["kill", "-9", pid.strip()],
+                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            freed = True
+        except Exception:
+            pass
+    return freed
+
+
+def _serve(host: str, port: int):
+    """Start the server, auto-recovering from 'address already in use'."""
+    import socket
+
+    def _try_serve(h, p):
+        try:
+            from waitress import serve as wserve
+            # Create socket manually with SO_REUSEADDR so the port is
+            # released immediately on restart without waiting for TIME_WAIT
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            sock.bind((h, p))
+            sock.listen(5)
+            print(f"  Serving with waitress on http://localhost:{p}")
+            print("  Press Ctrl+C to stop.\n")
+            wserve(app, sockets=[sock], threads=8)
+        except ImportError:
+            print("  waitress not found — falling back to Flask dev server.")
+            print("  Install it with:  pip3 install waitress\n")
+            app.run(host=h, port=p, debug=False, threaded=True)
+
+    try:
+        _try_serve(host, port)
+    except OSError as exc:
+        if "Address already in use" in str(exc) or getattr(exc, "errno", 0) == 98:
+            print(f"  Port {port} is already in use — attempting to free it...")
+            if _free_port(port):
+                time.sleep(1)
+                print(f"  Retrying on port {port}...\n")
+                _try_serve(host, port)
+            else:
+                print(f"\n  Could not free port {port} automatically.")
+                print(f"  Run this to fix it:")
+                print(f"    Linux:  fuser -k {port}/tcp")
+                print(f"    Mac:    lsof -ti tcp:{port} | xargs kill -9")
+                print(f"  Then start the app again.\n")
+                raise SystemExit(1)
+        else:
+            raise
+
+
 if __name__ == "__main__":
     print()
     print("  ╔════════════════════════════════════════╗")
@@ -883,15 +951,4 @@ if __name__ == "__main__":
     print(f"  ║    http://localhost:{PORT}               ║")
     print("  ╚════════════════════════════════════════╝")
     print()
-
-    # Try waitress first (production WSGI, no dev-server warning, Linux + Mac + Windows)
-    try:
-        from waitress import serve
-        print(f"  Serving with waitress on http://{HOST}:{PORT}")
-        print("  Press Ctrl+C to stop.\n")
-        serve(app, host=HOST, port=PORT, threads=8)
-    except ImportError:
-        # Fallback to Flask dev server if waitress not installed
-        print("  waitress not found — falling back to Flask dev server.")
-        print("  Install it with:  pip3 install waitress\n")
-        app.run(host=HOST, port=PORT, debug=False, threaded=True)
+    _serve(HOST, PORT)

@@ -1,0 +1,203 @@
+{
+  "skill_name": "dv-coverage-closure",
+  "skill_version": "1.0",
+  "description": "Evals for S10 dv-coverage-closure: code/functional coverage analysis, exclusion file generation, test stubs, milestone checks, sign-off report",
+
+  "test_cases": [
+
+    {
+      "id": "s10_eval_1_apb_uart_full_closure",
+      "name": "APB-UART: full coverage closure from urg reports + S7/S9 data",
+      "description": "Parse simulated urg hier.txt/groups.txt, classify gaps, generate .el exclusion files, generate test stubs for coverable gaps, evaluate DV-I/DV-C/DV-F milestones, write dv_coverage_data.json and sign-off report.",
+      "input": {
+        "project_name": "apb_uart",
+        "vdb_path": "/tmp/s10_eval/apb_uart/sim/merged.vdb",
+        "urg_report": {
+          "hier_txt_summary": {
+            "line":       {"covered": 248, "total": 250, "pct": 99.2},
+            "toggle":     {"covered": 178, "total": 196, "pct": 90.8},
+            "branch":     {"covered": 86,  "total": 88,  "pct": 97.7},
+            "expression": {"covered": 42,  "total": 43,  "pct": 97.7},
+            "fsm":        {"covered": 24,  "total": 25,  "pct": 96.0}
+          },
+          "groups_txt_gaps": [
+            {
+              "cg_name": "cg_apb_register", "cp_name": "cp_addr",
+              "bin_name": "bin_0xFF", "hit_count": 0, "at_least": 1
+            },
+            {
+              "cg_name": "cg_uart_tx", "cp_name": "cp_data_value",
+              "bin_name": "bin_max", "hit_count": 0, "at_least": 1
+            }
+          ],
+          "toggle_gaps": [
+            {
+              "scope": "tb_top.dut.u_ctrl.gen_dft_logic",
+              "signal": "scan_en", "direction": "01"
+            }
+          ]
+        },
+        "regression_data": {
+          "summary": {"total": 10, "pass": 9, "fail": 1, "pass_rate": 90.0}
+        },
+        "assertions_data": {
+          "chk_ids": {
+            "CHK_UART_APB_PROTOCOL_001": {"module": "apb_vip", "feature": "APB Register"},
+            "CHK_UART_TX_DATA_INTEGRITY_001": {"module": "uart_vip", "feature": "UART TX"}
+          }
+        }
+      },
+      "output_dir": "/tmp/s10_eval/apb_uart/sim/regression",
+      "assertions": [
+        {
+          "id": "a1",
+          "description": "scan_en toggle gap classified as excludable (matches _dft_ pattern)",
+          "check": "classified_gaps.json contains scan_en entry with classification == excludable"
+        },
+        {
+          "id": "a2",
+          "description": "Functional bin gaps classified as coverable",
+          "check": "classified_gaps.json contains bin_max entry with classification == coverable"
+        },
+        {
+          "id": "a3",
+          "description": "toggle_exclusions.el generated with EXCL_TOGGLE for scan_en",
+          "check": "exclusions/toggle_exclusions.el contains EXCL_TOGGLE AND scan_en"
+        },
+        {
+          "id": "a4",
+          "description": "combined.el aggregates all exclusion files",
+          "check": "exclusions/combined.el exists AND contains EXCL_TOGGLE"
+        },
+        {
+          "id": "a5",
+          "description": "Test stub generated for bin_max functional gap",
+          "check": "stubs/ contains a .sv file referencing cg_uart_tx AND bin_max"
+        },
+        {
+          "id": "a6",
+          "description": "DV-I milestone passes (line 99.2% > 80%, regression 90% == 90%)",
+          "check": "milestone_results.json dv_i.passed == true"
+        },
+        {
+          "id": "a7",
+          "description": "DV-F milestone fails due to toggle 90.8% < 95% threshold",
+          "check": "milestone_results.json dv_f.passed == false AND blocking metric is toggle_pct"
+        },
+        {
+          "id": "a8",
+          "description": "dv_coverage_data.json written with correct gap summary",
+          "check": "dv_coverage_data.json exists AND gaps_summary.excluded >= 1 AND gaps_summary.stubs_generated >= 1"
+        },
+        {
+          "id": "a9",
+          "description": "Sign-off report HTML generated and contains milestone section",
+          "check": "signoff_report/index.html exists AND contains DV-I AND DV-C AND DV-F AND Coverage Dashboard"
+        },
+        {
+          "id": "a10",
+          "description": "Sign-off banner shows NOT READY (DV-F not met)",
+          "check": "signoff_report/index.html contains NOT READY OR DV-C COMPLETE"
+        }
+      ]
+    },
+
+    {
+      "id": "s10_eval_2_exclusion_format",
+      "name": "Exclusion file: correct urg .el format for all exclusion types",
+      "description": "Verify that generated .el files use correct urg EXCL_LINE, EXCL_TOGGLE, EXCL_BRANCH, EXCL_FSM_STATE, EXCL_COVBIN syntax with -comment field.",
+      "input": {
+        "gap_decisions": {
+          "CODE_LIN_0001": {
+            "decision": "exclude",
+            "reason": "DFT-only path",
+            "gap": {"type": "line", "scope": "tb.dut.u_ctrl", "file": "ctrl.sv", "line": 42}
+          },
+          "CODE_TOG_0002": {
+            "decision": "exclude",
+            "reason": "Scan enable not driven in functional mode",
+            "gap": {"type": "toggle", "scope": "tb.dut.u_ctrl", "signal": "scan_en", "direction": "01"}
+          },
+          "CODE_FSM_0003": {
+            "decision": "exclude",
+            "reason": "RESET_STATE reachable only at power-on",
+            "gap": {"type": "fsm", "scope": "tb.dut.u_arb", "state": "RESET_STATE"}
+          },
+          "FUNC_BIN_0004": {
+            "decision": "exclude",
+            "reason": "Parity disabled in all test configs",
+            "gap": {"type": "functional", "scope": "tb.dut.u_uart", "cg_name": "cg_uart_tx",
+                    "cp_name": "cp_parity", "bin_name": "bin_none"}
+          }
+        }
+      },
+      "output_dir": "/tmp/s10_eval/exclusion_test",
+      "assertions": [
+        {
+          "id": "a1",
+          "description": "line_exclusions.el uses EXCL_LINE with file and line number",
+          "check": "line_exclusions.el contains EXCL_LINE AND ctrl.sv AND 42 AND -comment"
+        },
+        {
+          "id": "a2",
+          "description": "toggle_exclusions.el uses EXCL_TOGGLE with direction 01",
+          "check": "toggle_exclusions.el contains EXCL_TOGGLE AND scan_en AND 01 AND -comment"
+        },
+        {
+          "id": "a3",
+          "description": "fsm_exclusions.el uses EXCL_FSM_STATE with state name",
+          "check": "fsm_exclusions.el contains EXCL_FSM_STATE AND RESET_STATE AND -comment"
+        },
+        {
+          "id": "a4",
+          "description": "functional_exclusions.el uses EXCL_COVBIN with covergroup/coverpoint/bin",
+          "check": "functional_exclusions.el contains EXCL_COVBIN AND cg_uart_tx AND cp_parity AND bin_none AND -comment"
+        }
+      ]
+    },
+
+    {
+      "id": "s10_eval_3_signoff_report_dv_f_pass",
+      "name": "Sign-off report: green banner when DV-F passes",
+      "description": "When all DV-F criteria are met, verify the sign-off report shows a green READY FOR SIGN-OFF banner.",
+      "input": {
+        "milestone_results": {
+          "dv_i": {"passed": true},
+          "dv_c": {"passed": true},
+          "dv_f": {"passed": true, "checks": {}}
+        },
+        "coverage_data": {
+          "project_name": "apb_uart",
+          "code_coverage": {
+            "line":       {"covered": 1000, "total": 1000, "pct": 100.0},
+            "toggle":     {"covered": 980,  "total": 1000, "pct": 98.0},
+            "branch":     {"covered": 500,  "total": 500,  "pct": 100.0}
+          },
+          "functional_coverage": {"total_bins": 40, "covered_bins": 40, "pct": 100.0, "covergroups": []},
+          "gaps_summary": {"total_gaps": 2, "excluded": 2, "stubs_generated": 0, "skipped": 0},
+          "exclusions": {"items": []},
+          "stubs": {"items": []}
+        }
+      },
+      "output_dir": "/tmp/s10_eval/signoff_pass",
+      "assertions": [
+        {
+          "id": "a1",
+          "description": "HTML banner contains READY FOR SIGN-OFF",
+          "check": "signoff_report/index.html contains READY FOR SIGN-OFF"
+        },
+        {
+          "id": "a2",
+          "description": "Banner CSS class is green",
+          "check": "signoff_report/index.html contains banner green"
+        },
+        {
+          "id": "a3",
+          "description": "Recommended Actions section says no actions required",
+          "check": "signoff_report/index.html contains No actions required"
+        }
+      ]
+    }
+
+  ]
+}

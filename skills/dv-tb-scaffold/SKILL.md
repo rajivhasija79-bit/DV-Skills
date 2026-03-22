@@ -1506,6 +1506,188 @@ Write `/tmp/<project_name>_tb_data_output.json` — consumed by S6+:
 
 ---
 
+## Step 16 — Optional Sanity Run (Interactive)
+
+**Always ask this question after printing the terminal summary.**
+
+```
+============================================================
+  Optional: Compile + Elaborate + Simulate Sanity Check
+============================================================
+  Would you like to run a basic compile → elaborate → simulate
+  cycle now to verify the generated testbench has no errors?
+
+  This will run:
+    1. Compilation  : vlogan -sverilog -f compile.f
+    2. Elaboration  : vcs -o simv ...
+    3. Simulation   : ./simv +UVM_TESTNAME=<proj>_sanity_test +SEED=1
+
+  Requirements: VCS must be in PATH, $VCS_HOME set, $UVM_HOME set.
+
+  Run sanity check now? [Y/N]:
+============================================================
+```
+
+Wait for user response.
+
+- **If N (or user skips):** Print "Skipping sanity run. Use `make compile` and `make sim TEST=sanity` to run manually." and stop.
+- **If Y:** proceed with the steps below.
+
+---
+
+### 16a — Pre-flight checks
+
+Before running any command, verify:
+
+```bash
+which vcs         # VCS in PATH?
+echo $VCS_HOME    # VCS_HOME set?
+echo $UVM_HOME    # UVM_HOME set?
+ls <PROJECT_ROOT>/dv/sim/compile.f   # compile.f exists?
+```
+
+If any check fails, print:
+
+```
+⛔  Pre-flight failed:
+  - VCS not in PATH (or $VCS_HOME not set)    → set VCS_HOME and add $VCS_HOME/bin to PATH
+  - $UVM_HOME not set                         → set UVM_HOME to your UVM installation
+  - compile.f missing                         → re-run S5 or check <PROJECT_ROOT>/dv/sim/
+
+Please fix the above and run manually:
+  cd <PROJECT_ROOT>/dv/sim && make compile && make sim TEST=sanity SEED=1
+```
+
+Do NOT attempt to run compile/sim if pre-flight fails.
+
+---
+
+### 16b — Compilation
+
+```bash
+cd <PROJECT_ROOT>/dv/sim
+vlogan -sverilog -full64 -ntb_opts uvm \
+  -f compile.f \
+  -l compile.log \
+  2>&1 | tail -30
+```
+
+After completion:
+- Count `Error` lines in `compile.log`
+- Count `Warning` lines
+
+Print:
+```
+  [COMPILE] <PASS|FAIL>
+    Errors   : N
+    Warnings : N
+    Log      : <PROJECT_ROOT>/dv/sim/compile.log
+```
+
+If errors > 0:
+- Show the first 20 error lines from `compile.log`
+- Analyse the errors. For each unique error:
+  - Identify which generated file caused it
+  - State the likely cause (missing import, undefined type, typo)
+  - If the fix is clear and confined to one line, apply it with the Edit tool and note the fix
+  - If the fix requires understanding DUT internals or is ambiguous, flag as `⚠️ NEEDS_ENGINEER_REVIEW` with a description
+- After applying auto-fixes, re-run compilation once. If errors persist, report and stop.
+- **Do NOT attempt elaboration or simulation if compilation has errors.**
+
+---
+
+### 16c — Elaboration
+
+```bash
+vcs -full64 -ntb_opts uvm \
+  -debug_access+all \
+  -o <PROJECT_ROOT>/dv/sim/simv \
+  <PROJECT_ROOT>/dv/tb/<project>_tb_top.sv \
+  -l elab.log \
+  2>&1 | tail -20
+```
+
+After completion:
+- Count `Error` lines in `elab.log`
+
+Print:
+```
+  [ELABORATE] <PASS|FAIL>
+    Errors   : N
+    Log      : <PROJECT_ROOT>/dv/sim/elab.log
+```
+
+If errors > 0:
+- Show the first 15 error lines
+- Apply the same analysis and auto-fix approach as Step 16b
+- **Do NOT attempt simulation if elaboration has errors.**
+
+---
+
+### 16d — Simulation (sanity test)
+
+```bash
+cd <PROJECT_ROOT>/dv/sim
+./simv \
+  +UVM_TESTNAME=<project>_sanity_test \
+  +UVM_VERBOSITY=UVM_MEDIUM \
+  +ntb_random_seed=1 \
+  -l sim_sanity.log \
+  2>&1 | tail -40
+```
+
+After completion, scan `sim_sanity.log` for:
+- `UVM_FATAL` count
+- `UVM_ERROR` count
+- `[PASS]` lines (CHK_ID pass messages from generated code)
+- `UVM_TEST_DONE` or `** PASSED **` — indicates test completed
+
+Print:
+```
+  [SIMULATE] <PASS|FAIL>
+    UVM_FATAL  : N
+    UVM_ERROR  : N
+    UVM_WARNING: N
+    CHK passes : N  (grep "[PASS]" in log)
+    Log        : <PROJECT_ROOT>/dv/sim/sim_sanity.log
+```
+
+**Pass condition:** `UVM_FATAL == 0 AND UVM_ERROR == 0`
+
+If errors/fatals found:
+- Show the relevant log lines (± 5 lines around each UVM_ERROR/FATAL)
+- Classify each: likely a TODO stub issue / missing DUT connection / config_db miss
+- Flag items requiring engineer attention vs items that may be auto-fixable
+
+---
+
+### 16e — Sanity Run Summary
+
+Print final status:
+
+```
+============================================================
+  Sanity Run Summary — <PROJECT_NAME>
+============================================================
+  Compile    : ✓ PASS  (N warnings)    | ✗ FAIL  (N errors)
+  Elaborate  : ✓ PASS                  | ✗ FAIL  (N errors)
+  Simulate   : ✓ PASS  (0 UVM errors)  | ✗ FAIL  (N UVM errors)
+------------------------------------------------------------
+  Auto-fixes applied : N  (see above)
+  NEEDS_ENGINEER_REVIEW: N items
+------------------------------------------------------------
+  Logs:
+    compile.log  : <PROJECT_ROOT>/dv/sim/compile.log
+    elab.log     : <PROJECT_ROOT>/dv/sim/elab.log
+    sim_sanity.log: <PROJECT_ROOT>/dv/sim/sim_sanity.log
+------------------------------------------------------------
+  Next step: run /dv-sequences (S6) to generate protocol-
+             specific directed and random sequences
+============================================================
+```
+
+---
+
 ## Important Notes
 
 - **Every generated file MUST be syntactically valid SystemVerilog** — mentally validate

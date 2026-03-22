@@ -871,30 +871,35 @@ def _run_demo(skill_id: str, run_id: str, params: dict):
 if __name__ == "__main__":
     import socket
     import webbrowser
-
-    def _find_free_port(preferred: int) -> int:
-        # Try preferred port first
-        try:
-            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-                s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-                s.bind(("127.0.0.1", preferred))
-                return preferred
-        except OSError:
-            pass
-        # Fall back to OS-assigned ephemeral port (safest — never blocked by policy)
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.bind(("127.0.0.1", 0))
-            return s.getsockname()[1]
+    from werkzeug.serving import make_server
 
     preferred = int(os.environ.get("PORT", 7437))
-    port = _find_free_port(preferred)
-    if port != preferred:
-        print(f"  [info] Port {preferred} in use — using port {port} instead")
+
+    # Probe WITHOUT SO_REUSEADDR — same behaviour as werkzeug's bind
+    def _port_free(p: int) -> bool:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        try:
+            s.bind(("127.0.0.1", p))
+            return True
+        except OSError:
+            return False
+        finally:
+            s.close()
+
+    if _port_free(preferred):
+        port = preferred
+    else:
+        # Let OS pick a safe ephemeral port (never blocked by org policies)
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.bind(("127.0.0.1", 0))
+        port = s.getsockname()[1]
+        s.close()
+        print(f"  [info] Port {preferred} unavailable — OS assigned port {port}")
 
     url = f"http://127.0.0.1:{port}"
 
     def _open():
-        time.sleep(1.0)
+        time.sleep(1.2)
         webbrowser.open(url)
 
     threading.Thread(target=_open, daemon=True).start()

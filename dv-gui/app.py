@@ -869,18 +869,40 @@ def _run_demo(skill_id: str, run_id: str, params: dict):
 # ── Entry point ───────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
+    import socket
     import webbrowser
+
+    def _find_free_port(preferred: int, fallbacks=(8080, 8888, 5000, 5050)) -> int:
+        for port in (preferred,) + fallbacks:
+            try:
+                with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+                    s.bind(("127.0.0.1", port))
+                    return port
+            except OSError:
+                continue
+        # Last resort: let OS pick
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.bind(("127.0.0.1", 0))
+            return s.getsockname()[1]
+
+    preferred = int(os.environ.get("PORT", 7437))
+    port = _find_free_port(preferred)
+    if port != preferred:
+        print(f"  [info] Port {preferred} in use — using port {port} instead")
+
+    url = f"http://127.0.0.1:{port}"
 
     def _open():
         time.sleep(1.0)
-        webbrowser.open("http://127.0.0.1:7437")
+        webbrowser.open(url)
 
     threading.Thread(target=_open, daemon=True).start()
 
     print()
     print("  ╔════════════════════════════════════════╗")
     print("  ║    DV Skills GUI  —  v1.0              ║")
-    print("  ║    http://127.0.0.1:7437               ║")
+    print(f"  ║    {url:<38}║")
     print("  ╚════════════════════════════════════════╝")
     print()
-    app.run(host="127.0.0.1", port=7437, debug=False, threaded=True)
+    app.run(host="127.0.0.1", port=port, debug=False, threaded=True)

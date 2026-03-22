@@ -55,6 +55,12 @@ python3 <REPO_ROOT>/skills/common/scripts/check_environment.py --skill s3 --inst
 
 Search for these files in the working directory and common locations before asking the user:
 - `dv_spec_summary.json` — S1 output (preferred spec input)
+  - **Check for these updated S1 fields** (added in S1 v1.1):
+    - `register_map[]` — per-register detail with per-field access types; used in
+      Section 3 (Coverage) and Section 4 (Checker Plan)
+    - `proprietary_interfaces[]` — non-standard protocol signal list + timing;
+      used in Section 5 (TB Architecture) to describe custom VIPs
+  - If these fields are absent, the skill proceeds without them (no error)
 - `dv_spec_summary.md` — S1 markdown output
 - `testplan.xlsx` or `*testplan*.xlsx` — S2 output
 - Any `*.pdf`, `*.docx`, `*.txt`, `*.md` that look like a spec or design document
@@ -99,7 +105,12 @@ Create OUTPUT_DIR if it does not exist.
 
 ## Step 2 — DUT Description (Section 1)
 
-Pull from `dv_spec_summary.json` if available (use the `dut_description`, `interfaces`, `features`, `registers`, `clocks`, `resets` fields).
+Pull from `dv_spec_summary.json` if available. Use these fields:
+- `block_overview`, `features`, `interfaces`, `clock_domains`, `reset_strategy` — as before
+- `register_map[]` — use for "Register Map Summary" sub-section: list all registers with
+  offset, reset value, and field count. Show total register count and flag any W1C/RO fields.
+- `proprietary_interfaces[]` — list any non-standard interfaces separately with their
+  protocol phase descriptions (prose from S1). This informs the VIP design in Section 5.
 
 If spec JSON is not available, extract from raw spec:
 - Full name and version of the DUT
@@ -155,6 +166,28 @@ endgroup
 
 If S2 testplan is available, pull coverpoints from the `Coverpoint / Assertion Code` column and expand them.
 
+**If `register_map` is available from S1 JSON**, auto-generate register-level covergroups:
+
+```systemverilog
+// Register access coverage — auto-generated from register_map
+covergroup cg_reg_access @(posedge clk);
+  cp_reg_addr: coverpoint reg_addr {
+    // one bin per register offset
+    bins <REG_NAME> = {<OFFSET>};
+    // ... one per register
+  }
+  cp_reg_op: coverpoint reg_write { bins write = {1}; bins read = {0}; }
+  cx_reg_op: cross cp_reg_addr, cp_reg_op;  // every register exercised as both R and W
+endgroup
+
+// W1C field coverage — one covergroup per register containing W1C fields
+// covergroup cg_<REG_NAME>_w1c @(posedge clk);
+//   cp_<FIELD>_set:   coverpoint <FIELD> { bins set = {1}; bins clear = {0}; }
+// endgroup
+```
+
+Add one register access covergroup entry per register block. Tag with `DV-I` milestone.
+
 ### 4b. Coverage targets per milestone
 
 Ask the user to confirm or modify:
@@ -184,6 +217,19 @@ Store as `data["coverage_plan"]`.
 ## Step 5 — Checker Plan (Section 4)
 
 Pull all checker IDs from the S2 testplan (column: `Checker ID`, `Checker Type`, `Assertion Code` if available).
+
+**If `register_map` is available from S1 JSON** and no S2 testplan exists (or S2 testplan
+does not include register checkers), auto-populate register checkers:
+
+| Checker ID pattern | Description | Component | When generated |
+|---|---|---|---|
+| `CHK_<IP>_<REG>_REGISTER_RST` | Reset value correct at power-up | scoreboard (RAL) | Always |
+| `CHK_<IP>_<REG>_REGISTER_RW` | Write-readback matches | scoreboard (RAL) | If RW/WO fields exist |
+| `CHK_<IP>_<REG>_REGISTER_W1C` | W1C field clears correctly | scoreboard (RAL) | If W1C field exists |
+| `CHK_<IP>_<REG>_REGISTER_RO` | RO field not writable | scoreboard (RAL) | If RO field exists |
+
+Generate one row per register per applicable access type. Do not duplicate checkers
+already present in S2 testplan.
 
 For each checker:
 
@@ -221,6 +267,21 @@ Store as `data["checker_plan"]`.
 ## Step 6 — TB Architecture (Section 5)
 
 ### 6a. Component inventory
+
+**If `proprietary_interfaces` is available from S1 JSON**, add a sub-section before the
+component inventory describing each custom VIP:
+
+> "The spec defines **<N> proprietary interface(s)** that require custom VIP development:
+>
+> **`<if_name>`** — `<description from S1>`
+> - Signals: `<signal_list from S1 proprietary_interfaces[].signals>`
+> - Protocol phases: `<phases from S1>`
+> - Handshake: `<handshake from S1>`
+> - Clock: `<clock from S1>`
+>
+> For each proprietary VIP, the TB Architecture section will describe:
+> the custom driver state machine, monitor sampling strategy, and any
+> protocol-specific sequence items needed."
 
 Ask the user:
 > "For the TB architecture diagram, I need the complete list of DV components.

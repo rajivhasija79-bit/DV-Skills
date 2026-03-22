@@ -83,6 +83,14 @@ Check the conversation and confirm all required inputs. Ask for missing ones in 
 **If `dv_spec_summary.json` provided:**
 - Read and parse it directly. Extract: features, sub-features, interfaces, parameters,
   clock domains, operating modes, compliance standards, known constraints.
+- **Also extract these fields added by the updated S1:**
+  - `register_map` — array of registers with per-field detail (name, offset, reset_value,
+    fields[].name/bits/width/access/reset_value). Used in Step 3 to **auto-generate
+    register access test rows** without manual input.
+  - `proprietary_interfaces` — array of non-standard protocol interfaces with signal list,
+    protocol phases, timing, and handshake description. Used in Step 4 to generate
+    protocol-specific coverpoints with **actual signal names** from the spec.
+  - If either field is absent or empty in the JSON, proceed without it (no error).
 
 **If raw spec file provided:**
 - Read the spec file. Extract the same fields using the same logic as dv-spec-parse (S1).
@@ -113,6 +121,11 @@ For each sub-feature, decide its primary verification approach using these rules
 - Protocol state machine states and transitions (FSM coverage)
 - Toggle coverage of key control signals
 - Cross coverage rows (generated in Step 4)
+- **Proprietary protocol coverpoints**: if `proprietary_interfaces` is present in S1 JSON,
+  generate coverpoints using the **actual signal names** from the `signals[]` array.
+  Example: if a proprietary interface has signal `req_type[2:0]`, generate
+  `cp_req_type: coverpoint req_type { bins type_a = {3'b001}; ... }` rather than a
+  generic placeholder.
 
 ### Negative / Error Injection rows (separate rows, linked to parent)
 - Protocol violations
@@ -120,6 +133,29 @@ For each sub-feature, decide its primary verification approach using these rules
 - Reset during active operation
 - Buffer overflow / underflow
 - Timeout conditions
+
+### Auto-generate Register Access Rows (from register_map)
+
+**If `register_map` is present and non-empty in S1 JSON**, auto-generate the following
+testplan rows for each register — do NOT wait for user input, just generate them:
+
+| Row type | Test name format | When | Milestone |
+|---|---|---|---|
+| Reset value check | `<reg_name>_reset_test` | Always | DV-I |
+| Read-write | `<reg_name>_rw_test` | Register has ≥1 RW or WO field | DV-I |
+| W1C clear | `<reg_name>_w1c_test` | Register has ≥1 W1C field | DV-I |
+| RO protection | `<reg_name>_ro_protect_test` | Register has ≥1 RO field | DV-I |
+
+- **Checker ID format:** `CHK_<IP>_<REG_NAME>_REGISTER_<NNN>` (e.g. `CHK_UART_CTRL_REGISTER_001`)
+- **Checker type:** `Procedural` (UVM RAL `read()`/`write()` + mirror comparison)
+- **Component:** `scoreboard` (via RAL predictor)
+- **Verification type cell content:**
+  ```
+  Testcase(Directed): <reg_name>_reset_test
+  Checker: CHK_<IP>_<REG_NAME>_REGISTER_<NNN>
+  ```
+- **Do not duplicate** register rows if the feature list already mentions the register.
+  Merge if a feature row already covers the same register and test type.
 
 ### Corner / Stress test rows (dedicated rows)
 - Boundary values (min/max burst, 0-length, max-length transfer)

@@ -872,16 +872,16 @@ if __name__ == "__main__":
     import socket
     import webbrowser
 
-    def _find_free_port(preferred: int, fallbacks=(8080, 8888, 5000, 5050)) -> int:
-        for port in (preferred,) + fallbacks:
-            try:
-                with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-                    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-                    s.bind(("127.0.0.1", port))
-                    return port
-            except OSError:
-                continue
-        # Last resort: let OS pick
+    def _find_free_port(preferred: int) -> int:
+        # Try preferred port first
+        try:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+                s.bind(("127.0.0.1", preferred))
+                return preferred
+        except OSError:
+            pass
+        # Fall back to OS-assigned ephemeral port (safest — never blocked by policy)
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             s.bind(("127.0.0.1", 0))
             return s.getsockname()[1]

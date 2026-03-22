@@ -1,0 +1,199 @@
+{
+  "skill_name": "dv-regression",
+  "skill_version": "1.0",
+  "description": "Evals for S9 dv-regression: test list generation, regression runner, log parser, HTML report, coverage merge",
+
+  "test_cases": [
+
+    {
+      "id": "s9_eval_1_apb_uart_full_regression",
+      "name": "APB-UART: full regression infrastructure from sequences data",
+      "description": "Generate DV-I/DV-C/DV-F/full test lists, Makefile targets, regression runner, grid config from user answers. Verifies test list format, seed handling, Makefile completeness, and runner CLI options.",
+      "input": {
+        "project_name": "apb_uart",
+        "seq_data": {
+          "project_name": "apb_uart",
+          "tests": [
+            {"test_name": "apb_uart_reg_ctrl_write_test",  "milestone": "DV-I", "type": "directed"},
+            {"test_name": "apb_uart_tx_data_integrity_test","milestone": "DV-C", "type": "directed"},
+            {"test_name": "apb_uart_tx_fifo_test",          "milestone": "DV-C", "type": "directed"},
+            {"test_name": "apb_uart_rand_tx_test",          "milestone": "DV-C", "type": "random"},
+            {"test_name": "apb_uart_stress_test",           "milestone": "DV-F", "type": "random"}
+          ]
+        },
+        "grid_config": {
+          "enabled": false
+        },
+        "seed_config": {
+          "dv_i_seeds": 1,
+          "dv_c_seeds": 5,
+          "dv_f_seeds": 20
+        }
+      },
+      "output_dir": "/tmp/s9_eval/apb_uart/dv",
+      "assertions": [
+        {
+          "id": "a1",
+          "description": "DV-I test list contains only DV-I milestone tests",
+          "check": "dv/sim/regression/apb_uart_dv_i.f contains apb_uart_reg_ctrl_write_test AND does NOT contain apb_uart_stress_test"
+        },
+        {
+          "id": "a2",
+          "description": "DV-C test list contains DV-I + DV-C tests",
+          "check": "dv/sim/regression/apb_uart_dv_c.f contains apb_uart_reg_ctrl_write_test AND apb_uart_tx_data_integrity_test AND apb_uart_rand_tx_test"
+        },
+        {
+          "id": "a3",
+          "description": "Random test in test list has SEEDS= field",
+          "check": "apb_uart_dv_c.f row for apb_uart_rand_tx_test contains SEEDS=5"
+        },
+        {
+          "id": "a4",
+          "description": "Full test list includes all 5 tests",
+          "check": "apb_uart_full.f contains all 5 test entries"
+        },
+        {
+          "id": "a5",
+          "description": "Makefile has regress_dvi target calling run_regression.py with --reglist",
+          "check": "Makefile contains regress_dvi AND run_regression.py AND --reglist apb_uart_dv_i.f"
+        },
+        {
+          "id": "a6",
+          "description": "Makefile has cov_merge target calling merge_coverage.py",
+          "check": "Makefile contains cov_merge AND merge_coverage.py"
+        },
+        {
+          "id": "a7",
+          "description": "run_regression.py CLI help includes --test keyword filter option",
+          "check": "run_regression.py --help output contains --test"
+        },
+        {
+          "id": "a8",
+          "description": "dv_regression_data.json written with test counts and seed config",
+          "check": "dv_regression_data.json exists AND contains total_tests AND seed_config"
+        }
+      ]
+    },
+
+    {
+      "id": "s9_eval_2_grid_regression",
+      "name": "Grid regression: LSF grid config and job submission commands",
+      "description": "User provides LSF grid answers. Verify grid_config.json is written with correct placeholders, and Makefile regress_grid target uses --grid flag.",
+      "input": {
+        "project_name": "pcie_dma",
+        "grid_answers": {
+          "G1": "LSF",
+          "G2": "bsub -J {job_name} -o {log_file} -q {queue} {cmd}",
+          "G3": "bjobs {job_id}",
+          "G4": "bkill {job_id}",
+          "G5": "normal",
+          "G6": 64,
+          "G7": "bjobs -noheader {job_id} | awk '{print $3}'"
+        },
+        "seq_data": {
+          "project_name": "pcie_dma",
+          "tests": [
+            {"test_name": "pcie_dma_basic_test",   "milestone": "DV-I", "type": "directed"},
+            {"test_name": "pcie_dma_rand_rd_test",  "milestone": "DV-C", "type": "random"},
+            {"test_name": "pcie_dma_rand_wr_test",  "milestone": "DV-C", "type": "random"}
+          ]
+        }
+      },
+      "output_dir": "/tmp/s9_eval/pcie_dma/dv",
+      "assertions": [
+        {
+          "id": "a1",
+          "description": "grid_config.json written with LSF submit template containing placeholders",
+          "check": "grid_config.json contains bsub AND {job_name} AND {log_file} AND {queue} AND {cmd}"
+        },
+        {
+          "id": "a2",
+          "description": "grid_config.json has status check and kill command",
+          "check": "grid_config.json contains bjobs AND bkill"
+        },
+        {
+          "id": "a3",
+          "description": "Makefile regress_grid target passes --grid flag to run_regression.py",
+          "check": "Makefile contains regress_grid AND --grid"
+        }
+      ]
+    },
+
+    {
+      "id": "s9_eval_3_log_parser",
+      "name": "Log parser: parse VCS sim log for PASS/FAIL status and CHK_IDs",
+      "description": "Verify parse_sim_log.parse_log() correctly identifies test status, CHK_ID pass/fail counts, UVM error counts, and sim completion.",
+      "input": {
+        "log_content": [
+          "UVM_INFO @ 0: reporter [RNTST] Running test apb_uart_reg_ctrl_write_test...",
+          "ntb_random_seed = 42",
+          "UVM_INFO @ 100ns: [PASS] CHK_UART_REG_CTRL_WRITE_001 - UART_CTRL readback matched",
+          "UVM_INFO @ 200ns: [PASS] CHK_UART_REG_CTRL_WRITE_001 - second check passed",
+          "UVM_INFO @ 300ns: [FAIL] CHK_UART_TX_DATA_INTEGRITY_001 - TXD mismatch: expected=0xA5 actual=0x00",
+          "--- UVM Report Summary ---",
+          "UVM_INFO   : 15",
+          "UVM_WARNING: 0",
+          "UVM_ERROR  : 1",
+          "UVM_FATAL  : 0",
+          "$finish called from file tb_top.sv, line 42."
+        ]
+      },
+      "assertions": [
+        {
+          "id": "a1",
+          "description": "Status is FAIL due to UVM_ERROR=1",
+          "check": "parse_log() returns status == FAIL"
+        },
+        {
+          "id": "a2",
+          "description": "CHK_UART_REG_CTRL_WRITE_001 appears in chk_pass with count=2",
+          "check": "result.chk_pass['CHK_UART_REG_CTRL_WRITE_001'] == 2"
+        },
+        {
+          "id": "a3",
+          "description": "CHK_UART_TX_DATA_INTEGRITY_001 appears in chk_fail",
+          "check": "result.chk_fail['CHK_UART_TX_DATA_INTEGRITY_001'] == 1"
+        },
+        {
+          "id": "a4",
+          "description": "seed extracted as 42",
+          "check": "result.seed == 42"
+        },
+        {
+          "id": "a5",
+          "description": "sim_finished is True (saw $finish)",
+          "check": "result.sim_finished == True"
+        }
+      ]
+    },
+
+    {
+      "id": "s9_eval_4_keyword_filter",
+      "name": "Keyword test filter: --test DMA matches all tests containing DMA",
+      "description": "Verify that run_regression.py --test DMA matches test names case-insensitively and runs only those tests.",
+      "input": {
+        "test_names": [
+          "pcie_dma_basic_test",
+          "pcie_dma_rand_rd_test",
+          "pcie_dma_rand_wr_test",
+          "apb_uart_reg_ctrl_write_test",
+          "pcie_cfg_test"
+        ],
+        "keyword": "DMA"
+      },
+      "assertions": [
+        {
+          "id": "a1",
+          "description": "3 tests match --test DMA (case-insensitive substring)",
+          "check": "filter_by_keyword(tests, 'DMA') returns 3 tests: pcie_dma_basic_test, pcie_dma_rand_rd_test, pcie_dma_rand_wr_test"
+        },
+        {
+          "id": "a2",
+          "description": "apb_uart and pcie_cfg tests are excluded",
+          "check": "filter result does NOT contain apb_uart_reg_ctrl_write_test OR pcie_cfg_test"
+        }
+      ]
+    }
+
+  ]
+}

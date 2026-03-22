@@ -49,6 +49,13 @@ DEPS = {
         ("openpyxl",  "openpyxl", "pip"),   # read S2 testplan for assertions/checkers
         ("graphviz",  "graphviz", "pip"),   # VIP hierarchy diagrams
     ],
+    "s6": [
+        ("json",      None,       "stdlib"),
+        ("pathlib",   None,       "stdlib"),
+        ("datetime",  None,       "stdlib"),
+        ("re",        None,       "stdlib"),
+        ("openpyxl",  "openpyxl", "pip"),   # parse testplan.xlsx
+    ],
 }
 
 ALL_DEPS = {pkg: install for skill_deps in DEPS.values()
@@ -74,7 +81,7 @@ def install_dep(package):
 
 def main():
     parser = argparse.ArgumentParser(description="DV Skills environment checker")
-    parser.add_argument("--skill", choices=["s1","s2","s3","s4","s5","all"], default="all",
+    parser.add_argument("--skill", choices=["s1","s2","s3","s4","s5","s6","all"], default="all",
                         help="Which skill to check dependencies for")
     parser.add_argument("--install", action="store_true",
                         help="Auto-install missing pip packages")
@@ -104,7 +111,7 @@ def main():
                 missing.append(install_name)
 
     # ── System tool checks (for s3) ───────────────────────────────────────────
-    if args.skill in ("s3", "s5", "all"):
+    if args.skill in ("s3", "s5", "s6", "all"):
         print("\n  [S3] System tools:")
         for tool, desc in [("pandoc", "PDF generation (primary)"),
                             ("dot",   "Graphviz binary (diagrams)")]:

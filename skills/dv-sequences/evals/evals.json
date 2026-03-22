@@ -1,0 +1,188 @@
+{
+  "skill_name": "dv-sequences",
+  "skill_version": "1.0",
+  "description": "Evals for S6 dv-sequences: directed/random vseq generation, test class generation, checker ID embedding, interactive testcase creation",
+
+  "test_cases": [
+
+    {
+      "id": "s6_eval_1_apb_uart_directed",
+      "name": "APB-UART: generate directed tests from testplan + S5 TB data",
+      "description": "Full flow: dv_tb_data.json from S5 (apb_uart project) + testplan with 4 directed rows. Tests: vseq file layout, test class plusargs, CHK_ID embedding, packages.",
+      "input": {
+        "project_name": "apb_uart",
+        "dv_tb_data": {
+          "project_name": "apb_uart",
+          "unique_vips": [
+            {"vip_name": "apb_vip", "protocol": "APB",  "data_width": 32, "addr_width": 32,
+             "agent_name": "apb_if_agent", "sequencer_name": "m_apb_if_seqr"},
+            {"vip_name": "uart_vip","protocol": "UART", "data_width": 1,  "addr_width": 0,
+             "agent_name": "uart_if_agent","sequencer_name": "m_uart_if_seqr"}
+          ],
+          "ral": {
+            "reg_block_class": "apb_uart_reg_block",
+            "adapter_class":   "apb_vip_ral_adapter",
+            "base_addr":       "0x0",
+            "registers": [
+              {"name": "UART_CTRL",   "offset": "0x00"},
+              {"name": "UART_STATUS", "offset": "0x04"}
+            ]
+          },
+          "env": {
+            "env_class":          "apb_uart_env",
+            "env_cfg_class":      "apb_uart_env_cfg",
+            "virtual_seqr_class": "apb_uart_virtual_seqr"
+          },
+          "base_test": {
+            "base_test_class": "apb_uart_base_test"
+          }
+        },
+        "testplan_rows": [
+          {
+            "feature": "APB Slave Interface", "subfeature": "Register Write",
+            "verification_type": "directed", "test_name": "apb_reg_write_test",
+            "testcase_description": "DUT Config: UART_CTRL.TX_EN=0\nStimulus: APB write to UART_CTRL\nExpected Behavior: write accepted\nChecks: UART_CTRL readback matches\nPass Criteria: readback == written value",
+            "checker_id": "CHK_UART_APB_PROTOCOL_001", "checker_type": "Procedural",
+            "assertion_code": "", "milestone": "DV-I"
+          },
+          {
+            "feature": "APB Slave Interface", "subfeature": "Register Read",
+            "verification_type": "directed", "test_name": "apb_reg_read_test",
+            "testcase_description": "DUT Config: default\nStimulus: APB read from UART_STATUS\nExpected Behavior: STATUS returned\nChecks: prdata valid\nPass Criteria: prdata matches mirror",
+            "checker_id": "CHK_UART_APB_PROTOCOL_002", "checker_type": "Procedural",
+            "assertion_code": "", "milestone": "DV-I"
+          },
+          {
+            "feature": "UART TX", "subfeature": "Basic TX",
+            "verification_type": "directed", "test_name": "uart_tx_basic_test",
+            "testcase_description": "DUT Config: UART_CTRL.TX_EN=1\nStimulus: send UART byte 0xA5\nExpected Behavior: TXD line frames byte\nChecks: TXD observed\nPass Criteria: TXD matches 0xA5 frame",
+            "checker_id": "CHK_UART_TX_FUNCTIONAL_001", "checker_type": "Assertion",
+            "assertion_code": "property p_uart_tx_start;\n  @(posedge clk) disable iff (!rst_n)\n  $fell(txd) |-> ##1 !txd;\nendproperty\nassert property (p_uart_tx_start) else\n  $error(\"[FAIL] CHK_UART_TX_FUNCTIONAL_001 violated at time %0t\", $time);",
+            "milestone": "DV-C"
+          },
+          {
+            "feature": "UART TX", "subfeature": "Random TX",
+            "verification_type": "random", "test_name": "uart_tx_rand_test",
+            "testcase_description": "DUT Config: UART_CTRL.TX_EN=1\nStimulus: random UART bytes\nExpected Behavior: all bytes transmitted\nChecks: scoreboard byte comparison\nPass Criteria: 0 mismatches",
+            "checker_id": "CHK_UART_TX_DATA_INTEGRITY_001", "checker_type": "Procedural",
+            "assertion_code": "", "milestone": "DV-C"
+          }
+        ]
+      },
+      "output_dir": "/tmp/s6_eval/apb_uart/dv",
+      "assertions": [
+        {
+          "id": "a1",
+          "description": "Agent sequences generated: apb/ and UART/ directories with write/read/send/recv ops",
+          "check": "dv/sequences/APB/apb_write_seq.sv exists AND dv/sequences/APB/apb_read_seq.sv exists AND dv/sequences/UART/uart_send_seq.sv exists"
+        },
+        {
+          "id": "a2",
+          "description": "Base vseq generated with ral_write/ral_read/ral_check tasks and uvm_declare_p_sequencer",
+          "check": "dv/sequences/apb_uart/apb_uart_base_vseq.sv contains uvm_declare_p_sequencer AND ral_write AND ral_check AND apb_uart_virtual_seqr"
+        },
+        {
+          "id": "a3",
+          "description": "Directed vseq generated for each directed testcase row with CHK_ID embedded",
+          "check": "apb_reg_write_test_vseq.sv exists AND contains CHK_UART_APB_PROTOCOL_001 AND uart_tx_basic_test_vseq.sv exists AND contains CHK_UART_TX_FUNCTIONAL_001"
+        },
+        {
+          "id": "a4",
+          "description": "Random vseq generated for uart_tx_rand_test with num_txns constraint and repeat loop",
+          "check": "uart_tx_rand_test_vseq.sv contains rand int unsigned num_txns AND constraint c_defaults AND repeat (num_txns)"
+        },
+        {
+          "id": "a5",
+          "description": "Test classes generated: one per testplan row, extend base_test, have plusargs block",
+          "check": "apb_uart_apb_reg_write_test_test.sv extends apb_uart_base_test AND contains $test$plusargs AND raise_objection AND drop_objection"
+        },
+        {
+          "id": "a6",
+          "description": "Assertion code from testplan embedded in uart_tx_basic_test_vseq with CHK_ID",
+          "check": "uart_tx_basic_test_vseq.sv contains p_uart_tx_start OR contains CHK_UART_TX_FUNCTIONAL_001"
+        },
+        {
+          "id": "a7",
+          "description": "sequences_pkg and tests_pkg generated, import correct sub-packages",
+          "check": "apb_uart_sequences_pkg.sv contains import apb_vip_pkg AND import uart_vip_pkg AND apb_uart_tests_pkg.sv contains import apb_uart_sequences_pkg"
+        },
+        {
+          "id": "a8",
+          "description": "compile.f updated with sequences and tests package entries",
+          "check": "compile.f contains apb_uart_sequences_pkg.sv AND apb_uart_tests_pkg.sv"
+        },
+        {
+          "id": "a9",
+          "description": "dv_sequences_data.json written with correct test count and milestone breakdown",
+          "check": "dv_sequences_data.json contains project_name=apb_uart AND summary.total_tests=4 AND summary.dv_i=2 AND summary.dv_c=2"
+        }
+      ]
+    },
+
+    {
+      "id": "s6_eval_2_no_tb_data_stop",
+      "name": "STOP if dv_tb_data.json missing — prompt user",
+      "description": "No dv_tb_data.json provided. Skill must stop and present the 3-option prompt. Tests the mandatory gate check.",
+      "input": {
+        "project_name": "missing_tb",
+        "dv_tb_data": null,
+        "testplan_rows": []
+      },
+      "output_dir": "/tmp/s6_eval/missing_tb/dv",
+      "assertions": [
+        {
+          "id": "a1",
+          "description": "Skill output contains STOPPED message and 3 options (1/2/3)",
+          "check": "skill output contains 'S6 STOPPED' AND 'dv_tb_data.json' AND 'Options:' AND '1.' AND '2.' AND '3.'"
+        },
+        {
+          "id": "a2",
+          "description": "Skill does not generate any .sv files before user responds",
+          "check": "no .sv files written before user responds to the STOP prompt"
+        }
+      ]
+    },
+
+    {
+      "id": "s6_eval_3_interactive_single_testcase",
+      "name": "Interactive: generate single testcase from user description",
+      "description": "User describes a testcase in natural language. Skill asks clarifying questions (all in one message), then generates vseq + test class for that one testcase only.",
+      "input": {
+        "project_name": "apb_uart",
+        "user_description": "Write a test that enables TX, sends 5 bytes over UART, and checks STATUS.TX_FULL never asserts",
+        "dv_tb_data": {
+          "project_name": "apb_uart",
+          "unique_vips": [
+            {"vip_name": "apb_vip",  "protocol": "APB",  "agent_name": "apb_if_agent",  "sequencer_name": "m_apb_if_seqr"},
+            {"vip_name": "uart_vip", "protocol": "UART", "agent_name": "uart_if_agent", "sequencer_name": "m_uart_if_seqr"}
+          ],
+          "ral": {
+            "reg_block_class": "apb_uart_reg_block",
+            "registers": [{"name": "UART_CTRL"}, {"name": "UART_STATUS"}]
+          },
+          "env": {"virtual_seqr_class": "apb_uart_virtual_seqr"},
+          "base_test": {"base_test_class": "apb_uart_base_test"}
+        }
+      },
+      "output_dir": "/tmp/s6_eval/apb_uart_interactive/dv",
+      "assertions": [
+        {
+          "id": "a1",
+          "description": "Skill asks clarifying questions in a single message before generating any file",
+          "check": "skill output contains clarification question block (test name, agents, config, pass criteria, milestone) BEFORE any SV code"
+        },
+        {
+          "id": "a2",
+          "description": "After user responds OK, vseq file generated references UART_CTRL write and UART_STATUS check",
+          "check": "generated vseq contains uart_ctrl OR UART_CTRL AND uart_status OR UART_STATUS"
+        },
+        {
+          "id": "a3",
+          "description": "Generated test class has correct base class and plusargs",
+          "check": "generated test extends apb_uart_base_test AND contains $test$plusargs"
+        }
+      ]
+    }
+
+  ]
+}

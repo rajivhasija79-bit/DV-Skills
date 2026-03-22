@@ -89,6 +89,57 @@ SKILL_DEMO_STEPS = {
             "Generating base test class...",
             "Generating compile.f + Makefile...",
             "✓  S5 complete — 24 TB files generated"],
+    "s6":  ["Loading TB data from S5...",
+            "Loading testplan rows from S2...",
+            "Generating agent base sequences (APB, UART)...",
+            "Generating base virtual sequence...",
+            "Generating directed virtual sequences (12 rows)...",
+            "Generating randomised virtual sequences...",
+            "Generating test classes (DV-I: 3, DV-C: 5, DV-F: 4)...",
+            "Writing dv_sequences_data.json...",
+            "✓  S6 complete — 24 sequence files, 12 test classes generated"],
+    "s7":  ["Loading TB data from S5...",
+            "Loading testplan rows from S2...",
+            "Categorising assertions by VIP and DUT internal...",
+            "Generating APB assertion module (apb_assertions.sv)...",
+            "Generating UART assertion module (uart_assertions.sv)...",
+            "Generating DUT bind module (dut_assertions_bind.sv)...",
+            "Generating assertion control package...",
+            "Generating assertion checker UVM component...",
+            "Writing dv_assertions_data.json...",
+            "✓  S7 complete — 18 assertions, 2 VIP modules, bind module generated"],
+    "s8":  ["Loading TB data from S5...",
+            "Loading assertions data from S7...",
+            "Loading testplan rows from S2...",
+            "Generating sb_transaction class...",
+            "Generating reference model (SV stub)...",
+            "Generating scoreboard (in-order)...",
+            "Generating functional coverage model...",
+            "Linking CHK_IDs to scoreboard checks...",
+            "Writing dv_scoreboard_data.json...",
+            "✓  S8 complete — scoreboard + refmodel + coverage model generated"],
+    "s9":  ["Loading sequences data from S6...",
+            "Building DV-I test list (3 tests × 1 seed)...",
+            "Building DV-C test list (5 tests × 5 seeds)...",
+            "Building DV-F test list (4 tests × 20 seeds)...",
+            "Dispatching 28 jobs (local ThreadPoolExecutor, 8 workers)...",
+            "Running simulations... [████████████████████] 100%",
+            "Parsing simulation logs...",
+            "28/28 PASSED",
+            "Generating HTML regression report...",
+            "Writing dv_regression_data.json...",
+            "✓  S9 complete — 28/28 passed, report written"],
+    "s10": ["Loading coverage database...",
+            "Loading regression data from S9...",
+            "Loading assertions data from S7...",
+            "Running urg coverage merge...",
+            "Line coverage    : 99.2% (threshold: 99%  ✓)",
+            "Toggle coverage  : 96.1% (threshold: 95%  ✓)",
+            "Functional coverage: 100.0% (threshold: 99%  ✓)",
+            "Generating exclusion suggestions (3 items)...",
+            "Writing coverage_signoff_report.html...",
+            "Writing dv_coverage_data.json...",
+            "✓  S10 complete — coverage closure achieved, sign-off report written"],
 }
 
 # ── State ─────────────────────────────────────────────────────────────────────
@@ -558,6 +609,43 @@ def _finish_run(run_id: str, skill_id: str, exit_code: int):
     save_status(skill_status)
 
 
+def _has_real_data(skill_id: str, params: dict) -> tuple[bool, str]:
+    """Return (True, '') if the required upstream data files exist on disk,
+    else (False, reason) so the caller can fall back to demo mode."""
+    tb_data_path = params.get("tb_data", "")
+    testplan_path = params.get("testplan", "")
+
+    if skill_id in ("s6", "s7", "s8"):
+        # Need a real tb_data JSON written by S5
+        if not tb_data_path or not Path(tb_data_path).exists():
+            return False, (
+                f"tb_data file not found: '{tb_data_path or '(not set)'}'. "
+                "S5 must produce dv_tb_data.json first. Running in demo mode."
+            )
+        # S6 also needs testplan rows
+        if skill_id == "s6":
+            if not testplan_path or not Path(testplan_path).exists():
+                return False, (
+                    f"Testplan file not found: '{testplan_path or '(not set)'}'. "
+                    "S2 must produce testplan.xlsx or dv_testplan_data.json first. Running in demo mode."
+                )
+    if skill_id == "s9":
+        seq_data = params.get("seq_data", "")
+        if not seq_data or not Path(seq_data).exists():
+            return False, (
+                f"seq_data file not found: '{seq_data or '(not set)'}'. "
+                "S6 must produce dv_sequences_data.json first. Running in demo mode."
+            )
+    if skill_id == "s10":
+        vdb = params.get("vdb_path", "")
+        if not vdb or not Path(vdb).exists():
+            return False, (
+                f"VDB path not found: '{vdb or '(not set)'}'. "
+                "S9 must produce a merged coverage database first. Running in demo mode."
+            )
+    return True, ""
+
+
 def _execute_skill(skill_id: str, run_id: str, params: dict):
     # Merge saved project config as base; explicit params override
     merged = {**load_project_config(), **params}
@@ -568,6 +656,13 @@ def _execute_skill(skill_id: str, run_id: str, params: dict):
 
     script = SKILL_SCRIPTS.get(skill_id)
     if script is None or not Path(script).exists():
+        _run_demo(skill_id, run_id, params)
+        return
+
+    # Check upstream data files exist; fall back to demo if not
+    ok, reason = _has_real_data(skill_id, params)
+    if not ok:
+        _add_line(run_id, "stderr", f"⚠  {reason}")
         _run_demo(skill_id, run_id, params)
         return
 

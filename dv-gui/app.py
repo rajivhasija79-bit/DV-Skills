@@ -24,7 +24,6 @@ BASE_DIR  = Path(__file__).resolve().parent
 app = Flask(
     __name__,
     template_folder=str(BASE_DIR / "templates"),
-    static_folder=str(BASE_DIR / "static") if (BASE_DIR / "static").exists() else None,
 )
 RUNS_DIR  = BASE_DIR / "runs"
 RUNS_DIR.mkdir(exist_ok=True)
@@ -874,19 +873,25 @@ def _run_demo(skill_id: str, run_id: str, params: dict):
 
 # ── Entry point ───────────────────────────────────────────────────────────────
 
+HOST = "0.0.0.0"
+PORT = 7437
+
 if __name__ == "__main__":
-    import webbrowser
-
-    def _open():
-        time.sleep(1.0)
-        webbrowser.open("http://127.0.0.1:7437")
-
-    threading.Thread(target=_open, daemon=True).start()
-
     print()
     print("  ╔════════════════════════════════════════╗")
     print("  ║    DV Skills GUI  —  v1.0              ║")
-    print("  ║    http://127.0.0.1:7437               ║")
+    print(f"  ║    http://localhost:{PORT}               ║")
     print("  ╚════════════════════════════════════════╝")
     print()
-    app.run(host="127.0.0.1", port=7437, debug=False, threaded=True)
+
+    # Try waitress first (production WSGI, no dev-server warning, Linux + Mac + Windows)
+    try:
+        from waitress import serve
+        print(f"  Serving with waitress on http://{HOST}:{PORT}")
+        print("  Press Ctrl+C to stop.\n")
+        serve(app, host=HOST, port=PORT, threads=8)
+    except ImportError:
+        # Fallback to Flask dev server if waitress not installed
+        print("  waitress not found — falling back to Flask dev server.")
+        print("  Install it with:  pip3 install waitress\n")
+        app.run(host=HOST, port=PORT, debug=False, threaded=True)

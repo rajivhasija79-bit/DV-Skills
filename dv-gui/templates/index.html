@@ -536,6 +536,29 @@ html,body {
 .success-toast { position:fixed; bottom:80px; right:24px; background:var(--green); color:#fff; padding:12px 20px; border-radius:var(--r-lg); font-size:13px; font-weight:600; z-index:999; box-shadow:0 4px 24px rgba(0,0,0,.4); animation:slideInRight .3s ease; }
 @keyframes slideInRight { from{transform:translateX(60px);opacity:0} to{transform:translateX(0);opacity:1} }
 
+/* ── Category selector ── */
+.af-cat-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(170px,1fr)); gap:8px; margin-top:8px; }
+.af-cat-item { padding:10px 12px; background:var(--bg-2); border:1px solid var(--border); border-radius:var(--r); cursor:pointer; transition:.2s; }
+.af-cat-item:hover { border-color:var(--orange-mid); background:var(--bg-3); }
+.af-cat-item.selected { border-color:var(--orange); background:var(--orange-dim); }
+.af-cat-name { font-size:12px; font-weight:700; color:var(--t1); }
+.af-cat-sub  { font-size:10px; color:var(--t4); margin-top:3px; line-height:1.4; }
+
+/* ── Field builder ── */
+.af-add-btn { background:var(--bg-2); border:1px dashed var(--border); border-radius:var(--r); color:var(--t3); font-family:inherit; font-size:12px; padding:7px 14px; cursor:pointer; width:100%; margin-top:8px; transition:.2s; }
+.af-add-btn:hover { border-color:var(--orange); color:var(--orange); background:var(--orange-dim); }
+.af-extra-field-row { display:grid; grid-template-columns:110px 1fr 90px 70px 1fr 28px; gap:6px; align-items:center; padding:8px 10px; background:var(--bg-2); border:1px solid var(--border); border-radius:var(--r); margin-bottom:6px; }
+.af-extra-field-row input, .af-extra-field-row select { background:var(--bg-3); border:1px solid var(--border); border-radius:4px; color:var(--t1); font-size:11px; padding:4px 8px; font-family:inherit; width:100%; box-sizing:border-box; }
+.af-extra-field-row select { cursor:pointer; }
+.af-extra-field-row .af-req-label { font-size:10px; color:var(--t3); display:flex; align-items:center; gap:4px; cursor:pointer; white-space:nowrap; }
+.af-extra-field-row .af-req-label input { width:14px; height:14px; flex-shrink:0; accent-color:var(--orange); }
+.af-remove-btn { background:none; border:none; color:var(--t4); cursor:pointer; font-size:16px; padding:0; line-height:1; transition:.2s; }
+.af-remove-btn:hover { color:var(--red); }
+.af-out-file-row { display:grid; grid-template-columns:1fr 1fr 28px; gap:6px; align-items:center; padding:8px 10px; background:var(--bg-2); border:1px solid var(--border); border-radius:var(--r); margin-bottom:6px; }
+.af-out-file-row input { background:var(--bg-3); border:1px solid var(--border); border-radius:4px; color:var(--t1); font-size:11px; padding:4px 8px; font-family:monospace; width:100%; box-sizing:border-box; }
+.af-out-file-row input.desc-input { font-family:inherit; }
+.af-section-sep { border:none; border-top:1px solid var(--border); margin:20px 0; }
+
 .wizard-footer {
   flex-shrink:0; display:flex; align-items:center; padding:14px 32px;
   border-top:1px solid var(--border); background:var(--bg);
@@ -797,8 +820,9 @@ textarea.form-input { height:auto; padding:10px 12px; resize:vertical; min-heigh
       <div id="skill-list-2"></div>
       <div class="sb-section-label" style="margin-top:6px">Analysis</div>
       <div id="skill-list-3"></div>
-      <div class="sb-section-label" style="margin-top:6px" id="custom-skills-label" style="display:none">Custom</div>
+      <div class="sb-section-label" style="margin-top:6px;display:none" id="custom-skills-label">Custom</div>
       <div id="skill-list-custom"></div>
+      <div id="skill-list-dynamic-wrap"></div>
     </div>
     <div class="sb-footer">
       <button class="sb-reset-btn" onclick="App.navigate('addskill')" style="background:var(--orange-dim);color:var(--orange);border-color:var(--orange-mid);margin-bottom:6px">+ Add Custom Skill</button>
@@ -1656,9 +1680,12 @@ const ProjectSettings = {
 /* ═══════════════════════════════════════════════════════════════════════════
    CUSTOM SKILLS
    ═══════════════════════════════════════════════════════════════════════════ */
+const CATEGORY_TO_GROUP = {'Verification Flow':1,'Implementation':2,'Analysis':3,'Custom':4};
+const GROUP_TO_CATEGORY = {1:'Verification Flow',2:'Implementation',3:'Analysis',4:'Custom'};
+
 const CustomSkills = {
-  _data: [],          // loaded manifests
-  _outputs: {},       // SKILL_OUTPUTS from backend
+  _data: [],
+  _outputs: {},
 
   async loadAndRegister() {
     try {
@@ -1667,17 +1694,26 @@ const CustomSkills = {
       this._outputs = r.skill_outputs || {};
       for(const cs of this._data) {
         if(SKILL_MAP[cs.id]) continue;
+        // Resolve group: numeric from saved group or category string
+        const cat = cs.category || 'Custom';
+        const group = CATEGORY_TO_GROUP[cat] || cat; // string for custom categories
         const skill = {
           id: cs.id, tag: cs.tag||cs.id.toUpperCase(), name: cs.name,
-          group: 4, color: cs.color||'#8B5CF6', icon: cs.icon||'⚡',
+          group, color: cs.color||'#8B5CF6', icon: cs.icon||'⚡',
           desc: cs.desc||'', deps: cs.deps||[],
           steps: cs.steps||[{title:'Run',desc:'',fields:[{id:'output_dir',label:'Output Directory',type:'dir',required:true}]}],
         };
         SKILLS.push(skill);
         SKILL_MAP[cs.id] = skill;
         State.runState[cs.id] = {status:'idle',last_run:null,run_id:null,exit_code:null,deps_met:true};
-        if(!SKILL_GROUPS[4]) SKILL_GROUPS[4]=[];
-        if(!SKILL_GROUPS[4].includes(cs.id)) SKILL_GROUPS[4].push(cs.id);
+        if(typeof group === 'number'){
+          if(!SKILL_GROUPS[group]) SKILL_GROUPS[group]=[];
+          if(!SKILL_GROUPS[group].includes(cs.id)) SKILL_GROUPS[group].push(cs.id);
+        } else {
+          // Custom category — string key
+          if(!SKILL_GROUPS[group]) SKILL_GROUPS[group]=[];
+          if(!SKILL_GROUPS[group].includes(cs.id)) SKILL_GROUPS[group].push(cs.id);
+        }
       }
     } catch(e) { console.warn('Could not load custom skills:', e); }
   },
@@ -1734,12 +1770,12 @@ const CustomSkills = {
   <div class="af-row">
     <label>Skill ID <span>*</span></label>
     <input class="af-input" id="af-id" placeholder="e.g. s11, my_checker" />
-    <div class="af-hint">Lowercase letters, numbers, underscores only. Must be unique.</div>
+    <div class="af-hint">Lowercase, underscores only. Must be unique.</div>
   </div>
   <div class="af-row">
     <label>Short Tag <span>*</span></label>
     <input class="af-input" id="af-tag" placeholder="e.g. S11" maxlength="6"/>
-    <div class="af-hint">Shown on skill card. 2–6 chars.</div>
+    <div class="af-hint">Shown on card. 2–6 chars.</div>
   </div>
 </div>
 
@@ -1766,20 +1802,83 @@ const CustomSkills = {
 
 <div class="af-row">
   <label>Script File</label>
-  <input class="af-input" id="af-script" placeholder="run_<id>.bash  (auto-set from Skill ID if blank)"/>
-  <div class="af-hint">Bash or Python script in <code>dv-gui/custom_skills/&lt;id&gt;/</code>. A template is auto-generated if the file does not exist.</div>
+  <input class="af-input" id="af-script" placeholder="run_&lt;id&gt;.bash  (auto-generated if blank)"/>
+  <div class="af-hint">Bash or Python script placed in <code>dv-gui/custom_skills/&lt;id&gt;/</code>. Template auto-generated.</div>
 </div>
+
+<hr class="af-section-sep"/>
+
+<div class="af-row">
+  <label>Sidebar Category <span>*</span></label>
+  <div class="af-hint" style="margin-bottom:8px">Choose which section this skill appears under in the sidebar.</div>
+  <div class="af-cat-grid" id="af-cat-grid">
+    <div class="af-cat-item" data-cat="Verification Flow" onclick="CustomSkills._selectCat(this)">
+      <div class="af-cat-name">Verification Flow</div>
+      <div class="af-cat-sub">With S1–S5 (spec, testplan, arch)</div>
+    </div>
+    <div class="af-cat-item" data-cat="Implementation" onclick="CustomSkills._selectCat(this)">
+      <div class="af-cat-name">Implementation</div>
+      <div class="af-cat-sub">With S6 (sequences, tests)</div>
+    </div>
+    <div class="af-cat-item" data-cat="Analysis" onclick="CustomSkills._selectCat(this)">
+      <div class="af-cat-name">Analysis</div>
+      <div class="af-cat-sub">With S7–S10 (assertions, scores)</div>
+    </div>
+    <div class="af-cat-item selected" data-cat="Custom" onclick="CustomSkills._selectCat(this)">
+      <div class="af-cat-name">Custom</div>
+      <div class="af-cat-sub">Separate section at bottom</div>
+    </div>
+    <div class="af-cat-item" data-cat="__new__" onclick="CustomSkills._selectCat(this)">
+      <div class="af-cat-name">+ New Category</div>
+      <div class="af-cat-sub">Create a new sidebar section</div>
+    </div>
+  </div>
+  <div id="af-newcat-row" style="display:none;margin-top:10px">
+    <input class="af-input" id="af-newcat" placeholder="New category name e.g. Formal Verification"/>
+  </div>
+</div>
+
+<hr class="af-section-sep"/>
 
 <div class="af-row">
   <label>Upstream Dependencies</label>
-  <div class="af-hint" style="margin-bottom:8px">Select which standard skills this skill depends on. Their output files will be suggested as inputs below.</div>
+  <div class="af-hint" style="margin-bottom:8px">Tick which skills this skill depends on. Their output files are auto-suggested as inputs below.</div>
   <div class="af-dep-grid" id="af-dep-grid"></div>
 </div>
 
 <div class="af-row" id="af-inputs-row" style="display:none">
   <label>Input Files from Dependencies</label>
-  <div class="af-hint" style="margin-bottom:8px">Each file below will be auto-scanned from the workspace directory when the skill wizard opens. Set the Field ID — this becomes the form field name the user fills in.</div>
+  <div class="af-hint" style="margin-bottom:6px">These files will be auto-scanned from the workspace. Edit the Field ID — it becomes the wizard field name the user fills in.</div>
   <div class="af-in-file-list" id="af-in-file-list"></div>
+</div>
+
+<hr class="af-section-sep"/>
+
+<div class="af-row">
+  <label>Additional Wizard Fields</label>
+  <div class="af-hint" style="margin-bottom:6px">Add extra fields to the skill wizard — text inputs, toggles, numbers, selects, directories. These appear alongside the input files above.</div>
+  <div style="display:grid;grid-template-columns:110px 1fr 90px 70px 1fr 28px;gap:6px;padding:4px 10px;margin-bottom:4px">
+    <span style="font-size:10px;color:var(--t4)">FIELD ID</span>
+    <span style="font-size:10px;color:var(--t4)">LABEL</span>
+    <span style="font-size:10px;color:var(--t4)">TYPE</span>
+    <span style="font-size:10px;color:var(--t4)">REQ</span>
+    <span style="font-size:10px;color:var(--t4)">HINT TEXT</span>
+    <span></span>
+  </div>
+  <div id="af-extra-fields-list"></div>
+  <button type="button" class="af-add-btn" onclick="CustomSkills._addExtraField()">+ Add Field</button>
+</div>
+
+<div class="af-row">
+  <label>Output Files</label>
+  <div class="af-hint" style="margin-bottom:6px">Declare files this skill produces. Other custom skills can depend on these as inputs.</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 28px;gap:6px;padding:4px 10px;margin-bottom:4px">
+    <span style="font-size:10px;color:var(--t4)">FILENAME (e.g. my_output.json)</span>
+    <span style="font-size:10px;color:var(--t4)">DESCRIPTION</span>
+    <span></span>
+  </div>
+  <div id="af-outputs-list"></div>
+  <button type="button" class="af-add-btn" onclick="CustomSkills._addOutputFile()">+ Add Output File</button>
 </div>
 
 <button class="af-create-btn" id="af-create-btn" onclick="CustomSkills.submit()">⚡ Create Skill & Generate Files</button>`;
@@ -1801,6 +1900,42 @@ const CustomSkills = {
       if(!tagEl._touched) tagEl.value=v.toUpperCase().replace(/_/g,'').slice(0,4);
     });
     document.getElementById('af-tag').addEventListener('input',()=>document.getElementById('af-tag')._touched=true);
+  },
+
+  _selectCat(el) {
+    document.querySelectorAll('.af-cat-item').forEach(i=>i.classList.remove('selected'));
+    el.classList.add('selected');
+    document.getElementById('af-newcat-row').style.display = el.dataset.cat==='__new__' ? '' : 'none';
+  },
+
+  _addExtraField() {
+    const list = document.getElementById('af-extra-fields-list');
+    const row  = document.createElement('div'); row.className='af-extra-field-row';
+    row.innerHTML = `
+      <input placeholder="field_id" class="ef-id"/>
+      <input placeholder="Label" class="ef-label"/>
+      <select class="ef-type">
+        <option value="text">Text</option>
+        <option value="file">File</option>
+        <option value="dir">Directory</option>
+        <option value="toggle">Toggle</option>
+        <option value="number">Number</option>
+        <option value="select">Select (options)</option>
+      </select>
+      <label class="af-req-label"><input type="checkbox" class="ef-req"> Req</label>
+      <input placeholder="Hint text" class="ef-hint"/>
+      <button class="af-remove-btn" onclick="this.parentElement.remove()">×</button>`;
+    list.appendChild(row);
+  },
+
+  _addOutputFile() {
+    const list = document.getElementById('af-outputs-list');
+    const row  = document.createElement('div'); row.className='af-out-file-row';
+    row.innerHTML = `
+      <input placeholder="e.g. my_output.json" class="of-name" style="font-family:monospace"/>
+      <input placeholder="What this file contains" class="of-desc desc-input"/>
+      <button class="af-remove-btn" onclick="this.parentElement.remove()">×</button>`;
+    list.appendChild(row);
   },
 
   _refreshInputFiles() {
@@ -1831,48 +1966,77 @@ const CustomSkills = {
     const name = document.getElementById('af-name').value.trim();
     if(!sid||!name){ alert('Skill ID and Display Name are required.'); return; }
 
+    // Category
+    const selCat = document.querySelector('.af-cat-item.selected');
+    let category = selCat?.dataset.cat || 'Custom';
+    if(category === '__new__'){
+      category = document.getElementById('af-newcat').value.trim() || 'Custom';
+    }
+
     const deps = [...document.querySelectorAll('#af-dep-grid input:checked')].map(c=>c.value);
 
-    // Build input_files map from the field-id inputs
+    // Input files from dep suggestions
     const inputFiles = {};
     document.querySelectorAll('.af-field-id-input').forEach(inp=>{
       const fieldId = inp.value.trim().replace(/[^a-z0-9_]/g,'_');
       const fname   = inp.dataset.fname;
-      if(fieldId && fname) {
+      if(fieldId && fname){
         if(!inputFiles[fieldId]) inputFiles[fieldId]=[];
         inputFiles[fieldId].push(fname);
       }
     });
 
+    // Extra wizard fields
+    const extraFields = [];
+    document.querySelectorAll('.af-extra-field-row').forEach(row=>{
+      const id    = row.querySelector('.ef-id')?.value.trim().replace(/[^a-z0-9_]/g,'_');
+      const label = row.querySelector('.ef-label')?.value.trim();
+      const type  = row.querySelector('.ef-type')?.value || 'text';
+      const req   = row.querySelector('.ef-req')?.checked || false;
+      const hint  = row.querySelector('.ef-hint')?.value.trim() || '';
+      if(id && label) extraFields.push({id, label, type, required:req, hint});
+    });
+
+    // Output files
+    const outputFiles = {};
+    document.querySelectorAll('.af-out-file-row').forEach(row=>{
+      const fname = row.querySelector('.of-name')?.value.trim();
+      const desc  = row.querySelector('.of-desc')?.value.trim() || '';
+      if(fname) outputFiles[fname] = desc;
+    });
+
     btn.disabled=true; btn.textContent='Creating…';
 
-    // Build steps — one step per selected dep plus always an output_dir field
-    const inputFields = Object.entries(inputFiles).map(([fid, fnames])=>({
+    // Build wizard steps
+    // Step 1: Inputs (dep files + extra fields)
+    const depInputFields = Object.entries(inputFiles).map(([fid, fnames])=>({
       id: fid,
       label: fnames[0].replace('.json','').replace('.xlsx','').replace(/_/g,' '),
       type: 'file',
       accept: fnames[0].endsWith('.xlsx')?'.xlsx,.json':'.json',
-      hint: `Required input (${fnames.join(' or ')})`,
+      hint: `Auto-scanned (${fnames.join(' or ')})`,
       required: true,
     }));
-    const steps = [{
-      title: 'Inputs',
-      desc:  'Provide required input files and output directory.',
-      fields: [
-        ...inputFields,
-        {id:'output_dir', label:'Output Directory', type:'dir', required:true},
-      ],
-    }];
+    const step1Fields = [
+      ...depInputFields,
+      {id:'output_dir', label:'Output Directory', type:'dir', required:true},
+    ];
+
+    const steps = [{title:'Inputs', desc:'Provide required input files and output directory.', fields:step1Fields}];
+    // Step 2: Options (extra fields) — only if any
+    if(extraFields.length){
+      steps.push({title:'Options', desc:'Configure skill behaviour.', fields:extraFields});
+    }
 
     const payload = {
-      id:          sid,
-      name:        document.getElementById('af-name').value.trim(),
-      tag:         document.getElementById('af-tag').value.trim()||sid.toUpperCase().slice(0,4),
-      desc:        document.getElementById('af-desc').value.trim(),
-      icon:        document.getElementById('af-icon').value.trim()||'⚡',
-      color:       document.getElementById('af-color').value,
-      script:      document.getElementById('af-script').value.trim()||`run_${sid}.bash`,
-      deps, input_files: inputFiles, steps,
+      id:           sid,
+      name:         document.getElementById('af-name').value.trim(),
+      tag:          document.getElementById('af-tag').value.trim()||sid.toUpperCase().slice(0,4),
+      desc:         document.getElementById('af-desc').value.trim(),
+      icon:         document.getElementById('af-icon').value.trim()||'⚡',
+      color:        document.getElementById('af-color').value,
+      script:       document.getElementById('af-script').value.trim()||`run_${sid}.bash`,
+      category, deps, input_files: inputFiles, output_files: outputFiles, steps,
     };
 
     const result = await API.createCustomSkill(payload);
@@ -1880,13 +2044,11 @@ const CustomSkills = {
 
     if(result.error){ alert(`Error: ${result.error}`); return; }
 
-    // Show toast
     const toast=document.createElement('div'); toast.className='success-toast';
-    toast.textContent=`✓ Skill "${payload.name}" created! Edit the script at: custom_skills/${sid}/run_${sid}.bash`;
+    toast.innerHTML=`✓ <strong>${payload.name}</strong> created in <em>${category}</em>! Script: custom_skills/${sid}/run_${sid}.bash`;
     document.body.appendChild(toast);
-    setTimeout(()=>toast.remove(), 6000);
+    setTimeout(()=>toast.remove(), 7000);
 
-    // Reload custom skills and re-render
     await this.loadAndRegister();
     Sidebar.render();
     this.renderView();
@@ -2062,20 +2224,40 @@ const Wizard = {
    ═══════════════════════════════════════════════════════════════════════════ */
 const Sidebar = {
   render() {
-      const groups = {1:document.getElementById('skill-list-1'),2:document.getElementById('skill-list-2'),3:document.getElementById('skill-list-3'),4:document.getElementById('skill-list-custom')};
-      const customLabel = document.getElementById('custom-skills-label');
-      if(customLabel) customLabel.style.display = (SKILL_GROUPS[4]?.length>0)?'':'none';
-      for(const [g,el] of Object.entries(groups)){
-        if(!el) continue;
-        el.innerHTML='';
-        for(const sid of SKILL_GROUPS[g]||[]){
-        const skill=SKILL_MAP[sid]; const rs=State.runState[sid]||{}; const status=rs.status||'idle';
-        const item=document.createElement('div');
-        item.className='sb-item'+(State.active===sid?' active':'');
-        item.id=`sb-${sid}`;
-        item.innerHTML=`<div class="sb-icon" style="background:${skill.color}18">${skill.icon}</div><div style="flex:1;min-width:0"><div class="sb-item-name">${skill.tag} ${skill.name}</div></div><div class="sb-dot ${status}"></div>`;
-        item.addEventListener('click',()=>App.navigate(sid));
-        el.appendChild(item);
+    const _renderSkillItem = (sid) => {
+      const skill=SKILL_MAP[sid]; if(!skill) return null;
+      const rs=State.runState[sid]||{}; const status=rs.status||'idle';
+      const item=document.createElement('div');
+      item.className='sb-item'+(State.active===sid?' active':'');
+      item.id=`sb-${sid}`;
+      item.innerHTML=`<div class="sb-icon" style="background:${skill.color}18">${skill.icon}</div><div style="flex:1;min-width:0"><div class="sb-item-name">${skill.tag} ${skill.name}</div></div><div class="sb-dot ${status}"></div>`;
+      item.addEventListener('click',()=>App.navigate(sid));
+      return item;
+    };
+
+    // Fixed numeric groups
+    const fixedGroups = {1:'skill-list-1',2:'skill-list-2',3:'skill-list-3',4:'skill-list-custom'};
+    const customLabel = document.getElementById('custom-skills-label');
+    if(customLabel) customLabel.style.display = (SKILL_GROUPS[4]?.length>0)?'':'none';
+    for(const [g, listId] of Object.entries(fixedGroups)){
+      const el = document.getElementById(listId); if(!el) continue;
+      el.innerHTML='';
+      for(const sid of SKILL_GROUPS[g]||[]){
+        const item=_renderSkillItem(sid); if(item) el.appendChild(item);
+      }
+    }
+
+    // Dynamic string-keyed custom categories
+    const dynWrap = document.getElementById('skill-list-dynamic-wrap');
+    if(dynWrap){
+      dynWrap.innerHTML='';
+      for(const [key, sids] of Object.entries(SKILL_GROUPS)){
+        if(!isNaN(key)) continue; // skip numeric groups
+        if(!sids?.length) continue;
+        const label=document.createElement('div'); label.className='sb-section-label'; label.style.marginTop='6px'; label.textContent=key;
+        const list=document.createElement('div'); list.id=`skill-list-${key}`;
+        dynWrap.appendChild(label); dynWrap.appendChild(list);
+        for(const sid of sids){ const item=_renderSkillItem(sid); if(item) list.appendChild(item); }
       }
     }
     this._highlightActive();

@@ -661,6 +661,9 @@ def _register_custom_skills():
         ])
         if cs.get("input_files"):
             SKILL_INPUT_FILES[sid] = cs["input_files"]
+        # Register output files so other skills can depend on them
+        if cs.get("output_files"):
+            SKILL_OUTPUTS[sid] = cs["output_files"]
 
 
 _register_custom_skills()
@@ -726,6 +729,8 @@ def create_custom_skill():
     skill_dir = CUSTOM_SKILLS_DIR / sid
     skill_dir.mkdir(parents=True, exist_ok=True)
 
+    category = data.get("category", "Custom")
+
     manifest = {
         "id":           sid,
         "name":         data.get("name", sid),
@@ -733,10 +738,10 @@ def create_custom_skill():
         "desc":         data.get("desc", ""),
         "icon":         data.get("icon", "⚡"),
         "color":        data.get("color", "#8B5CF6"),
-        "group":        4,
+        "category":     category,
         "deps":         data.get("deps", []),
         "input_files":  data.get("input_files", {}),
-        "output_files": data.get("output_files", []),
+        "output_files": data.get("output_files", {}),
         "script":       data.get("script", f"run_{sid}.bash"),
         "steps":        data.get("steps", [
             {

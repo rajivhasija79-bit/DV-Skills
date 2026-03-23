@@ -221,11 +221,6 @@ def run_skill_route(skill_id):
         if run.get("status") == "running":
             return jsonify({"error": "Already running"}), 409
 
-    missing = [d for d in SKILL_DEPS[skill_id]
-               if skill_status.get(d, {}).get("status") != "success"]
-    if missing:
-        return jsonify({"error": "dependencies not met", "missing": missing}), 400
-
     params = request.get_json() or {}
     run_id = f"{skill_id}_{int(time.time())}_{uuid.uuid4().hex[:6]}"
 
@@ -579,6 +574,72 @@ def browse():
         })
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+# ── Auto-scan: known input files per skill ───────────────────────────────────
+# Maps skill_id → { field_id: [candidate filenames in priority order] }
+SKILL_INPUT_FILES = {
+    "s2":  {"spec_data":      ["dv_spec_data.json"]},
+    "s3":  {"spec_data":      ["dv_spec_data.json"],
+            "testplan_data":  ["dv_testplan_data.json"]},
+    "s4":  {"spec_data":      ["dv_spec_data.json"]},
+    "s5":  {"spec_data":      ["dv_spec_data.json"],
+            "testplan_data":  ["dv_testplan_data.json"],
+            "tb_arch_data":   ["dv_tb_arch_data.json"]},
+    "s6":  {"tb_data":        ["dv_tb_data.json"],
+            "testplan":       ["testplan.xlsx", "dv_testplan_data.json"]},
+    "s7":  {"tb_data":        ["dv_tb_data.json"],
+            "testplan":       ["testplan.xlsx", "dv_testplan_data.json"]},
+    "s8":  {"tb_data":        ["dv_tb_data.json"],
+            "testplan":       ["testplan.xlsx", "dv_testplan_data.json"]},
+    "s9":  {"tb_data":        ["dv_tb_data.json"],
+            "testplan":       ["testplan.xlsx", "dv_testplan_data.json"]},
+    "s10": {"tb_data":        ["dv_tb_data.json"],
+            "testplan":       ["testplan.xlsx", "dv_testplan_data.json"],
+            "coverage_report":["coverage_report.txt","coverage_report.xml","urgReport.txt"]},
+}
+
+
+@app.route("/api/scan-inputs/<skill_id>")
+def scan_inputs(skill_id):
+    """
+    Scan a directory (and its immediate subdirs) for known input files for a skill.
+    Returns { field_id: absolute_path } for every file found.
+    Query param: dir  (defaults to workspace_dir from project config or home dir)
+    """
+    if skill_id not in SKILL_INPUT_FILES:
+        return jsonify({"found": {}})
+
+    scan_dir = request.args.get("dir", "")
+    if not scan_dir:
+        cfg = load_project_config()
+        scan_dir = cfg.get("workspace_dir", os.path.expanduser("~"))
+
+    base = Path(scan_dir)
+    if not base.exists() or not base.is_dir():
+        return jsonify({"found": {}, "error": f"Directory not found: {scan_dir}"})
+
+    # Collect all candidate paths: base + one level of subdirs
+    search_dirs = [base]
+    try:
+        search_dirs += [d for d in base.iterdir() if d.is_dir() and not d.name.startswith(".")]
+    except PermissionError:
+        pass
+
+    field_map = SKILL_INPUT_FILES[skill_id]
+    found = {}
+
+    for field_id, candidates in field_map.items():
+        for candidate in candidates:          # priority order
+            for d in search_dirs:
+                p = d / candidate
+                if p.exists() and p.is_file():
+                    found[field_id] = str(p)
+                    break
+            if field_id in found:
+                break
+
+    return jsonify({"found": found, "scanned_dir": str(base)})
 
 
 # ── Skill execution ───────────────────────────────────────────────────────────

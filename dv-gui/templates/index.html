@@ -464,8 +464,22 @@ html,body {
   background:rgba(239,68,68,.06); border:1px solid rgba(239,68,68,.2);
   border-radius:var(--r-lg); margin-bottom:18px;
 }
+.dep-warning.dep-warning-info {
+  background:rgba(96,165,250,.06); border-color:rgba(96,165,250,.2);
+}
 .dep-warning-icon { font-size:16px; flex-shrink:0; }
 .dep-warning-text { font-size:13px; color:var(--t2); line-height:1.55; }
+
+.autofill-banner {
+  display:flex; align-items:flex-start; gap:12px;
+  padding:12px 18px; margin-bottom:16px;
+  background:rgba(250,93,41,.08); border:1px solid rgba(250,93,41,.25);
+  border-radius:var(--r-lg); font-size:13px; color:var(--t2); line-height:1.5;
+}
+.autofill-banner code {
+  font-family:monospace; font-size:11px; color:var(--orange);
+  background:rgba(250,93,41,.10); padding:1px 5px; border-radius:3px;
+}
 
 .wizard-footer {
   flex-shrink:0; display:flex; align-items:center; padding:14px 32px;
@@ -1584,6 +1598,40 @@ const Wizard = {
     this._skill=SKILL_MAP[skillId]; this._step=0; this._steps=this._skill.steps;
     App.setView('wizard');
     this._renderHeader(); this._renderAllSteps(); this._renderFooter(); this._showStep(0,'right');
+    this._autoFill();
+  },
+
+  async _autoFill() {
+    const skillId = this._skill.id;
+    const scanDir = State.projectConfig?.workspace_dir || State.projectConfig?.output_dir || '';
+    try {
+      const r = await fetch(`/api/scan-inputs/${skillId}?dir=${encodeURIComponent(scanDir)}`);
+      const data = await r.json();
+      if(!data.found || !Object.keys(data.found).length) return;
+      // Pre-fill State.formData
+      const found = data.found;
+      if(!State.formData[skillId]) State.formData[skillId]={};
+      let count=0;
+      for(const [fieldId,path] of Object.entries(found)){
+        if(!State.formData[skillId][fieldId]){
+          State.formData[skillId][fieldId]=path; count++;
+          // Update live input if visible
+          const inp=document.getElementById(`field-${skillId}-${fieldId}`);
+          if(inp){ inp.value=path; inp.dispatchEvent(new Event('change')); }
+        }
+      }
+      if(count>0) this._showAutoFillBanner(count, data.scanned_dir);
+    } catch(e) { /* silent */ }
+  },
+
+  _showAutoFillBanner(count, dir) {
+    const existing=document.getElementById('autofill-banner');
+    if(existing) existing.remove();
+    const banner=document.createElement('div'); banner.id='autofill-banner';
+    banner.className='autofill-banner';
+    banner.innerHTML=`<span style="font-size:16px">🔍</span><div><strong>${count} input file${count>1?'s':''} auto-detected</strong> from <code>${dir}</code><br><span style="opacity:.7;font-size:12px">Fields have been pre-filled. Adjust if needed.</span></div><button onclick="this.parentElement.remove()" style="background:none;border:none;color:var(--t3);cursor:pointer;font-size:18px;padding:0 4px">×</button>`;
+    const wrap=document.getElementById('wizard-steps-wrap');
+    if(wrap) wrap.insertAdjacentElement('beforebegin', banner);
   },
 
   _renderHeader() {
@@ -1616,9 +1664,9 @@ const Wizard = {
       div.innerHTML=`<div class="step-title">${step.title}</div><div class="step-desc">${step.desc}</div>`;
 
       if(i===0 && depsUnmet){
-        const warn=document.createElement('div'); warn.className='dep-warning';
+        const warn=document.createElement('div'); warn.className='dep-warning dep-warning-info';
         const missing=s.deps.filter(d=>State.runState[d]?.status!=='success').map(d=>`${SKILL_MAP[d].tag} ${SKILL_MAP[d].name}`).join(', ');
-        warn.innerHTML=`<span class="dep-warning-icon">⚠️</span><div class="dep-warning-text">This skill requires <strong>${missing}</strong> to complete successfully first. You can fill in the form but the Run button will be disabled.</div>`;
+        warn.innerHTML=`<span class="dep-warning-icon">ℹ️</span><div class="dep-warning-text">Upstream skills (<strong>${missing}</strong>) have not run yet — you can still run this skill if you provide the required input files manually.</div>`;
         div.appendChild(warn);
       }
 
@@ -1657,12 +1705,10 @@ const Wizard = {
     back.addEventListener('click',()=>this.prevStep());
 
     const isLast = this._step===this._steps.length-1;
-    const depsUnmet = this._skill.deps.some(d=>State.runState[d]?.status!=='success');
     let action;
     if(isLast){
       action=document.createElement('button'); action.id='wiz-run'; action.className='btn btn-run';
       action.innerHTML=`▶ Run ${this._skill.name}`;
-      if(depsUnmet){ action.disabled=true; action.title='Complete dependencies first'; }
       action.addEventListener('click',()=>this._runSkill());
     } else {
       action=document.createElement('button'); action.className='btn btn-primary';
@@ -1715,9 +1761,8 @@ const Sidebar = {
       el.innerHTML='';
       for(const sid of SKILL_GROUPS[g]){
         const skill=SKILL_MAP[sid]; const rs=State.runState[sid]||{}; const status=rs.status||'idle';
-        const dm=!rs.deps_met&&status==='idle';
         const item=document.createElement('div');
-        item.className='sb-item'+(State.active===sid?' active':'')+(dm?' disabled':'');
+        item.className='sb-item'+(State.active===sid?' active':'');
         item.id=`sb-${sid}`;
         item.innerHTML=`<div class="sb-icon" style="background:${skill.color}18">${skill.icon}</div><div style="flex:1;min-width:0"><div class="sb-item-name">${skill.tag} ${skill.name}</div></div><div class="sb-dot ${status}"></div>`;
         item.addEventListener('click',()=>App.navigate(sid));
@@ -1752,9 +1797,8 @@ const Dashboard = {
     grid.innerHTML = '';
     for(const skill of SKILLS){
       const rs=State.runState[skill.id]||{}; const status=rs.status||'idle';
-      const depsUnmet=skill.deps.some(d=>State.runState[d]?.status!=='success');
       const card=document.createElement('div');
-      card.className='skill-card'+(depsUnmet&&status==='idle'?' disabled':'');
+      card.className='skill-card';
       card.innerHTML=`
         <div class="skill-card-bar ${status}"></div>
         <div class="skill-card-body">

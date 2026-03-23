@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DV Skills — ChipAgent</title>
+<title>DV Flow Orchestrator — ChipAgent</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -785,6 +785,64 @@ textarea.form-input { height:auto; padding:10px 12px; resize:vertical; min-heigh
 
 @keyframes fadeIn { from{opacity:0;transform:scale(.95)} to{opacity:1;transform:none} }
 @media (prefers-reduced-motion:reduce) { *,*::before,*::after { transition-duration:.01ms !important; animation-duration:.01ms !important; } }
+
+/* ── Collapsible sidebar groups ── */
+.sb-collapsible { cursor:pointer; user-select:none; display:flex !important; align-items:center; gap:6px; }
+.sb-collapsible:hover { color:var(--t1) !important; }
+.sb-chev { font-size:11px; color:var(--t4); transition:transform .25s ease; display:inline-block; flex-shrink:0; line-height:1; }
+.sb-group-list { transition:max-height .28s ease, opacity .25s ease; overflow:hidden; }
+
+/* ── Dashboard search ── */
+.dash-search-wrap { position:relative; margin-bottom:20px; max-width:380px; }
+.dash-search-wrap .ds-icon { position:absolute; left:12px; top:50%; transform:translateY(-50%); pointer-events:none; opacity:.35; }
+.dash-search { width:100%; background:var(--card); border:1px solid var(--border); border-radius:var(--r); color:var(--t1); font-family:inherit; font-size:13px; padding:9px 14px 9px 38px; box-sizing:border-box; transition:.2s; }
+.dash-search:focus { outline:none; border-color:var(--orange); background:var(--card-hover); }
+.dash-search::placeholder { color:var(--t4); }
+.dash-no-results { padding:40px 0; text-align:center; color:var(--t4); font-size:13px; display:none; }
+
+/* ── Skill card deps button ── */
+.skill-card { position:relative; }
+.skill-card-deps-btn { position:absolute; top:10px; right:10px; background:rgba(250,93,41,.08); border:1px solid rgba(250,93,41,.18); border-radius:6px; color:var(--orange); font-size:10px; font-weight:700; padding:3px 8px; cursor:pointer; font-family:inherit; transition:.2s; opacity:0; letter-spacing:.04em; z-index:2; }
+.skill-card:hover .skill-card-deps-btn { opacity:1; }
+.skill-card-deps-btn:hover { background:rgba(250,93,41,.2); border-color:var(--orange); }
+
+/* ── Dependency graph modal ── */
+#dep-graph-modal { display:none; position:fixed; inset:0; z-index:900; align-items:center; justify-content:center; background:rgba(0,0,0,.75); backdrop-filter:blur(8px); opacity:0; transition:opacity .28s ease; }
+#dep-graph-modal.visible { opacity:1; }
+.dg-window { background:#131210; border:1px solid rgba(255,255,255,.1); border-radius:16px; box-shadow:0 32px 80px rgba(0,0,0,.75); display:flex; flex-direction:column; max-width:94vw; max-height:90vh; min-width:560px; overflow:hidden; }
+.dg-header { display:flex; align-items:center; padding:14px 18px; border-bottom:1px solid rgba(255,255,255,.07); gap:12px; flex-shrink:0; }
+.dg-title { font-size:13px; font-weight:800; color:rgba(255,255,255,.9); flex:1; letter-spacing:-.02em; }
+.dg-legend { display:flex; gap:14px; align-items:center; }
+.dg-leg { display:flex; align-items:center; gap:5px; font-size:10px; color:rgba(255,255,255,.38); white-space:nowrap; }
+.dg-leg-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+.dg-close { background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.1); border-radius:8px; color:rgba(255,255,255,.5); font-size:17px; width:28px; height:28px; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:.2s; flex-shrink:0; line-height:1; }
+.dg-close:hover { background:rgba(239,68,68,.15); color:#EF4444; border-color:rgba(239,68,68,.3); }
+.dg-body { flex:1; overflow:auto; padding:20px; display:flex; align-items:flex-start; justify-content:center; min-height:200px; }
+.dg-body::-webkit-scrollbar { width:5px; height:5px; }
+.dg-body::-webkit-scrollbar-thumb { background:rgba(255,255,255,.1); border-radius:3px; }
+.dg-hint { flex-shrink:0; padding:7px 18px; font-size:10px; color:rgba(255,255,255,.22); text-align:center; border-top:1px solid rgba(255,255,255,.05); }
+
+/* ── Validation modal ── */
+#val-modal { display:none; position:fixed; inset:0; z-index:950; align-items:center; justify-content:center; background:rgba(0,0,0,.78); backdrop-filter:blur(6px); opacity:0; transition:opacity .22s ease; }
+#val-modal.open { opacity:1; }
+.val-window { width:min(480px,92vw); background:#131210; border:1px solid rgba(239,68,68,.22); border-radius:14px; box-shadow:0 0 0 1px rgba(239,68,68,.08),0 30px 60px rgba(0,0,0,.6); overflow:hidden; transform:scale(.96) translateY(12px); transition:transform .22s ease; }
+#val-modal.open .val-window { transform:none; }
+.val-header { padding:16px 20px 12px; display:flex; align-items:center; gap:10px; border-bottom:1px solid rgba(255,255,255,.06); }
+.val-header-icon { font-size:18px; }
+.val-header-title { font-size:14px; font-weight:800; color:var(--t1); flex:1; letter-spacing:-.02em; }
+.val-body { padding:16px 20px; display:flex; flex-direction:column; gap:14px; max-height:360px; overflow-y:auto; }
+.val-block { background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.06); border-radius:var(--r-lg); padding:12px 14px; }
+.val-block-title { font-size:11px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; margin-bottom:8px; }
+.val-block-title.warn { color:#FB923C; }
+.val-block-title.err  { color:#F87171; }
+.val-item { font-size:12.5px; color:var(--t2); padding:2px 0; }
+.val-hint { font-size:11.5px; color:var(--t4); margin-top:8px; line-height:1.6; border-top:1px solid rgba(255,255,255,.05); padding-top:8px; }
+.val-footer { padding:12px 20px 16px; display:flex; gap:8px; justify-content:flex-end; border-top:1px solid rgba(255,255,255,.06); }
+.val-btn { height:34px; padding:0 16px; border-radius:var(--r); font-size:12.5px; font-weight:700; font-family:var(--font); cursor:pointer; transition:.2s; border:1px solid transparent; }
+.val-btn-cancel { background:transparent; border-color:rgba(255,255,255,.1); color:var(--t3); }
+.val-btn-cancel:hover { border-color:rgba(255,255,255,.2); color:var(--t1); }
+.val-btn-force  { background:rgba(250,93,41,.12); border-color:rgba(250,93,41,.3); color:var(--orange-soft); }
+.val-btn-force:hover  { background:rgba(250,93,41,.22); border-color:var(--orange); }
 </style>
 </head>
 <body>
@@ -811,17 +869,17 @@ textarea.form-input { height:auto; padding:10px 12px; resize:vertical; min-heigh
       <div class="sb-section-label" style="margin-top:6px">Overview</div>
       <div class="sb-item" id="nav-dash" onclick="App.navigate('dash')">
         <div class="sb-icon" style="background:rgba(96,165,250,.12)">⊞</div>
-        <div><div class="sb-item-name">Dashboard</div></div>
+        <div><div class="sb-item-name">DV Flow Orchestrator</div></div>
       </div>
 
-      <div class="sb-section-label" style="margin-top:6px">Verification Flow</div>
-      <div id="skill-list-1"></div>
-      <div class="sb-section-label" style="margin-top:6px">Implementation</div>
-      <div id="skill-list-2"></div>
-      <div class="sb-section-label" style="margin-top:6px">Analysis</div>
-      <div id="skill-list-3"></div>
-      <div class="sb-section-label" style="margin-top:6px;display:none" id="custom-skills-label">Custom</div>
-      <div id="skill-list-custom"></div>
+      <div class="sb-section-label sb-collapsible" style="margin-top:6px" id="sb-grp-label-1" onclick="Sidebar.toggleGroup(1)"><span class="sb-chev" id="sb-chev-1">▾</span>Verification Flow</div>
+      <div id="skill-list-1" class="sb-group-list"></div>
+      <div class="sb-section-label sb-collapsible" style="margin-top:6px" id="sb-grp-label-2" onclick="Sidebar.toggleGroup(2)"><span class="sb-chev" id="sb-chev-2">▾</span>Implementation</div>
+      <div id="skill-list-2" class="sb-group-list"></div>
+      <div class="sb-section-label sb-collapsible" style="margin-top:6px" id="sb-grp-label-3" onclick="Sidebar.toggleGroup(3)"><span class="sb-chev" id="sb-chev-3">▾</span>Analysis</div>
+      <div id="skill-list-3" class="sb-group-list"></div>
+      <div class="sb-section-label sb-collapsible" style="margin-top:6px;display:none" id="custom-skills-label" onclick="Sidebar.toggleGroup(4)"><span class="sb-chev" id="sb-chev-4">▾</span>Custom</div>
+      <div id="skill-list-custom" class="sb-group-list"></div>
       <div id="skill-list-dynamic-wrap"></div>
     </div>
     <div class="sb-footer">
@@ -833,7 +891,7 @@ textarea.form-input { height:auto; padding:10px 12px; resize:vertical; min-heigh
   <!-- ── Main content ───────────────────────────────────────────────────── -->
   <main id="main">
     <div class="main-header">
-      <h1 id="main-title">Dashboard</h1>
+      <h1 id="main-title">DV Flow Orchestrator</h1>
       <div class="main-header-sub" id="main-sub"></div>
     </div>
     <div class="main-body">
@@ -842,8 +900,8 @@ textarea.form-input { height:auto; padding:10px 12px; resize:vertical; min-heigh
       <div class="view" id="view-dash">
         <div class="dash-page">
           <div class="dash-hero">
-            <div class="dash-hero-eyebrow">DV Skills — ChipAgent</div>
-            <div class="dash-hero-title">Verification<br><span>Flow Pipeline</span></div>
+            <div class="dash-hero-eyebrow">ChipAgent · DV Flow Orchestrator</div>
+            <div class="dash-hero-title">DV Skill<br><span>Library</span></div>
             <div class="dash-hero-desc">A 10-skill pipeline from specification extraction to coverage sign-off. Complete skills in order — each skill builds on the previous outputs.</div>
           </div>
 
@@ -872,6 +930,11 @@ textarea.form-input { height:auto; padding:10px 12px; resize:vertical; min-heigh
             <span class="dash-progress-count" id="progress-count">0 / 10</span>
           </div>
 
+          <div class="dash-search-wrap">
+            <span class="ds-icon">🔍</span>
+            <input class="dash-search" id="dash-search" placeholder="Search skills by name, tag or description…" oninput="Dashboard.search(this.value)"/>
+          </div>
+          <div class="dash-no-results" id="dash-no-results">No skills match "<span id="dash-nrq"></span>"</div>
           <div class="dash-grid" id="dash-grid"></div>
         </div>
       </div>
@@ -897,6 +960,21 @@ textarea.form-input { height:auto; padding:10px 12px; resize:vertical; min-heigh
   </main>
 </div><!-- /app -->
 
+<!-- Validation modal -->
+<div id="val-modal">
+  <div class="val-window">
+    <div class="val-header">
+      <span class="val-header-icon">⚠</span>
+      <span class="val-header-title">Input Validation Failed</span>
+    </div>
+    <div class="val-body" id="val-modal-body"></div>
+    <div class="val-footer">
+      <button class="val-btn val-btn-cancel" id="val-cancel-btn">← Fix Inputs</button>
+      <button class="val-btn val-btn-force" id="val-force-btn" style="display:none">Run Anyway ▶</button>
+    </div>
+  </div>
+</div>
+
 <!-- Terminal -->
 <div id="terminal-panel">
   <div class="term-header" onclick="Terminal.toggle()">
@@ -909,6 +987,24 @@ textarea.form-input { height:auto; padding:10px 12px; resize:vertical; min-heigh
     </div>
   </div>
   <div class="term-body" id="term-body"></div>
+</div>
+
+<!-- Dependency graph modal -->
+<div id="dep-graph-modal" onclick="if(event.target===this)DepGraph.hide()">
+  <div class="dg-window">
+    <div class="dg-header">
+      <div class="dg-title" id="dep-graph-title">Dependency Graph</div>
+      <div class="dg-legend">
+        <div class="dg-leg"><div class="dg-leg-dot" style="background:#FA5D29"></div>Selected</div>
+        <div class="dg-leg"><div class="dg-leg-dot" style="background:#60A5FA"></div>Upstream</div>
+        <div class="dg-leg"><div class="dg-leg-dot" style="background:#22C55E"></div>Downstream</div>
+        <div class="dg-leg"><div class="dg-leg-dot" style="background:#3A3830"></div>Unrelated</div>
+      </div>
+      <div class="dg-close" onclick="DepGraph.hide()">×</div>
+    </div>
+    <div class="dg-body" id="dep-graph-svg-wrap"></div>
+    <div class="dg-hint">Click any node to open that skill · Status dot: 🟢 success · 🔴 error · 🟠 running · ⬛ idle</div>
+  </div>
 </div>
 
 <!-- File picker modal -->
@@ -2057,6 +2153,188 @@ const CustomSkills = {
 
 
 /* ═══════════════════════════════════════════════════════════════════════════
+   DEPENDENCY GRAPH
+   ═══════════════════════════════════════════════════════════════════════════ */
+const DepGraph = {
+  _current: null,
+  _escHandler: null,
+
+  show(skillId) {
+    this._current = skillId;
+    const skill = SKILL_MAP[skillId]; if(!skill) return;
+    document.getElementById('dep-graph-title').textContent = `Dependency Graph — ${skill.tag} ${skill.name}`;
+    const wrap = document.getElementById('dep-graph-svg-wrap');
+    wrap.innerHTML = '';
+    wrap.appendChild(this._buildSVG(skillId));
+    const modal = document.getElementById('dep-graph-modal');
+    modal.style.display = 'flex';
+    requestAnimationFrame(()=>{ requestAnimationFrame(()=>modal.classList.add('visible')); });
+    this._escHandler = e=>{ if(e.key==='Escape') this.hide(); };
+    document.addEventListener('keydown', this._escHandler);
+  },
+
+  hide() {
+    const modal = document.getElementById('dep-graph-modal');
+    modal.classList.remove('visible');
+    setTimeout(()=>{ modal.style.display='none'; }, 300);
+    if(this._escHandler){ document.removeEventListener('keydown', this._escHandler); this._escHandler=null; }
+  },
+
+  _getAllDeps(sid, out=new Set(), visiting=new Set()) {
+    if(visiting.has(sid)) return out;
+    visiting.add(sid);
+    for(const dep of SKILL_MAP[sid]?.deps||[]){ out.add(dep); this._getAllDeps(dep, out, visiting); }
+    visiting.delete(sid);
+    return out;
+  },
+
+  _rel(sid, sel) {
+    if(sid===sel) return 'selected';
+    const selDeps = SKILL_MAP[sel]?.deps||[];
+    if(selDeps.includes(sid)) return 'dep-direct';
+    if(this._getAllDeps(sel).has(sid)) return 'dep-trans';
+    if((SKILL_MAP[sid]?.deps||[]).includes(sel)) return 'down-direct';
+    if(this._getAllDeps(sid).has(sel)) return 'down-trans';
+    return 'none';
+  },
+
+  _levels() {
+    const lv={}, vis=new Set();
+    const get=(sid)=>{
+      if(lv[sid]!==undefined) return lv[sid];
+      if(vis.has(sid)) return 0; vis.add(sid);
+      const deps=SKILL_MAP[sid]?.deps||[];
+      lv[sid]=deps.length ? Math.max(...deps.map(d=>get(d)))+1 : 0;
+      vis.delete(sid); return lv[sid];
+    };
+    for(const s of SKILLS) get(s.id);
+    return lv;
+  },
+
+  _buildSVG(sel) {
+    const NW=148,NH=60,HG=72,VG=26,PX=24,PY=24;
+    const lv=this._levels();
+    const byLv={};
+    for(const [sid,l] of Object.entries(lv)){ if(!byLv[l]) byLv[l]=[]; byLv[l].push(sid); }
+    const order=SKILLS.map(s=>s.id);
+    for(const l of Object.keys(byLv)) byLv[l].sort((a,b)=>order.indexOf(a)-order.indexOf(b));
+    const numL=Object.keys(byLv).length, maxPL=Math.max(...Object.values(byLv).map(a=>a.length));
+    const pos={};
+    for(const [l,sids] of Object.entries(byLv)){
+      const x=PX+Number(l)*(NW+HG);
+      const gh=sids.length*NH+(sids.length-1)*VG, sh=maxPL*NH+(maxPL-1)*VG;
+      const sy=PY+(sh-gh)/2;
+      sids.forEach((sid,i)=>{ pos[sid]={x,y:sy+i*(NH+VG)}; });
+    }
+    const svgW=PX*2+numL*(NW+HG)-HG, svgH=PY*2+maxPL*(NH+VG)-VG;
+    const ns='http://www.w3.org/2000/svg';
+    const svg=document.createElementNS(ns,'svg');
+    svg.setAttribute('width',svgW); svg.setAttribute('height',svgH);
+    svg.setAttribute('viewBox',`0 0 ${svgW} ${svgH}`);
+
+    // Arrowhead markers
+    const defs=document.createElementNS(ns,'defs');
+    for(const [id,c] of [['ao','#FA5D29'],['ab','#60A5FA'],['ag','#22C55E'],['ad','#383530']]){
+      const m=document.createElementNS(ns,'marker');
+      m.setAttribute('id',id); m.setAttribute('markerWidth','8'); m.setAttribute('markerHeight','8');
+      m.setAttribute('refX','7'); m.setAttribute('refY','3'); m.setAttribute('orient','auto');
+      const p=document.createElementNS(ns,'path'); p.setAttribute('d','M0,0 L0,6 L8,3 z'); p.setAttribute('fill',c);
+      m.appendChild(p); defs.appendChild(m);
+    }
+    svg.appendChild(defs);
+
+    // Edges
+    const eg=document.createElementNS(ns,'g');
+    for(const skill of SKILLS){
+      const sid=skill.id, p=pos[sid]; if(!p) continue;
+      for(const dep of skill.deps||[]){
+        const dp=pos[dep]; if(!dp) continue;
+        const rs=this._rel(sid,sel), rd=this._rel(dep,sel);
+        let stroke='#2A2822',marker='ad',sw='1.5',op='.35';
+        if(sid===sel){stroke='#22C55E';marker='ag';sw='2';op='1';}
+        else if(dep===sel){stroke='#FA5D29';marker='ao';sw='2';op='1';}
+        else if(rd==='dep-direct'||rd==='dep-trans'){stroke='#60A5FA';marker='ab';sw='1.5';op='.6';}
+        else if(rs==='down-direct'||rs==='down-trans'){stroke='#22C55E';marker='ag';sw='1.5';op='.4';}
+        const x1=dp.x+NW,y1=dp.y+NH/2,x2=p.x,y2=p.y+NH/2,cx=(x1+x2)/2;
+        const path=document.createElementNS(ns,'path');
+        path.setAttribute('d',`M${x1},${y1} C${cx},${y1} ${cx},${y2} ${x2},${y2}`);
+        path.setAttribute('fill','none'); path.setAttribute('stroke',stroke);
+        path.setAttribute('stroke-width',sw); path.setAttribute('opacity',op);
+        path.setAttribute('marker-end',`url(#${marker})`);
+        eg.appendChild(path);
+      }
+    }
+    svg.appendChild(eg);
+
+    // Nodes
+    const ng=document.createElementNS(ns,'g');
+    const ST={
+      selected:   {fill:'#FA5D29',stroke:'#FA5D29',text:'#FFFFFF',tag:'rgba(255,255,255,.75)',sw:2.5,glow:'drop-shadow(0 0 16px rgba(250,93,41,.65))'},
+      'dep-direct':  {fill:'#0F1E32',stroke:'#60A5FA',text:'#A8C8F8',tag:'#60A5FA',sw:2,glow:'none'},
+      'dep-trans':   {fill:'#0A1622',stroke:'#2A4A70',text:'#5878A8',tag:'#3A5888',sw:1.5,glow:'none'},
+      'down-direct': {fill:'#0C2018',stroke:'#22C55E',text:'#78D898',tag:'#22C55E',sw:2,glow:'none'},
+      'down-trans':  {fill:'#081610',stroke:'#185830',text:'#3A7858',tag:'#186838',sw:1.5,glow:'none'},
+      none:          {fill:'#111009',stroke:'#222018',text:'#353228',tag:'#282520',sw:1,glow:'none'},
+    };
+    const DC={idle:'#383530',success:'#22C55E',error:'#EF4444',running:'#FA5D29'};
+
+    for(const skill of SKILLS){
+      const sid=skill.id, p=pos[sid]; if(!p) continue;
+      const rel=this._rel(sid,sel), st=ST[rel]||ST.none;
+      const rs=State.runState[sid]||{}, dotC=DC[rs.status||'idle']||DC.idle;
+
+      const g=document.createElementNS(ns,'g');
+      g.style.cursor='pointer'; g.style.filter=st.glow;
+      g.addEventListener('click',()=>{ DepGraph.hide(); setTimeout(()=>App.navigate(sid),310); });
+
+      // Card bg
+      const rect=document.createElementNS(ns,'rect');
+      rect.setAttribute('x',p.x); rect.setAttribute('y',p.y);
+      rect.setAttribute('width',NW); rect.setAttribute('height',NH);
+      rect.setAttribute('rx','10'); rect.setAttribute('fill',st.fill);
+      rect.setAttribute('stroke',st.stroke); rect.setAttribute('stroke-width',st.sw);
+      g.addEventListener('mouseenter',()=>{ if(rel!=='selected') rect.setAttribute('fill',rel==='none'?'#1A1812':st.fill==='#111009'?'#191712':st.fill); });
+      g.addEventListener('mouseleave',()=>rect.setAttribute('fill',st.fill));
+      g.appendChild(rect);
+
+      // Status dot top-left
+      const dot=document.createElementNS(ns,'circle');
+      dot.setAttribute('cx',p.x+11); dot.setAttribute('cy',p.y+11); dot.setAttribute('r','3.5'); dot.setAttribute('fill',dotC);
+      g.appendChild(dot);
+
+      // Tag
+      const tagT=document.createElementNS(ns,'text');
+      tagT.setAttribute('x',p.x+21); tagT.setAttribute('y',p.y+16);
+      tagT.setAttribute('font-family','Inter Tight,sans-serif'); tagT.setAttribute('font-size','9');
+      tagT.setAttribute('font-weight','800'); tagT.setAttribute('fill',st.tag);
+      tagT.setAttribute('letter-spacing','0.1em'); tagT.textContent=skill.tag;
+      g.appendChild(tagT);
+
+      // Icon top-right
+      const iconT=document.createElementNS(ns,'text');
+      iconT.setAttribute('x',p.x+NW-10); iconT.setAttribute('y',p.y+16);
+      iconT.setAttribute('font-size','13'); iconT.setAttribute('text-anchor','end');
+      iconT.textContent=skill.icon;
+      g.appendChild(iconT);
+
+      // Skill name
+      const nameStr=skill.name.length>16?skill.name.slice(0,15)+'…':skill.name;
+      const nameT=document.createElementNS(ns,'text');
+      nameT.setAttribute('x',p.x+11); nameT.setAttribute('y',p.y+42);
+      nameT.setAttribute('font-family','Inter Tight,sans-serif'); nameT.setAttribute('font-size','12');
+      nameT.setAttribute('font-weight','700'); nameT.setAttribute('fill',st.text);
+      nameT.textContent=nameStr;
+      g.appendChild(nameT);
+
+      ng.appendChild(g);
+    }
+    svg.appendChild(ng);
+    return svg;
+  },
+};
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
    WIZARD
    ═══════════════════════════════════════════════════════════════════════════ */
 const Wizard = {
@@ -2204,6 +2482,46 @@ const Wizard = {
   },
 
   async _runSkill() {
+    // ── Input validation ──────────────────────────────────────────────────
+    const skill = this._skill;
+    const formData = State.formData[skill.id] || {};
+
+    // Collect missing required fields
+    const missingFields = [];
+    for(const step of skill.steps||[]){
+      for(const f of step.fields||[]){
+        if(!f.required) continue;
+        const val = formData[f.id];
+        if(!val || String(val).trim()==='') missingFields.push(f.label);
+      }
+    }
+
+    // Collect deps that haven't succeeded yet
+    const unrunDeps = (skill.deps||[]).filter(d=>(State.runState[d]?.status||'idle')!=='success');
+
+    if(missingFields.length>0 || unrunDeps.length>0){
+      const depNames = unrunDeps.map(d=>SKILL_MAP[d]?.name||d);
+      let html = '';
+      if(unrunDeps.length>0){
+        html += `<div class="val-block">
+          <div class="val-block-title warn">⚠ Dependent skills not yet complete</div>
+          ${depNames.map(n=>`<div class="val-item">• ${n}</div>`).join('')}
+          <div class="val-hint">Run the listed skills first — or manually fill in every required input file in the form fields above, then click <em>Run Anyway</em>.</div>
+        </div>`;
+      }
+      if(missingFields.length>0){
+        html += `<div class="val-block">
+          <div class="val-block-title err">✗ Required fields are empty</div>
+          ${missingFields.map(n=>`<div class="val-item">• ${n}</div>`).join('')}
+        </div>`;
+      }
+      // Show "Run Anyway" only when deps aren't run but no required fields are missing
+      const canForce = unrunDeps.length>0 && missingFields.length===0;
+      const proceed = await this._showValidationDialog(html, canForce);
+      if(!proceed) return;
+    }
+    // ── End validation ────────────────────────────────────────────────────
+
     const btn=document.getElementById('wiz-run');
     btn.disabled=true; btn.innerHTML='<div class="spinner"></div> Starting…';
     const params = {...(State.projectConfig||{}), ...(State.formData[this._skill.id]||{})};
@@ -2216,6 +2534,24 @@ const Wizard = {
       if(s.status!=='running'){ clearInterval(poll); btn.disabled=false; btn.innerHTML=`▶ Run ${this._skill.name}`; Sidebar.refreshAll(); this._renderHeader(); this._renderFooter(); }
     },1500);
   },
+
+  _showValidationDialog(html, canForce){
+    return new Promise(resolve=>{
+      const modal = document.getElementById('val-modal');
+      document.getElementById('val-modal-body').innerHTML = html;
+      const forceBtn = document.getElementById('val-force-btn');
+      forceBtn.style.display = canForce ? '' : 'none';
+      modal.style.display='flex';
+      requestAnimationFrame(()=>modal.classList.add('open'));
+      const close=(result)=>{
+        modal.classList.remove('open');
+        setTimeout(()=>{ modal.style.display='none'; },240);
+        resolve(result);
+      };
+      document.getElementById('val-cancel-btn').onclick=()=>close(false);
+      forceBtn.onclick=()=>close(true);
+    });
+  },
 };
 
 
@@ -2223,6 +2559,28 @@ const Wizard = {
    SIDEBAR
    ═══════════════════════════════════════════════════════════════════════════ */
 const Sidebar = {
+  _collapsed: (()=>{ try{ return JSON.parse(localStorage.getItem('sbCollapsed')||'{}'); }catch(e){ return {}; } })(),
+
+  toggleGroup(key) {
+    this._collapsed[key] = !this._collapsed[key];
+    try{ localStorage.setItem('sbCollapsed', JSON.stringify(this._collapsed)); }catch(e){}
+    this._applyCollapse(key);
+  },
+
+  _applyCollapse(key) {
+    const listMap = {'1':'skill-list-1','2':'skill-list-2','3':'skill-list-3','4':'skill-list-custom'};
+    const listId  = listMap[String(key)] !== undefined ? listMap[String(key)] : `skill-list-${key}`;
+    const list    = document.getElementById(listId);
+    const chev    = document.getElementById(`sb-chev-${key}`);
+    const collapsed = !!this._collapsed[key];
+    if(list){
+      list.style.maxHeight = collapsed ? '0px' : '';
+      list.style.opacity   = collapsed ? '0'   : '';
+      list.style.overflow  = collapsed ? 'hidden' : '';
+    }
+    if(chev) chev.style.transform = collapsed ? 'rotate(-90deg)' : '';
+  },
+
   render() {
     const _renderSkillItem = (sid) => {
       const skill=SKILL_MAP[sid]; if(!skill) return null;
@@ -2254,12 +2612,17 @@ const Sidebar = {
       for(const [key, sids] of Object.entries(SKILL_GROUPS)){
         if(!isNaN(key)) continue; // skip numeric groups
         if(!sids?.length) continue;
-        const label=document.createElement('div'); label.className='sb-section-label'; label.style.marginTop='6px'; label.textContent=key;
-        const list=document.createElement('div'); list.id=`skill-list-${key}`;
+        const label=document.createElement('div'); label.className='sb-section-label sb-collapsible'; label.style.marginTop='6px'; label.id=`sb-grp-label-${key}`;
+        label.innerHTML=`<span class="sb-chev" id="sb-chev-${key}">▾</span>${key}`;
+        label.onclick=()=>this.toggleGroup(key);
+        const list=document.createElement('div'); list.id=`skill-list-${key}`; list.className='sb-group-list';
         dynWrap.appendChild(label); dynWrap.appendChild(list);
         for(const sid of sids){ const item=_renderSkillItem(sid); if(item) list.appendChild(item); }
+        this._applyCollapse(key);
       }
     }
+    // Apply persisted collapse states for all fixed groups
+    for(const key of [1,2,3,4]) this._applyCollapse(key);
     this._highlightActive();
   },
 
@@ -2283,13 +2646,18 @@ const Sidebar = {
    DASHBOARD
    ═══════════════════════════════════════════════════════════════════════════ */
 const Dashboard = {
+  _query:'',
   render() {
     const grid = document.getElementById('dash-grid');
     grid.innerHTML = '';
+    const q = this._query.toLowerCase().trim();
+    let shown = 0;
     for(const skill of SKILLS){
       const rs=State.runState[skill.id]||{}; const status=rs.status||'idle';
+      const match = !q || skill.name.toLowerCase().includes(q) || skill.tag.toLowerCase().includes(q) || (skill.desc||'').toLowerCase().includes(q) || skill.id.toLowerCase().includes(q);
       const card=document.createElement('div');
       card.className='skill-card';
+      if(!match) card.style.display='none'; else shown++;
       card.innerHTML=`
         <div class="skill-card-bar ${status}"></div>
         <div class="skill-card-body">
@@ -2300,12 +2668,16 @@ const Dashboard = {
             <span class="skill-card-status ${status}">${this._label(status)}</span>
             <span class="skill-card-open">Open →</span>
           </div>
-        </div>`;
+        </div>
+        <button class="skill-card-deps-btn" onclick="event.stopPropagation();DepGraph.show('${skill.id}')">⬡ Deps</button>`;
       card.addEventListener('click',()=>App.navigate(skill.id));
       grid.appendChild(card);
     }
+    const nr=document.getElementById('dash-no-results'), nrq=document.getElementById('dash-nrq');
+    if(nr){ nr.style.display=(q&&shown===0)?'block':'none'; if(nrq) nrq.textContent=q; }
     this._progress();
   },
+  search(q){ this._query=q; this.render(); },
   refresh(){ this.render(); },
   _label(s){ return {idle:'Not started',success:'Complete',error:'Error',running:'Running',pending:'Waiting'}[s]||s; },
   _progress(){
@@ -2344,8 +2716,8 @@ const App = {
 
     if(id==='dash'){
       this.setView('dash');
-      document.getElementById('main-title').textContent='Dashboard';
-      document.getElementById('main-sub').textContent='DV Verification Pipeline';
+      document.getElementById('main-title').textContent='DV Flow Orchestrator';
+      document.getElementById('main-sub').textContent='DV Skill Library';
     } else if(id==='project'){
       this.setView('project');
       document.getElementById('main-title').textContent='Project Settings';

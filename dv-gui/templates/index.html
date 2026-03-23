@@ -481,6 +481,61 @@ html,body {
   background:rgba(250,93,41,.10); padding:1px 5px; border-radius:3px;
 }
 
+/* ── Add Skill view ── */
+.addskill-page { padding:28px; max-width:900px; }
+.addskill-hero { margin-bottom:32px; }
+.addskill-hero h2 { font-size:clamp(22px,3vw,32px); font-weight:900; color:var(--t1); letter-spacing:-.03em; margin:0 0 8px; }
+.addskill-hero p  { font-size:13px; color:var(--t3); line-height:1.65; margin:0; }
+
+.skill-outputs-guide { margin-bottom:32px; }
+.skill-outputs-guide h3 { font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--orange); margin:0 0 14px; }
+.so-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:8px; }
+.so-card { background:var(--card); border:1px solid var(--border); border-radius:var(--r-lg); padding:12px 14px; }
+.so-card-header { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+.so-tag { font-size:10px; font-weight:800; color:var(--orange); background:var(--orange-dim); padding:2px 7px; border-radius:4px; }
+.so-name { font-size:12px; font-weight:700; color:var(--t1); }
+.so-file { font-size:11px; color:var(--t3); margin:3px 0 1px; font-family:monospace; display:flex; gap:6px; align-items:flex-start; }
+.so-file code { color:var(--blue); background:rgba(96,165,250,.08); padding:1px 5px; border-radius:3px; font-size:10px; }
+.so-file span  { color:var(--t4); font-family:inherit; line-height:1.4; }
+
+.addskill-form { background:var(--card); border:1px solid var(--border); border-radius:var(--r-lg); padding:24px; }
+.addskill-form h3 { font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--orange); margin:0 0 20px; }
+.af-row { margin-bottom:16px; }
+.af-row label { display:block; font-size:12px; font-weight:600; color:var(--t2); margin-bottom:6px; }
+.af-row label span { color:var(--orange); } /* required star */
+.af-input { width:100%; background:var(--bg-2); border:1px solid var(--border); border-radius:var(--r); color:var(--t1); font-size:13px; padding:9px 12px; font-family:inherit; transition:.2s; box-sizing:border-box; }
+.af-input:focus { outline:none; border-color:var(--orange); background:var(--bg-3); }
+.af-hint { font-size:11px; color:var(--t4); margin-top:4px; line-height:1.45; }
+.af-row-2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.af-dep-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:8px; margin-top:8px; }
+.af-dep-item { display:flex; align-items:center; gap:8px; padding:8px 10px; background:var(--bg-2); border:1px solid var(--border); border-radius:var(--r); cursor:pointer; transition:.2s; }
+.af-dep-item:hover { border-color:var(--orange-mid); background:var(--bg-3); }
+.af-dep-item.selected { border-color:var(--orange); background:var(--orange-dim); }
+.af-dep-item input[type=checkbox] { accent-color:var(--orange); width:14px; height:14px; flex-shrink:0; }
+.af-dep-label { font-size:12px; color:var(--t1); font-weight:600; }
+.af-dep-sub   { font-size:10px; color:var(--t4); }
+.af-in-file-list { margin-top:10px; display:flex; flex-direction:column; gap:6px; }
+.af-in-file { display:flex; align-items:center; gap:8px; padding:8px 12px; background:var(--bg-2); border:1px solid var(--border); border-radius:var(--r); font-size:12px; }
+.af-in-file code { color:var(--blue); font-size:11px; background:rgba(96,165,250,.08); padding:1px 5px; border-radius:3px; }
+.af-in-file .af-field-id-input { flex:1; background:var(--bg-3); border:1px solid var(--border); border-radius:4px; color:var(--t1); font-size:11px; padding:3px 8px; font-family:monospace; }
+.af-create-btn { width:100%; padding:13px; background:var(--orange); color:#fff; border:none; border-radius:var(--r); font-family:inherit; font-size:14px; font-weight:700; cursor:pointer; transition:.2s; margin-top:20px; letter-spacing:.02em; }
+.af-create-btn:hover { background:var(--orange-soft); }
+.af-create-btn:disabled { opacity:.4; cursor:not-allowed; }
+
+.custom-skill-list { margin-bottom:28px; }
+.custom-skill-list h3 { font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--t4); margin:0 0 12px; }
+.cs-card { display:flex; align-items:center; gap:12px; padding:12px 14px; background:var(--card); border:1px solid var(--border); border-radius:var(--r-lg); margin-bottom:8px; transition:.2s; }
+.cs-card:hover { border-color:var(--orange-mid); }
+.cs-icon { width:36px; height:36px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+.cs-meta { flex:1; min-width:0; }
+.cs-name { font-size:13px; font-weight:700; color:var(--t1); }
+.cs-desc { font-size:11px; color:var(--t4); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.cs-deps { font-size:10px; color:var(--orange); margin-top:3px; }
+.cs-open-btn { font-size:11px; background:var(--bg-2); border:1px solid var(--border); border-radius:6px; color:var(--t2); padding:5px 10px; cursor:pointer; font-family:inherit; transition:.2s; }
+.cs-open-btn:hover { border-color:var(--orange); color:var(--orange); }
+.success-toast { position:fixed; bottom:80px; right:24px; background:var(--green); color:#fff; padding:12px 20px; border-radius:var(--r-lg); font-size:13px; font-weight:600; z-index:999; box-shadow:0 4px 24px rgba(0,0,0,.4); animation:slideInRight .3s ease; }
+@keyframes slideInRight { from{transform:translateX(60px);opacity:0} to{transform:translateX(0);opacity:1} }
+
 .wizard-footer {
   flex-shrink:0; display:flex; align-items:center; padding:14px 32px;
   border-top:1px solid var(--border); background:var(--bg);
@@ -742,8 +797,11 @@ textarea.form-input { height:auto; padding:10px 12px; resize:vertical; min-heigh
       <div id="skill-list-2"></div>
       <div class="sb-section-label" style="margin-top:6px">Analysis</div>
       <div id="skill-list-3"></div>
+      <div class="sb-section-label" style="margin-top:6px" id="custom-skills-label" style="display:none">Custom</div>
+      <div id="skill-list-custom"></div>
     </div>
     <div class="sb-footer">
+      <button class="sb-reset-btn" onclick="App.navigate('addskill')" style="background:var(--orange-dim);color:var(--orange);border-color:var(--orange-mid);margin-bottom:6px">+ Add Custom Skill</button>
       <button class="sb-reset-btn" onclick="App.resetAll()">↺ Reset All Skills</button>
     </div>
   </aside>
@@ -797,6 +855,11 @@ textarea.form-input { height:auto; padding:10px 12px; resize:vertical; min-heigh
       <!-- Project Settings -->
       <div class="view hidden" id="view-project">
         <div style="padding:28px 28px 100px" id="proj-content"></div>
+      </div>
+
+      <!-- Add / manage custom skills -->
+      <div class="view hidden" id="view-addskill">
+        <div class="addskill-page" id="addskill-content"></div>
       </div>
 
       <!-- Wizard -->
@@ -1047,6 +1110,8 @@ const API = {
   async saveProjectConfig(cfg)      { const r=await fetch('/api/project-config',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(cfg)}); return r.json(); },
   async runProjectAction(actionId,p){ const r=await fetch(`/api/project-action/${actionId}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(p)}); return r.json(); },
   stream(rid)                 { return new EventSource(`/api/stream/${rid}`); },
+  async getCustomSkills()     { return (await fetch('/api/custom-skills')).json(); },
+  async createCustomSkill(d)  { const r=await fetch('/api/custom-skills',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)}); return r.json(); },
 };
 
 
@@ -1589,6 +1654,247 @@ const ProjectSettings = {
 
 
 /* ═══════════════════════════════════════════════════════════════════════════
+   CUSTOM SKILLS
+   ═══════════════════════════════════════════════════════════════════════════ */
+const CustomSkills = {
+  _data: [],          // loaded manifests
+  _outputs: {},       // SKILL_OUTPUTS from backend
+
+  async loadAndRegister() {
+    try {
+      const r = await API.getCustomSkills();
+      this._data = r.skills || [];
+      this._outputs = r.skill_outputs || {};
+      for(const cs of this._data) {
+        if(SKILL_MAP[cs.id]) continue;
+        const skill = {
+          id: cs.id, tag: cs.tag||cs.id.toUpperCase(), name: cs.name,
+          group: 4, color: cs.color||'#8B5CF6', icon: cs.icon||'⚡',
+          desc: cs.desc||'', deps: cs.deps||[],
+          steps: cs.steps||[{title:'Run',desc:'',fields:[{id:'output_dir',label:'Output Directory',type:'dir',required:true}]}],
+        };
+        SKILLS.push(skill);
+        SKILL_MAP[cs.id] = skill;
+        State.runState[cs.id] = {status:'idle',last_run:null,run_id:null,exit_code:null,deps_met:true};
+        if(!SKILL_GROUPS[4]) SKILL_GROUPS[4]=[];
+        if(!SKILL_GROUPS[4].includes(cs.id)) SKILL_GROUPS[4].push(cs.id);
+      }
+    } catch(e) { console.warn('Could not load custom skills:', e); }
+  },
+
+  renderView() {
+    const el = document.getElementById('addskill-content');
+    el.innerHTML = '';
+
+    // Hero
+    const hero = document.createElement('div'); hero.className='addskill-hero';
+    hero.innerHTML = `<h2>Integrate a Custom Skill</h2><p>Register a new skill that plugs into the DV pipeline. Choose which upstream skills it depends on, declare the input files it needs, and provide a bash or Python script. The GUI generates a <code>skill.json</code> manifest and a template script automatically.</p>`;
+    el.appendChild(hero);
+
+    // Existing custom skills list
+    if(this._data.length > 0) {
+      const listSec = document.createElement('div'); listSec.className='custom-skill-list';
+      listSec.innerHTML = `<h3>Registered Custom Skills</h3>`;
+      for(const cs of this._data) {
+        const card = document.createElement('div'); card.className='cs-card';
+        const deps = cs.deps?.length ? cs.deps.map(d=>SKILL_MAP[d]?.tag||d).join(', ') : 'None';
+        card.innerHTML = `
+          <div class="cs-icon" style="background:${cs.color||'#8B5CF6'}18">${cs.icon||'⚡'}</div>
+          <div class="cs-meta">
+            <div class="cs-name">${cs.tag||cs.id} — ${cs.name}</div>
+            <div class="cs-desc">${cs.desc||'No description'}</div>
+            <div class="cs-deps">Depends on: ${deps}</div>
+          </div>
+          <button class="cs-open-btn" onclick="Wizard.open('${cs.id}')">Open Wizard →</button>`;
+        listSec.appendChild(card);
+      }
+      el.appendChild(listSec);
+    }
+
+    // Integration guide
+    const guide = document.createElement('div'); guide.className='skill-outputs-guide';
+    guide.innerHTML = `<h3>What each skill produces — declare dependencies carefully</h3><div class="so-grid" id="so-grid"></div>`;
+    el.appendChild(guide);
+    const grid = document.getElementById('so-grid');
+    const allSkills = SKILLS.filter(s=>s.group!==4);
+    for(const s of allSkills) {
+      const card = document.createElement('div'); card.className='so-card';
+      const outputs = this._outputs[s.id] || {};
+      const fileRows = Object.entries(outputs).map(([f,desc])=>
+        `<div class="so-file"><code>${f}</code><span>${desc}</span></div>`).join('') || '<div class="so-file"><span style="color:var(--t5)">No file outputs (AI/demo skill)</span></div>';
+      card.innerHTML = `<div class="so-card-header"><span class="so-tag">${s.tag}</span><span class="so-name">${s.name}</span></div>${fileRows}`;
+      grid.appendChild(card);
+    }
+
+    // Registration form
+    const form = document.createElement('div'); form.className='addskill-form';
+    form.innerHTML = `<h3>Register New Skill</h3>
+
+<div class="af-row-2">
+  <div class="af-row">
+    <label>Skill ID <span>*</span></label>
+    <input class="af-input" id="af-id" placeholder="e.g. s11, my_checker" />
+    <div class="af-hint">Lowercase letters, numbers, underscores only. Must be unique.</div>
+  </div>
+  <div class="af-row">
+    <label>Short Tag <span>*</span></label>
+    <input class="af-input" id="af-tag" placeholder="e.g. S11" maxlength="6"/>
+    <div class="af-hint">Shown on skill card. 2–6 chars.</div>
+  </div>
+</div>
+
+<div class="af-row">
+  <label>Display Name <span>*</span></label>
+  <input class="af-input" id="af-name" placeholder="e.g. Protocol Lint Checker"/>
+</div>
+
+<div class="af-row">
+  <label>Description</label>
+  <input class="af-input" id="af-desc" placeholder="What does this skill do?"/>
+</div>
+
+<div class="af-row-2">
+  <div class="af-row">
+    <label>Icon (emoji)</label>
+    <input class="af-input" id="af-icon" placeholder="⚡" maxlength="4" style="font-size:20px"/>
+  </div>
+  <div class="af-row">
+    <label>Accent Color</label>
+    <input class="af-input" id="af-color" type="color" value="#8B5CF6" style="height:40px;padding:4px 8px;cursor:pointer"/>
+  </div>
+</div>
+
+<div class="af-row">
+  <label>Script File</label>
+  <input class="af-input" id="af-script" placeholder="run_<id>.bash  (auto-set from Skill ID if blank)"/>
+  <div class="af-hint">Bash or Python script in <code>dv-gui/custom_skills/&lt;id&gt;/</code>. A template is auto-generated if the file does not exist.</div>
+</div>
+
+<div class="af-row">
+  <label>Upstream Dependencies</label>
+  <div class="af-hint" style="margin-bottom:8px">Select which standard skills this skill depends on. Their output files will be suggested as inputs below.</div>
+  <div class="af-dep-grid" id="af-dep-grid"></div>
+</div>
+
+<div class="af-row" id="af-inputs-row" style="display:none">
+  <label>Input Files from Dependencies</label>
+  <div class="af-hint" style="margin-bottom:8px">Each file below will be auto-scanned from the workspace directory when the skill wizard opens. Set the Field ID — this becomes the form field name the user fills in.</div>
+  <div class="af-in-file-list" id="af-in-file-list"></div>
+</div>
+
+<button class="af-create-btn" id="af-create-btn" onclick="CustomSkills.submit()">⚡ Create Skill & Generate Files</button>`;
+    el.appendChild(form);
+
+    // Populate dependency checkboxes
+    const depGrid = document.getElementById('af-dep-grid');
+    for(const s of SKILLS.filter(sk=>sk.group!==4)) {
+      const item = document.createElement('div'); item.className='af-dep-item';
+      item.dataset.sid = s.id;
+      item.innerHTML = `<input type="checkbox" id="afd-${s.id}" value="${s.id}"><label for="afd-${s.id}" style="cursor:pointer;flex:1"><div class="af-dep-label">${s.tag} ${s.name}</div><div class="af-dep-sub">${Object.keys(this._outputs[s.id]||{}).join(', ')||'No outputs'}</div></label>`;
+      item.querySelector('input').addEventListener('change', ()=>{ item.classList.toggle('selected', item.querySelector('input').checked); this._refreshInputFiles(); });
+      depGrid.appendChild(item);
+    }
+    // Auto-tag from id input
+    document.getElementById('af-id').addEventListener('input', e=>{
+      const v=e.target.value.trim();
+      const tagEl=document.getElementById('af-tag');
+      if(!tagEl._touched) tagEl.value=v.toUpperCase().replace(/_/g,'').slice(0,4);
+    });
+    document.getElementById('af-tag').addEventListener('input',()=>document.getElementById('af-tag')._touched=true);
+  },
+
+  _refreshInputFiles() {
+    const selectedDeps = [...document.querySelectorAll('#af-dep-grid input:checked')].map(c=>c.value);
+    const row = document.getElementById('af-inputs-row');
+    const list = document.getElementById('af-in-file-list');
+    list.innerHTML='';
+    const files = [];
+    for(const dep of selectedDeps) {
+      const outputs = this._outputs[dep]||{};
+      for(const [fname, fdesc] of Object.entries(outputs)) {
+        files.push({dep, fname, fdesc, fieldId: fname.replace('.json','').replace('.xlsx','').replace(/[^a-z0-9_]/gi,'_')});
+      }
+    }
+    if(!files.length){ row.style.display='none'; return; }
+    row.style.display='';
+    for(const f of files) {
+      const depSkill = SKILL_MAP[f.dep];
+      const div = document.createElement('div'); div.className='af-in-file';
+      div.innerHTML = `<span class="so-tag" style="font-size:9px">${depSkill?.tag||f.dep}</span><code>${f.fname}</code><span style="flex:1;font-size:11px;color:var(--t4)">${f.fdesc}</span><span style="font-size:10px;color:var(--t4);margin-right:4px">Field ID:</span><input class="af-field-id-input" data-fname="${f.fname}" value="${f.fieldId}" placeholder="field_id"/>`;
+      list.appendChild(div);
+    }
+  },
+
+  async submit() {
+    const btn = document.getElementById('af-create-btn');
+    const sid  = document.getElementById('af-id').value.trim().toLowerCase().replace(/[^a-z0-9_]/g,'_');
+    const name = document.getElementById('af-name').value.trim();
+    if(!sid||!name){ alert('Skill ID and Display Name are required.'); return; }
+
+    const deps = [...document.querySelectorAll('#af-dep-grid input:checked')].map(c=>c.value);
+
+    // Build input_files map from the field-id inputs
+    const inputFiles = {};
+    document.querySelectorAll('.af-field-id-input').forEach(inp=>{
+      const fieldId = inp.value.trim().replace(/[^a-z0-9_]/g,'_');
+      const fname   = inp.dataset.fname;
+      if(fieldId && fname) {
+        if(!inputFiles[fieldId]) inputFiles[fieldId]=[];
+        inputFiles[fieldId].push(fname);
+      }
+    });
+
+    btn.disabled=true; btn.textContent='Creating…';
+
+    // Build steps — one step per selected dep plus always an output_dir field
+    const inputFields = Object.entries(inputFiles).map(([fid, fnames])=>({
+      id: fid,
+      label: fnames[0].replace('.json','').replace('.xlsx','').replace(/_/g,' '),
+      type: 'file',
+      accept: fnames[0].endsWith('.xlsx')?'.xlsx,.json':'.json',
+      hint: `Required input (${fnames.join(' or ')})`,
+      required: true,
+    }));
+    const steps = [{
+      title: 'Inputs',
+      desc:  'Provide required input files and output directory.',
+      fields: [
+        ...inputFields,
+        {id:'output_dir', label:'Output Directory', type:'dir', required:true},
+      ],
+    }];
+
+    const payload = {
+      id:          sid,
+      name:        document.getElementById('af-name').value.trim(),
+      tag:         document.getElementById('af-tag').value.trim()||sid.toUpperCase().slice(0,4),
+      desc:        document.getElementById('af-desc').value.trim(),
+      icon:        document.getElementById('af-icon').value.trim()||'⚡',
+      color:       document.getElementById('af-color').value,
+      script:      document.getElementById('af-script').value.trim()||`run_${sid}.bash`,
+      deps, input_files: inputFiles, steps,
+    };
+
+    const result = await API.createCustomSkill(payload);
+    btn.disabled=false; btn.textContent='⚡ Create Skill & Generate Files';
+
+    if(result.error){ alert(`Error: ${result.error}`); return; }
+
+    // Show toast
+    const toast=document.createElement('div'); toast.className='success-toast';
+    toast.textContent=`✓ Skill "${payload.name}" created! Edit the script at: custom_skills/${sid}/run_${sid}.bash`;
+    document.body.appendChild(toast);
+    setTimeout(()=>toast.remove(), 6000);
+
+    // Reload custom skills and re-render
+    await this.loadAndRegister();
+    Sidebar.render();
+    this.renderView();
+  },
+};
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
    WIZARD
    ═══════════════════════════════════════════════════════════════════════════ */
 const Wizard = {
@@ -1756,10 +2062,13 @@ const Wizard = {
    ═══════════════════════════════════════════════════════════════════════════ */
 const Sidebar = {
   render() {
-    const groups = {1:document.getElementById('skill-list-1'),2:document.getElementById('skill-list-2'),3:document.getElementById('skill-list-3')};
-    for(const [g,el] of Object.entries(groups)){
-      el.innerHTML='';
-      for(const sid of SKILL_GROUPS[g]){
+      const groups = {1:document.getElementById('skill-list-1'),2:document.getElementById('skill-list-2'),3:document.getElementById('skill-list-3'),4:document.getElementById('skill-list-custom')};
+      const customLabel = document.getElementById('custom-skills-label');
+      if(customLabel) customLabel.style.display = (SKILL_GROUPS[4]?.length>0)?'':'none';
+      for(const [g,el] of Object.entries(groups)){
+        if(!el) continue;
+        el.innerHTML='';
+        for(const sid of SKILL_GROUPS[g]||[]){
         const skill=SKILL_MAP[sid]; const rs=State.runState[sid]||{}; const status=rs.status||'idle';
         const item=document.createElement('div');
         item.className='sb-item'+(State.active===sid?' active':'');
@@ -1838,6 +2147,7 @@ const App = {
     State.restore();
     await ProjectSettings.load();
     State.projectConfig = {...ProjectSettings._cfg};
+    await CustomSkills.loadAndRegister();
     await Sidebar.refreshAll();
     Dashboard.render();
     this.navigate('dash');
@@ -1859,6 +2169,11 @@ const App = {
       document.getElementById('main-title').textContent='Project Settings';
       document.getElementById('main-sub').textContent='Global configuration for all skills';
       ProjectSettings.render();
+    } else if(id==='addskill'){
+      this.setView('addskill');
+      document.getElementById('main-title').textContent='Custom Skills';
+      document.getElementById('main-sub').textContent='Integrate new skills into the DV pipeline';
+      CustomSkills.renderView();
     } else {
       const skill=SKILL_MAP[id];
       document.getElementById('main-title').textContent=`${skill.tag} — ${skill.name}`;

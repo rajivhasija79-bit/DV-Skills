@@ -599,6 +599,72 @@ SKILL_INPUT_FILES = {
             "coverage_report":["coverage_report.txt","coverage_report.xml","urgReport.txt"]},
 }
 
+# ── Custom Skills Registry ───────────────────────────────────────────────────
+CUSTOM_SKILLS_DIR = BASE_DIR / "custom_skills"
+CUSTOM_SKILLS_DIR.mkdir(exist_ok=True)
+
+# Known outputs produced by each standard skill
+SKILL_OUTPUTS = {
+    "s1":  {"dv_spec_data.json":       "VIP interfaces, protocols, clocks, register map"},
+    "s2":  {"dv_testplan_data.json":   "Testplan rows with CHK_IDs and milestones",
+            "testplan.xlsx":           "Excel testplan workbook"},
+    "s3":  {"dv_tb_arch_data.json":    "TB architecture — agents, env hierarchy, VIPs"},
+    "s4":  {"dv_ral_data.json":        "UVM Register Abstraction Layer (RAL) definition"},
+    "s5":  {"dv_tb_data.json":         "Full TB scaffold — VIPs, sequences, env, tests, pkg files"},
+    "s6":  {"dv_sequences_data.json":  "Generated UVM sequences and directed test classes"},
+    "s7":  {"dv_assertions_data.json": "Generated SVA assertions with CHK_ID binding"},
+    "s8":  {"dv_scoreboard_data.json": "Generated scoreboard and per-CHK_ID checker stubs"},
+    "s9":  {"dv_regression_data.json": "Regression results — pass/fail per test, seed log"},
+    "s10": {"dv_coverage_data.json":   "Coverage closure report and sign-off data"},
+}
+
+
+def load_custom_skills() -> list:
+    """Scan custom_skills/ for skill.json manifests and return list of dicts."""
+    skills = []
+    if not CUSTOM_SKILLS_DIR.exists():
+        return skills
+    for skill_dir in sorted(CUSTOM_SKILLS_DIR.iterdir()):
+        if not skill_dir.is_dir():
+            continue
+        manifest = skill_dir / "skill.json"
+        if not manifest.exists():
+            continue
+        try:
+            data = json.loads(manifest.read_text())
+            data["_dir"] = str(skill_dir)
+            skills.append(data)
+        except Exception as e:
+            print(f"[warn] Could not load custom skill {skill_dir.name}: {e}")
+    return skills
+
+
+def _register_custom_skills():
+    """Load custom skills and inject them into runtime registries."""
+    for cs in load_custom_skills():
+        sid = cs.get("id")
+        if not sid or sid in SKILL_IDS:
+            continue
+        SKILL_IDS.append(sid)
+        SKILL_DEPS[sid] = cs.get("deps", [])
+        script_name = cs.get("script")
+        if script_name:
+            sp = Path(cs["_dir"]) / script_name
+            SKILL_SCRIPTS[sid] = sp if sp.exists() else None
+        else:
+            SKILL_SCRIPTS[sid] = None
+        SKILL_DEMO_STEPS[sid] = cs.get("demo_steps", [
+            f"▶  Starting {cs.get('name', sid)}…",
+            "   Validating inputs…",
+            "   Processing…",
+            f"✓  {cs.get('name', sid)} complete.",
+        ])
+        if cs.get("input_files"):
+            SKILL_INPUT_FILES[sid] = cs["input_files"]
+
+
+_register_custom_skills()
+
 
 @app.route("/api/scan-inputs/<skill_id>")
 def scan_inputs(skill_id):
@@ -640,6 +706,89 @@ def scan_inputs(skill_id):
                 break
 
     return jsonify({"found": found, "scanned_dir": str(base)})
+
+
+@app.route("/api/custom-skills", methods=["GET"])
+def get_custom_skills():
+    skills = load_custom_skills()
+    return jsonify({"skills": skills, "skill_outputs": SKILL_OUTPUTS})
+
+
+@app.route("/api/custom-skills", methods=["POST"])
+def create_custom_skill():
+    data = request.get_json() or {}
+    sid  = data.get("id", "").strip().lower().replace(" ", "_").replace("-", "_")
+    if not sid:
+        return jsonify({"error": "id is required"}), 400
+    if sid in SKILL_IDS:
+        return jsonify({"error": f"Skill '{sid}' already exists"}), 409
+
+    skill_dir = CUSTOM_SKILLS_DIR / sid
+    skill_dir.mkdir(parents=True, exist_ok=True)
+
+    manifest = {
+        "id":           sid,
+        "name":         data.get("name", sid),
+        "tag":          data.get("tag", sid.upper()[:4]),
+        "desc":         data.get("desc", ""),
+        "icon":         data.get("icon", "⚡"),
+        "color":        data.get("color", "#8B5CF6"),
+        "group":        4,
+        "deps":         data.get("deps", []),
+        "input_files":  data.get("input_files", {}),
+        "output_files": data.get("output_files", []),
+        "script":       data.get("script", f"run_{sid}.bash"),
+        "steps":        data.get("steps", [
+            {
+                "title": "Inputs",
+                "desc":  "Provide required input files and output directory.",
+                "fields": [
+                    {"id": "output_dir", "label": "Output Directory", "type": "dir", "required": True}
+                ]
+            }
+        ]),
+    }
+
+    manifest_path = skill_dir / "skill.json"
+    manifest_path.write_text(json.dumps(manifest, indent=2))
+
+    # Generate template bash script
+    script_path = skill_dir / f"run_{sid}.bash"
+    if not script_path.exists():
+        dep_comments = "\n".join(
+            f"# {d}: see dv-gui/custom_skills/{d}/skill.json for its output files"
+            for d in manifest["deps"]
+        ) or "# (no dependencies)"
+        script_path.write_text(
+            f"""#!/usr/bin/env bash
+# ── {manifest['name']} ──────────────────────────────────────────────────────
+# Auto-generated template script.  Fill in your logic below.
+# All wizard form fields arrive as UPPER_SNAKE_CASE environment variables.
+#
+# Dependencies:
+{dep_comments}
+#
+# Common env vars available:
+#   PROJECT_NAME   WORKSPACE_DIR   OUTPUT_DIR
+#   (plus any field ids you defined in skill.json — uppercased)
+set -euo pipefail
+
+OUTPUT_DIR="${{OUTPUT_DIR:-./dv}}"
+mkdir -p "$OUTPUT_DIR"
+
+echo "▶  Starting {manifest['name']}…"
+echo "   Output dir : $OUTPUT_DIR"
+
+# ── Your logic here ───────────────────────────────────────────────────────────
+# Example: python3 my_generator.py --output "$OUTPUT_DIR"
+
+echo "✓  {manifest['name']} complete."
+"""
+        )
+        script_path.chmod(0o755)
+
+    _register_custom_skills()
+    return jsonify({"status": "created", "dir": str(skill_dir), "skill": manifest})
 
 
 # ── Skill execution ───────────────────────────────────────────────────────────

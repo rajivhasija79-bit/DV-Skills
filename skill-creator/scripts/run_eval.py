@@ -178,12 +178,17 @@ def run_single_query(
         os.environ["LLM_BACKEND"] = backend
 
     prompt = (
-        f'You are Claude. You have exactly one skill available:\n\n'
-        f'  Skill name: {skill_name}\n'
-        f'  Skill description: {skill_description}\n\n'
-        f'A user sends you this query: "{query}"\n\n'
-        f'Would you invoke this skill to handle the query?\n'
-        f'Reply with exactly one word: YES or NO.'
+        f'This is a skill-trigger evaluation task. '
+        f'Do NOT invoke any skills, tools, or perform any actions whatsoever.\n\n'
+        f'You are evaluating whether a hypothetical skill would be triggered '
+        f'by a hypothetical user query. This is purely a classification exercise.\n\n'
+        f'Hypothetical skill:\n'
+        f'  Name: {skill_name}\n'
+        f'  Description: {skill_description}\n\n'
+        f'Hypothetical user query: "{query}"\n\n'
+        f'Based only on the skill description, would this skill be triggered '
+        f'by this query? Answer with exactly one word — YES or NO — and nothing else. '
+        f'Do not take any other action.'
     )
     try:
         response = _call_llm(prompt, model, max_tokens=10)

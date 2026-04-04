@@ -1,0 +1,4 @@
+[
+  { "query": "create a new skill called hello-world", "should_trigger": true },
+  { "query": "what is the weather today", "should_trigger": false }
+]

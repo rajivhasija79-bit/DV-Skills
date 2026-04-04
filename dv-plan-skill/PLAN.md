@@ -384,25 +384,316 @@ Generated section by section to manage token load.
 
 ## Benchmarking Plan (5 Existing Projects)
 
-Use the 5 existing project pairs (spec + testplan + verstrat) in phases:
+Use the 5 existing project pairs (spec + testplan + verstrat) across two independent benchmarking tracks:
+1. **Testplan Quality Benchmark** — how good is the generated testplan vs existing
+2. **Spec Quality Benchmark** — how complete and DV-ready is the input specification itself
 
-### Phase 1 — Extraction Accuracy
-- Run `spec-ingester` on each spec
-- Compare extracted features/FIDs against known testplan
-- Metric: % features captured, % registers captured
+---
 
-### Phase 2 — Generation Coverage
-- Run full pipeline
-- Compare generated testplan rows vs existing testplan rows
-- Metric: feature recall, feature precision, TC coverage overlap
+### Track 1: Testplan Quality Benchmark
 
-### Phase 3 — Format Fidelity
-- Run `xlsx-formatter` + `docx-formatter`
-- Compare column schema match with org's existing format
+Benchmarking is split into four independent dimensions. Each is scored separately so gaps can be identified and fixed in isolation.
 
-### Scoring
+---
+
+#### 1A. Feature Benchmark
+
+Measures how well features are identified and structured from the spec.
+
+| Metric | Formula | Description |
+|---|---|---|
+| Feature Recall | \|generated ∩ existing\| / \|existing\| | What % of features from existing testplan were found |
+| Feature Precision | \|generated ∩ existing\| / \|generated\| | What % of generated features are valid (not hallucinated) |
+| Sub-feature Depth | sub-features generated / sub-features in existing | How well features are decomposed into sub-features |
+| New Features Found | \|generated − existing\| | Features in generated but not in existing — potential gaps in existing |
+| FID Coverage | FIDs with entries / total FIDs in fid_prd_map | % of FIDs that have at least one testplan row |
+| PRD Traceability | rows with PRD ref / rows where PRD exists | % of rows correctly linked back to PRD number |
+
+**Benchmark output:**
+```json
+{
+  "feature_recall": 0.91,
+  "feature_precision": 0.88,
+  "sub_feature_depth": 0.75,
+  "new_features_found": ["F012", "F015"],
+  "fid_coverage": 0.94,
+  "prd_traceability": 0.87,
+  "missing_features": ["UART Loopback Mode", "RX Timeout"],
+  "score": 0.88
+}
 ```
-skill_score = (feature_recall × 0.4) + (tc_coverage × 0.4) + (format_match × 0.2)
+
+---
+
+#### 1B. Testcase Benchmark
+
+Measures quality and completeness of testcase identification.
+
+| Metric | Formula | Description |
+|---|---|---|
+| TC Count Ratio | generated TC count / existing TC count | Are enough testcases generated? |
+| TC Type Distribution Match | KL divergence of type distributions | Does directed/random/mixed ratio match existing style? |
+| TC Naming Convention | % following `<ip/ss/soc>_<feature>_<type>` pattern | Naming consistency |
+| Directed TC Coverage | features with directed TC / features needing directed TC | Corner cases, error injection, reset tests covered |
+| Random TC Coverage | features with random TC / features needing random TC | Datapath, protocol, normal operation covered |
+| Sim Switch Completeness | rows with switches / rows needing switches | % of TCs with required plusargs populated |
+| Unique Scenario Coverage | unique test scenarios / total rows | No duplicate/redundant test scenarios |
+
+**Benchmark output:**
+```json
+{
+  "tc_count_ratio": 1.12,
+  "tc_type_distribution_match": 0.85,
+  "naming_convention_compliance": 0.93,
+  "directed_tc_coverage": 0.88,
+  "random_tc_coverage": 0.91,
+  "sim_switch_completeness": 0.79,
+  "unique_scenario_coverage": 0.96,
+  "missing_tc_scenarios": ["register reset after power cycle", "back-to-back TX with no gap"],
+  "score": 0.89
+}
+```
+
+---
+
+#### 1C. Coverage Benchmark
+
+Measures quality and completeness of functional coverage specification.
+
+| Metric | Formula | Description |
+|---|---|---|
+| Coverpoint Count Ratio | generated / existing | Enough coverpoints? |
+| Coverpoint Type Distribution | register field / interface state / error / protocol / config | Matches existing coverage intent |
+| SV Code Validity | % of coverpoints with syntactically valid SV code | Can the coverpoint be used directly in TB? |
+| Feature-Coverpoint Mapping | features with ≥1 coverpoint / total features | No feature left without coverage |
+| Bins Completeness | coverpoints with explicit bins / total coverpoints | Are boundary and corner-case bins specified? |
+| Cross Coverage | cross coverpoints generated / cross coverpoints in existing | Multi-signal coverage captured |
+| Coverage Hole Detection | features with no coverpoint despite being verifiable | Gaps in coverage plan |
+
+**Benchmark output:**
+```json
+{
+  "coverpoint_count_ratio": 0.94,
+  "sv_code_validity": 0.87,
+  "feature_coverpoint_mapping": 0.91,
+  "bins_completeness": 0.83,
+  "cross_coverage_ratio": 0.72,
+  "coverage_holes": ["F007 - power state transition", "F011 - error flag clearing"],
+  "score": 0.85
+}
+```
+
+---
+
+#### 1D. Checker Benchmark
+
+Measures quality and completeness of checker specification.
+
+| Metric | Formula | Description |
+|---|---|---|
+| Checker Count Ratio | generated / existing | Enough checkers? |
+| Checker ID Uniqueness | unique checker IDs / total checker rows | No duplicate checker IDs |
+| Checker Placement Distribution | scoreboard / monitor / interface / testcase ratios | Matches existing checker architecture style |
+| Feature-Checker Mapping | features with ≥1 checker / total features | No feature left without a check |
+| Checker Type Coverage | protocol + datapath + register + error flag checkers present | Broad checker taxonomy covered |
+| Passive Checker Coverage | checkers in monitor/scoreboard / total checkers | Proportion of always-on vs test-specific checks |
+| Assertion Coverage | interface-placed checkers (SVA) / total checkers | Protocol-level assertion coverage |
+
+**Benchmark output:**
+```json
+{
+  "checker_count_ratio": 0.89,
+  "checker_id_uniqueness": 1.0,
+  "placement_distribution": { "scoreboard": 0.45, "monitor": 0.30, "interface": 0.20, "testcase": 0.05 },
+  "feature_checker_mapping": 0.86,
+  "passive_checker_coverage": 0.75,
+  "assertion_coverage": 0.68,
+  "missing_checkers": ["CHK_RX_PARITY", "CHK_TX_UNDERFLOW"],
+  "score": 0.83
+}
+```
+
+---
+
+#### Overall Testplan Score
+
+```
+testplan_score = (feature_score   × 0.30)
+               + (testcase_score  × 0.30)
+               + (coverage_score  × 0.25)
+               + (checker_score   × 0.15)
+```
+
+Weightings reflect DV priority: feature completeness and testcase quality are most critical; checker spec is important but can be iterated.
+
+---
+
+### Track 2: Spec Quality Benchmark
+
+Measures how complete and DV-ready the input specification is — independently of what was generated. This surfaces problems in the *spec itself* before blaming the skill output. Output is a spec quality report given back to the user alongside the generated docs.
+
+---
+
+#### 2A. Structural Completeness
+
+Which expected sections are present or missing from the spec?
+
+| Check | Expected | Severity if Missing |
+|---|---|---|
+| Feature/functionality description | All DV types | Critical |
+| Register map with field definitions | IP / SS | Critical for IP, High for SS |
+| Interface specification (protocol, timing) | All DV types | Critical |
+| Clock domain description | All DV types | High |
+| Reset behavior description | All DV types | High |
+| Power domain / power state description | IP / SS / SoC | Medium-High |
+| Interrupt list with conditions | IP / SS | High |
+| Memory map | SS / SoC | High |
+| Error conditions and handling | All DV types | High |
+| Configuration modes and interactions | IP / SS | Medium |
+| PRD / FID mapping | SS / SoC | High (SS), Medium (IP) |
+| Boundary conditions and corner cases | All DV types | Medium |
+| Timing diagrams or waveforms | IP | Medium |
+
+**Score:** `structural_completeness = sections_present / sections_expected`
+
+---
+
+#### 2B. Feature Clarity for DV
+
+For each feature extracted, assess whether it is clearly described enough to write a testcase.
+
+| Clarity Dimension | Question asked | Score |
+|---|---|---|
+| Observable behavior | Is there a clear expected output or state change that can be checked? | 0-1 per feature |
+| Stimulus defined | Is it clear what input/stimulus triggers this feature? | 0-1 per feature |
+| Configuration dependency | Are required DUT config settings to enable this feature documented? | 0-1 per feature |
+| Error behavior | If the feature has error conditions, are they described? | 0-1 per feature |
+| Pass criteria clarity | Can a pass/fail criterion be written from the description alone? | 0-1 per feature |
+
+**Output:**
+```json
+{
+  "features_fully_clear":   12,
+  "features_partially_clear": 5,
+  "features_unclear_for_dv": 3,
+  "unclear_features": [
+    { "fid": "F008", "name": "TX Arbitration", "issue": "Expected priority resolution behavior not specified — multiple valid interpretations possible" },
+    { "fid": "F011", "name": "Error Recovery", "issue": "No description of DUT state after error cleared — unclear if registers reset or retain values" }
+  ],
+  "clarity_score": 0.78
+}
+```
+
+---
+
+#### 2C. Register Map Quality (IP / SS)
+
+| Metric | Check | Severity |
+|---|---|---|
+| Reset value completeness | Are reset values specified for all fields? | High |
+| Access type completeness | Is R/W/RO/WO/W1C/W1S defined for every field? | Critical |
+| Field description quality | Are field descriptions DV-actionable (not just "reserved")? | Medium |
+| Address map completeness | Are all register offsets unique and non-overlapping? | Critical |
+| Side-effect documentation | Are write side-effects (e.g. W1C clears flag) documented? | High |
+| Reserved field behavior | Is behavior on write to reserved fields documented? | Low |
+
+**Score:** `regmap_quality = checks_passed / total_checks`
+
+---
+
+#### 2D. Interface Specification Quality
+
+| Metric | Check |
+|---|---|
+| Protocol parameters complete | Data width, address width, burst length, strobe defined? |
+| Timing requirements documented | Setup/hold, latency, back-pressure behavior? |
+| Error/exception signaling | How does interface signal errors? |
+| Handshake behavior | Ready/valid or req/ack protocol fully described? |
+| Out-of-spec behavior | What happens if master violates protocol? |
+
+---
+
+#### 2E. Consistency Check
+
+Cross-section contradictions that create DV ambiguity:
+
+| Check | Example |
+|---|---|
+| Feature described but no register to configure it | Feature "RX timeout" mentioned but no timeout register in register map |
+| Interrupt listed but no condition documented | IRQ `rx_overflow` in interrupt table but no description of when it fires |
+| Register field described but feature never mentioned | Field `TX_LOOP_EN` in register map but loopback feature not in feature list |
+| Clock domain mentioned in one section but absent in timing section | `clk_fast` appears in register description but not in clock domain table |
+| PRD item with no matching feature | PRD-17 in PRD table but no corresponding feature in feature list |
+
+**Score:** `consistency_score = 1 - (contradictions_found / checks_performed)`
+
+---
+
+#### 2F. DV Testability Assessment
+
+Features that are difficult or impossible to verify in simulation:
+
+| Testability Issue | Example | Action |
+|---|---|---|
+| No observable output | Feature modifies internal state only — nothing visible on interface | Flag — needs internal signal or coverage-only verification |
+| Requires analog stimulus | Feature depends on PVT or analog signal | Flag — needs note in assumptions |
+| Timing-only observable | Behavior only visible with specific clock timing | Flag — needs assertions or timing-sensitive TB |
+| OTP / one-time programmable | Can only be verified once | Flag — needs dedicated test environment note |
+| Power-gated feature | Only active in specific power state not easily reachable in simulation | Flag — needs power-aware TB note |
+
+---
+
+#### Overall Spec Quality Score
+
+```
+spec_quality_score = (structural_completeness × 0.25)
+                   + (feature_clarity         × 0.30)
+                   + (regmap_quality          × 0.20)
+                   + (interface_quality       × 0.15)
+                   + (consistency_score       × 0.10)
+```
+
+**Spec quality report output** (given to user before or alongside generated docs):
+```
+╔══════════════════════════════════════════════╗
+║         SPEC QUALITY REPORT                  ║
+║  DUT: uart_ctrl  |  Type: IP                 ║
+╠══════════════════════════════════════════════╣
+║  Overall Spec Quality Score:    0.74 / 1.0   ║
+╠══════════════════════════════════════════════╣
+║  Structural Completeness:  0.85  ✓            ║
+║  Feature Clarity for DV:   0.78  ⚠            ║
+║  Register Map Quality:     0.91  ✓            ║
+║  Interface Spec Quality:   0.65  ✗            ║
+║  Consistency:              0.88  ✓            ║
+╠══════════════════════════════════════════════╣
+║  CRITICAL GAPS:                               ║
+║  • Interface timing requirements missing      ║
+║  • 3 features unclear for DV (see below)      ║
+║  • TX_LOOP_EN register field has no matching  ║
+║    feature in feature list                    ║
+╠══════════════════════════════════════════════╣
+║  NOTE: Testplan generated with LOW confidence ║
+║  for F008, F011 — please review manually      ║
+╚══════════════════════════════════════════════╝
+```
+
+The spec quality report is always generated regardless of `--benchmark` flag — it only needs the spec as input and helps the user understand how much to trust the generated outputs.
+
+---
+
+### Benchmark Report Summary
+
+Full `benchmark_report.md` structure:
+
+```
+Section 1: Spec Quality Report        ← always generated
+Section 2: Feature Benchmark          ← requires existing testplan/verstrat
+Section 3: Testcase Benchmark         ← requires existing testplan
+Section 4: Coverage Benchmark         ← requires existing testplan
+Section 5: Checker Benchmark          ← requires existing testplan
+Section 6: Overall Scores Summary     ← all scores in one table
+Section 7: Recommended Actions        ← prioritized list of what to fix
 ```
 
 ---

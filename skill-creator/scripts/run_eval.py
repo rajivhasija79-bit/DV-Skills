@@ -118,7 +118,7 @@ def _call_claude_cli(prompt: str, model: str | None, max_tokens: int = 16) -> st
 def _call_llm(prompt: str, model: str | None, max_tokens: int = 16) -> str:
     """Call LLM using the configured backend."""
     backend = os.environ.get("LLM_BACKEND", "auto").lower()
-    if backend == "chipagent":
+    if backend == "chipagents":
         return _call_chipagent(prompt)
     elif backend == "claude_cli":
         return _call_claude_cli(prompt, model, max_tokens)

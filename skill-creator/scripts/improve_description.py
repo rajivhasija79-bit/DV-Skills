@@ -18,6 +18,9 @@ import re
 import sys
 from pathlib import Path
 
+# Allow running from any directory by adding skill-creator root to path
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
 from scripts.utils import parse_skill_md
 
 

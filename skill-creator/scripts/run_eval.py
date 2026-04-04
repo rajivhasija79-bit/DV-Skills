@@ -19,6 +19,9 @@ import time
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 
+# Allow running from any directory by adding skill-creator root to path
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
 from scripts.utils import parse_skill_md
 
 

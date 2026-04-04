@@ -15,6 +15,9 @@ import tempfile
 import time
 from pathlib import Path
 
+# Allow running from any directory by adding skill-creator root to path
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
 from scripts.generate_report import generate_html
 from scripts.improve_description import improve_description
 from scripts.run_eval import find_project_root, run_eval

@@ -11,6 +11,8 @@ Backend selection via --backend flag or LLM_BACKEND env var (priority order):
   4. Default/auto           → tries chipagent → anthropic SDK → claude CLI
 """
 
+from __future__ import annotations
+
 import argparse
 import json
 import os

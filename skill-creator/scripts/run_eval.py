@@ -11,6 +11,8 @@ Backend selection via --backend flag or LLM_BACKEND env var (priority order):
   4. Default/auto           → tries chipagent → anthropic SDK → claude CLI
 """
 
+from __future__ import annotations
+
 import argparse
 import json
 import os
@@ -160,14 +162,21 @@ def run_single_query(
     timeout: int,
     project_root: str,         # kept for API compat, unused in SDK path
     model: str | None = None,
+    backend: str | None = None,
 ) -> bool:
     """Return True if Claude would invoke this skill for the given query.
 
     Asks Claude directly via the SDK: given the skill name + description,
     would you invoke this skill to handle the user query?
-    This replaces the previous approach of injecting a command file and
-    watching Claude Code's stream output for tool calls.
+    backend is set explicitly here so it works correctly when called from
+    ProcessPoolExecutor worker processes (spawn mode on macOS Python 3.12+
+    does not reliably inherit os.environ changes from the parent process).
     """
+    # Set backend inside the worker so it is guaranteed to be correct
+    # regardless of how the process was started (fork vs spawn)
+    if backend:
+        os.environ["LLM_BACKEND"] = backend
+
     prompt = (
         f'You are Claude. You have exactly one skill available:\n\n'
         f'  Skill name: {skill_name}\n'
@@ -197,6 +206,8 @@ def run_eval(
 ) -> dict:
     """Run the full eval set and return results."""
     results = []
+    # Capture backend here in the main process and pass explicitly to workers
+    backend = os.environ.get("LLM_BACKEND")
 
     with ProcessPoolExecutor(max_workers=num_workers) as executor:
         future_to_info = {}
@@ -210,6 +221,7 @@ def run_eval(
                     timeout,
                     str(project_root),
                     model,
+                    backend,
                 )
                 future_to_info[future] = (item, run_idx)
 

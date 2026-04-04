@@ -8,11 +8,11 @@ overfitting.
 
 import argparse
 import json
+import os
 import random
 import sys
 import tempfile
 import time
-import webbrowser
 from pathlib import Path
 
 from scripts.generate_report import generate_html
@@ -256,7 +256,12 @@ def main():
     parser.add_argument("--verbose", action="store_true", help="Print progress to stderr")
     parser.add_argument("--report", default="auto", help="Generate HTML report at this path (default: 'auto' for temp file, 'none' to disable)")
     parser.add_argument("--results-dir", default=None, help="Save all outputs (results.json, report.html, log.txt) to a timestamped subdirectory here")
+    parser.add_argument("--backend", default=None,
+                        help="LLM backend: chipagent | anthropic | claude_cli (overrides LLM_BACKEND env var)")
     args = parser.parse_args()
+
+    if args.backend:
+        os.environ["LLM_BACKEND"] = args.backend
 
     eval_set = json.loads(Path(args.eval_set).read_text())
     skill_path = Path(args.skill_path)
@@ -274,9 +279,13 @@ def main():
             live_report_path = Path(tempfile.gettempdir()) / f"skill_description_report_{skill_path.name}_{timestamp}.html"
         else:
             live_report_path = Path(args.report)
-        # Open the report immediately so the user can watch
+        # Open the report immediately so the user can watch (browser open optional)
         live_report_path.write_text("<html><body><h1>Starting optimization loop...</h1><meta http-equiv='refresh' content='5'></body></html>")
-        webbrowser.open(str(live_report_path))
+        try:
+            import webbrowser
+            webbrowser.open(str(live_report_path))
+        except Exception:
+            print(f"Report started at: {live_report_path}", file=sys.stderr)
     else:
         live_report_path = None
 

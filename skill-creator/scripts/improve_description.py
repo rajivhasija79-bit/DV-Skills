@@ -2,36 +2,108 @@
 """Improve a skill description based on eval results.
 
 Takes eval results (from run_eval.py) and generates an improved description
-by calling `claude -p` as a subprocess (same auth pattern as run_eval.py —
-uses the session's Claude Code auth, no separate ANTHROPIC_API_KEY needed).
+by calling the LLM via chipagent, Anthropic SDK, or claude CLI subprocess.
+
+Backend selection via --backend flag or LLM_BACKEND env var (priority order):
+  1. LLM_BACKEND=chipagent  → uses chipagent batch --prompt (needs chipagent CLI)
+  2. LLM_BACKEND=anthropic  → uses anthropic Python SDK (needs ANTHROPIC_API_KEY)
+  3. LLM_BACKEND=claude_cli → uses `claude -p` subprocess (needs Claude Code)
+  4. Default/auto           → tries chipagent → anthropic SDK → claude CLI
 """
 
 import argparse
 import json
 import os
 import re
-import subprocess
 import sys
 from pathlib import Path
 
 from scripts.utils import parse_skill_md
 
 
-def _call_claude(prompt: str, model: str | None, timeout: int = 300) -> str:
-    """Run `claude -p` with the prompt on stdin and return the text response.
+# ---------------------------------------------------------------------------
+# Backend helpers
+# ---------------------------------------------------------------------------
 
-    Prompt goes over stdin (not argv) because it embeds the full SKILL.md
-    body and can easily exceed comfortable argv length.
+def _get_model(model: str | None) -> str:
+    return model or os.environ.get("ANTHROPIC_MODEL", "claude-opus-4-5-20251101")
+
+
+def _call_chipagent(prompt: str, timeout: int = 300) -> str:
+    """Call LLM via chipagent batch non-interactive mode.
+
+    Uses --output to capture response via temp file, which is more reliable
+    than stdout capture for long responses (SKILL.md + history can be 3-5KB+).
+    Note: chipagent uses its own configured model; --model is not supported.
     """
+    import subprocess
+    import tempfile
+
+    with tempfile.NamedTemporaryFile(
+        mode="w", suffix=".txt", delete=False, encoding="utf-8"
+    ) as f:
+        output_file = f.name
+
+    try:
+        cmd = [
+            "chipagents", "batch",
+            "--prompt", prompt,
+            "--output", output_file,
+        ]
+        working_dir = os.environ.get("CHIPAGENT_WORKING_DIR")
+        if working_dir:
+            cmd.extend(["--working-directory", working_dir])
+
+        result = subprocess.run(
+            cmd,
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+        )
+        if result.returncode != 0:
+            raise RuntimeError(
+                f"chipagents batch exited {result.returncode}\nstderr: {result.stderr}"
+            )
+        # Prefer output file; fall back to stdout
+        out_path = Path(output_file)
+        if out_path.exists() and out_path.stat().st_size > 0:
+            return out_path.read_text(encoding="utf-8")
+        return result.stdout
+    finally:
+        try:
+            Path(output_file).unlink(missing_ok=True)
+        except Exception:
+            pass
+
+
+def _call_anthropic_sdk(prompt: str, model: str | None, max_tokens: int = 2048) -> str:
+    """Call Claude via the Anthropic Python SDK."""
+    try:
+        import anthropic
+    except ImportError:
+        raise RuntimeError(
+            "anthropic package not installed. Run: pip install anthropic"
+        )
+    client = anthropic.Anthropic(
+        api_key=os.environ.get("ANTHROPIC_API_KEY"),
+        base_url=os.environ.get("ANTHROPIC_BASE_URL"),  # chipagent override if needed
+    )
+    message = client.messages.create(
+        model=_get_model(model),
+        max_tokens=max_tokens,
+        messages=[{"role": "user", "content": prompt}],
+    )
+    return message.content[0].text
+
+
+def _call_claude_cli(prompt: str, model: str | None, max_tokens: int = 2048,
+                     timeout: int = 300) -> str:
+    """Call Claude via the claude CLI subprocess (Claude Code)."""
+    import subprocess
     cmd = ["claude", "-p", "--output-format", "text"]
     if model:
         cmd.extend(["--model", model])
-
-    # Remove CLAUDECODE env var to allow nesting claude -p inside a
-    # Claude Code session. The guard is for interactive terminal conflicts;
-    # programmatic subprocess usage is safe. Same pattern as run_eval.py.
     env = {k: v for k, v in os.environ.items() if k != "CLAUDECODE"}
-
     result = subprocess.run(
         cmd,
         input=prompt,
@@ -47,6 +119,34 @@ def _call_claude(prompt: str, model: str | None, timeout: int = 300) -> str:
     return result.stdout
 
 
+def _call_llm(prompt: str, model: str | None, max_tokens: int = 2048,
+              timeout: int = 300) -> str:
+    """Call LLM using the configured backend."""
+    backend = os.environ.get("LLM_BACKEND", "auto").lower()
+    if backend == "chipagent":
+        return _call_chipagent(prompt, timeout)
+    elif backend == "claude_cli":
+        return _call_claude_cli(prompt, model, max_tokens, timeout)
+    elif backend == "anthropic":
+        return _call_anthropic_sdk(prompt, model, max_tokens)
+    else:
+        # auto: try chipagent → anthropic SDK → claude CLI
+        for fn in [
+            lambda: _call_chipagent(prompt, timeout),
+            lambda: _call_anthropic_sdk(prompt, model, max_tokens),
+            lambda: _call_claude_cli(prompt, model, max_tokens, timeout),
+        ]:
+            try:
+                return fn()
+            except Exception:
+                continue
+        raise RuntimeError("All LLM backends failed. Set LLM_BACKEND explicitly.")
+
+
+# ---------------------------------------------------------------------------
+# Core logic
+# ---------------------------------------------------------------------------
+
 def improve_description(
     skill_name: str,
     skill_content: str,
@@ -58,7 +158,7 @@ def improve_description(
     log_dir: Path | None = None,
     iteration: int | None = None,
 ) -> str:
-    """Call Claude to improve the description based on eval results."""
+    """Call LLM to improve the description based on eval results."""
     failed_triggers = [
         r for r in eval_results["results"]
         if r["should_trigger"] and not r["pass"]
@@ -104,7 +204,10 @@ Current scores ({scores_summary}):
         prompt += "PREVIOUS ATTEMPTS (do NOT repeat these — try something structurally different):\n\n"
         for h in history:
             train_s = f"{h.get('train_passed', h.get('passed', 0))}/{h.get('train_total', h.get('total', 0))}"
-            test_s = f"{h.get('test_passed', '?')}/{h.get('test_total', '?')}" if h.get('test_passed') is not None else None
+            test_s = (
+                f"{h.get('test_passed', '?')}/{h.get('test_total', '?')}"
+                if h.get("test_passed") is not None else None
+            )
             score_str = f"train={train_s}" + (f", test={test_s}" if test_s else "")
             prompt += f'<attempt {score_str}>\n'
             prompt += f'Description: "{h["description"]}"\n'
@@ -137,11 +240,11 @@ Here are some tips that we've found to work well in writing these descriptions:
 - The description competes with other skills for Claude's attention — make it distinctive and immediately recognizable.
 - If you're getting lots of failures after repeated attempts, change things up. Try different sentence structures or wordings.
 
-I'd encourage you to be creative and mix up the style in different iterations since you'll have multiple opportunities to try different approaches and we'll just grab the highest-scoring one at the end. 
+I'd encourage you to be creative and mix up the style in different iterations since you'll have multiple opportunities to try different approaches and we'll just grab the highest-scoring one at the end.
 
 Please respond with only the new description text in <new_description> tags, nothing else."""
 
-    text = _call_claude(prompt, model)
+    text = _call_llm(prompt, model, max_tokens=2048)
 
     match = re.search(r"<new_description>(.*?)</new_description>", text, re.DOTALL)
     description = match.group(1).strip().strip('"') if match else text.strip().strip('"')
@@ -155,11 +258,7 @@ Please respond with only the new description text in <new_description> tags, not
         "over_limit": len(description) > 1024,
     }
 
-    # Safety net: the prompt already states the 1024-char hard limit, but if
-    # the model blew past it anyway, make one fresh single-turn call that
-    # quotes the too-long version and asks for a shorter rewrite. (The old
-    # SDK path did this as a true multi-turn; `claude -p` is one-shot, so we
-    # inline the prior output into the new prompt instead.)
+    # If over limit, make a fresh call asking for a shorter rewrite
     if len(description) > 1024:
         shorten_prompt = (
             f"{prompt}\n\n"
@@ -171,14 +270,14 @@ Please respond with only the new description text in <new_description> tags, not
             f"important trigger words and intent coverage. Respond with only "
             f"the new description in <new_description> tags."
         )
-        shorten_text = _call_claude(shorten_prompt, model)
+        shorten_text = _call_llm(shorten_prompt, model, max_tokens=2048)
         match = re.search(r"<new_description>(.*?)</new_description>", shorten_text, re.DOTALL)
         shortened = match.group(1).strip().strip('"') if match else shorten_text.strip().strip('"')
 
-        transcript["rewrite_prompt"] = shorten_prompt
-        transcript["rewrite_response"] = shorten_text
+        transcript["rewrite_prompt"]      = shorten_prompt
+        transcript["rewrite_response"]    = shorten_text
         transcript["rewrite_description"] = shortened
-        transcript["rewrite_char_count"] = len(shortened)
+        transcript["rewrite_char_count"]  = len(shortened)
         description = shortened
 
     transcript["final_description"] = description
@@ -191,14 +290,23 @@ Please respond with only the new description text in <new_description> tags, not
     return description
 
 
+# ---------------------------------------------------------------------------
+# CLI entry point
+# ---------------------------------------------------------------------------
+
 def main():
     parser = argparse.ArgumentParser(description="Improve a skill description based on eval results")
     parser.add_argument("--eval-results", required=True, help="Path to eval results JSON (from run_eval.py)")
-    parser.add_argument("--skill-path", required=True, help="Path to skill directory")
-    parser.add_argument("--history", default=None, help="Path to history JSON (previous attempts)")
-    parser.add_argument("--model", required=True, help="Model for improvement")
-    parser.add_argument("--verbose", action="store_true", help="Print thinking to stderr")
+    parser.add_argument("--skill-path",   required=True, help="Path to skill directory")
+    parser.add_argument("--history",      default=None,  help="Path to history JSON (previous attempts)")
+    parser.add_argument("--model",        required=True, help="Model for improvement")
+    parser.add_argument("--verbose",      action="store_true", help="Print thinking to stderr")
+    parser.add_argument("--backend",      default=None,
+                        help="LLM backend: chipagent | anthropic | claude_cli (overrides LLM_BACKEND env var)")
     args = parser.parse_args()
+
+    if args.backend:
+        os.environ["LLM_BACKEND"] = args.backend
 
     skill_path = Path(args.skill_path)
     if not (skill_path / "SKILL.md").exists():
@@ -214,8 +322,11 @@ def main():
     current_description = eval_results["description"]
 
     if args.verbose:
-        print(f"Current: {current_description}", file=sys.stderr)
-        print(f"Score: {eval_results['summary']['passed']}/{eval_results['summary']['total']}", file=sys.stderr)
+        print(f"Backend : {os.environ.get('LLM_BACKEND', 'auto')}", file=sys.stderr)
+        print(f"Model   : {_get_model(args.model)}", file=sys.stderr)
+        print(f"Current : {current_description}", file=sys.stderr)
+        print(f"Score   : {eval_results['summary']['passed']}/{eval_results['summary']['total']}",
+              file=sys.stderr)
 
     new_description = improve_description(
         skill_name=name,
@@ -229,14 +340,13 @@ def main():
     if args.verbose:
         print(f"Improved: {new_description}", file=sys.stderr)
 
-    # Output as JSON with both the new description and updated history
     output = {
         "description": new_description,
         "history": history + [{
             "description": current_description,
-            "passed": eval_results["summary"]["passed"],
-            "failed": eval_results["summary"]["failed"],
-            "total": eval_results["summary"]["total"],
+            "passed":  eval_results["summary"]["passed"],
+            "failed":  eval_results["summary"]["failed"],
+            "total":   eval_results["summary"]["total"],
             "results": eval_results["results"],
         }],
     }

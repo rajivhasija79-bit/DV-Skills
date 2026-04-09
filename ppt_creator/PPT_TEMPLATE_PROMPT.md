@@ -830,6 +830,580 @@ Use SEAFOAM vertical divider at x=5.0.
 
 ---
 
+## 5d. Extended Layout Library II (Layouts AK–BD)
+
+> 20 additional layouts for technical, marketing, executive, and team audiences.
+
+---
+
+### ── TECHNICAL PRESENTATION ──
+
+---
+
+### Layout AK — System Architecture Diagram
+
+```
+┌──────────────────────────────────────────────┐
+│  DARK header — "System Architecture"         │
+│                                              │
+│  ┌─────────┐  →  ┌─────────┐  →  ┌────────┐│
+│  │ Block A │      │ Block B │      │Block C ││
+│  │ TEAL bg │      │SEAFOAM  │      │ MINT   ││
+│  └─────────┘      └─────────┘      └────────┘│
+│        ↕                  ↕                  │
+│  ┌─────────┐         ┌─────────┐            │
+│  │ Block D │         │ Block E │            │
+│  │ DARK bg │         │ACCENT bg│            │
+│  └─────────┘         └─────────┘            │
+│  Legend strip: colour swatch + label row     │
+└──────────────────────────────────────────────┘
+```
+- Each block: rect with coloured fill, WHITE 11pt bold label, DARKTEXT 9pt sub-label
+- Arrows: thin MUTED rects (horizontal/vertical) + arrowhead triangles
+- Legend bar at bottom: small coloured squares + MUTED 9pt labels
+- Use for system block diagrams, dataflow, pipeline architecture
+
+---
+
+### Layout AL — Code Walkthrough (Code + Annotation Side-by-Side)
+
+```
+┌──────────────────────────────────────────────┐
+│  DARK header — "How It Works: <function>"    │
+│  ┌──────────────────────┬───────────────────┐│
+│  │  CODE BLOCK  w=5.6   │  ANNOTATION w=3.8 ││
+│  │  CODEBG fill         │  LIGHTBG fill     ││
+│  │  Consolas 9pt        │  Step callouts:   ││
+│  │  line highlight      │  ① TEAL badge +  ││
+│  │  rows in TEAL/20%    │    DARKTEXT 11pt  ││
+│  │                      │  ② badge + text   ││
+│  │                      │  ③ badge + text   ││
+│  └──────────────────────┴───────────────────┘│
+└──────────────────────────────────────────────┘
+```
+- Highlighted code lines: thin TEAL rect behind the line (20% opacity approximated by TEALBG)
+- Step numbers: TEAL circle badge (WHITE number) aligned with corresponding code line
+- Use for technical demos, code reviews, onboarding
+
+---
+
+### Layout AM — Before / After Technical Diff
+
+```
+┌──────────────────────────────────────────────┐
+│  DARK header — "Before vs After"             │
+│  ┌──────────────────┬──────────────────────┐ │
+│  │ BEFORE           │ AFTER                │ │
+│  │ RED bg header    │ GREEN bg header      │ │
+│  ├──────────────────┼──────────────────────┤ │
+│  │ - old approach   │ + new approach       │ │
+│  │ RED bullet  ✗    │ GREEN bullet  ✓      │ │
+│  │ issues listed    │ improvements listed  │ │
+│  └──────────────────┴──────────────────────┘ │
+│  Bottom: MINT bar "Net Improvement: +42%"    │
+└──────────────────────────────────────────────┘
+```
+- Left pane: REDBG fill, RED header bar, RED cross bullets
+- Right pane: GREENBG fill, GREEN header bar, GREEN tick bullets
+- Summary bar at bottom: MINT bg full width, WHITE 13pt bold centred stat
+- Use for bug fixes, refactors, version comparisons, A/B results
+
+---
+
+### Layout AN — API / Interface Specification Table
+
+```
+┌──────────────────────────────────────────────┐
+│  DARK header — "API: endpoint_name"          │
+│                                              │
+│  ┌──────────────────────────────────────┐   │
+│  │ METHOD  POST    PATH  /api/v1/infer  │   │  ← CODEBG row
+│  ├──────────┬───────────┬───────────────┤   │
+│  │ Field    │ Type      │ Description   │   │
+│  ├──────────┼───────────┼───────────────┤   │
+│  │ input    │ string    │ Raw spec text │   │
+│  │ format   │ enum      │ pdf/docx/xlsx │   │
+│  │ output   │ object    │ testplan JSON │   │
+│  └──────────┴───────────┴───────────────┘   │
+│  Request / Response code block below        │
+└──────────────────────────────────────────────┘
+```
+- Method/path bar: CODEBG fill, CODEBLUE method text, CODEFG path text, Consolas 10pt
+- Table header: DARK bg, WHITE 10pt bold
+- Response example: compact CODEBG block, Consolas 9pt, CODEFG text
+- Use for API docs, interface specs, protocol definitions
+
+---
+
+### Layout AO — Debug / Error Trace Log with Annotations
+
+```
+┌──────────────────────────────────────────────┐
+│  DARK header — "Issue Analysis"              │
+│  ┌────────────────────────────────────────┐  │
+│  │ [ERROR] line 42: NullPointerException  │ ←│── RED highlight + ACCENT callout box
+│  │   at module.parse() ← CODEGRAY        │  │
+│  │ [WARN]  context 87% full ← ORANGE     │  │
+│  │ [INFO]  batch 3/5 complete ← GREEN    │  │
+│  └────────────────────────────────────────┘  │
+│  ┌──────────────────────────────────────┐    │
+│  │ Root Cause   │  Fix Applied          │    │
+│  │ REDBG text   │  GREENBG text         │    │
+│  └──────────────────────────────────────┘    │
+└──────────────────────────────────────────────┘
+```
+- Log block: CODEBG fill, colour-coded by severity (RED=error, ORANGE=warn, GREEN=info)
+- Error line: REDBG highlight rect behind the row
+- Callout arrow: ACCENT filled triangle pointing to error line
+- Root-cause / fix table below log
+- Use for post-mortems, bug triage, test failure analysis
+
+---
+
+### ── MARKETING — FANCY & FLASHY ──
+
+---
+
+### Layout AP — Gradient Splash with Floating Stat Cards
+
+```
+┌──────────────────────────────────────────────┐
+│  Full-slide DARK→TEAL diagonal gradient bg   │
+│                                              │
+│  BIG HEADLINE  WHITE 38pt bold  y=0.5        │
+│  Sub-headline  SEAFOAM 16pt     y=1.2        │
+│                                              │
+│  ┌────────┐   ┌────────┐   ┌────────┐       │
+│  │  98%   │   │  3.2x  │   │  500K  │       │
+│  │ WHITE  │   │ WHITE  │   │ WHITE  │       │
+│  │ TEAL   │   │ SEAFOAM│   │ MINT   │       │
+│  │ border │   │ border │   │ border │       │
+│  └────────┘   └────────┘   └────────┘       │
+│  Floating glow: white shadow rect behind     │
+└──────────────────────────────────────────────┘
+```
+- Background: simulate gradient with 3 overlapping dark rects, lightening left→right
+- Stat cards: WHITE bg with thick TEAL/SEAFOAM/MINT left border (0.08"), drop-shadow via offset MUTED rect
+- Big numbers: 34pt bold in matching accent colour; label below: MUTED 10pt
+- Use for product launches, marketing dashboards, headline metrics
+
+---
+
+### Layout AQ — Product Spotlight with Feature Badges
+
+```
+┌──────────────────────────────────────────────┐
+│  DARK full background                        │
+│                                              │
+│  ┌────────────────────────┐                  │
+│  │   LARGE PRODUCT IMAGE  │  Feature badge   │
+│  │   or screenshot        │  ┌──────────┐   │
+│  │   x=0.3 w=5.5 h=4.6   │  │⚡ Fast    │   │
+│  │                        │  │ TEAL bg  │   │
+│  └────────────────────────┘  ├──────────┤   │
+│                              │🔒 Secure  │   │
+│  Product name WHITE 28pt     │SEAFOAM bg│   │
+│  Tagline SEAFOAM 14pt        ├──────────┤   │
+│                              │📊 Smart  │   │
+│                              │ MINT bg  │   │
+│                              └──────────┘   │
+└──────────────────────────────────────────────┘
+```
+- Feature badges: pill-shaped rects (h=0.42), icon + label WHITE 11pt bold
+- Badges stacked right, x=6.2, evenly spaced
+- Thin ACCENT horizontal line under product name
+- Use for product demos, sales pitches, feature showcases
+
+---
+
+### Layout AR — Customer Journey Map (Swim-Lane)
+
+```
+┌──────────────────────────────────────────────┐
+│  DARK header — "Customer Journey"            │
+│  ┌────────┬──────┬──────┬──────┬────────┐   │
+│  │ Stage  │Aware │Consid│Decide│Loyalty │   │ ← DARK row
+│  ├────────┼──────┼──────┼──────┼────────┤   │
+│  │Actions │ ...  │ ...  │ ...  │ ...    │   │ ← LIGHTBG
+│  ├────────┼──────┼──────┼──────┼────────┤   │
+│  │Feeling │ 😐   │  🤔  │  😊  │  😍    │   │ ← TEALBG
+│  ├────────┼──────┼──────┼──────┼────────┤   │
+│  │Touchpnt│ ...  │ ...  │ ...  │ ...    │   │ ← SEAFOAMBG
+│  └────────┴──────┴──────┴──────┴────────┘   │
+└──────────────────────────────────────────────┘
+```
+- Stage columns: alternating TEAL/SEAFOAM/MINT top strip (h=0.06) per column
+- Row label column: DARK bg, WHITE 10pt bold
+- Emotion row: large emoji or Unicode face + sentiment label in colour
+- Use for UX research, product strategy, sales process mapping
+
+---
+
+### Layout AS — Social Proof / Testimonial Spotlight
+
+```
+┌──────────────────────────────────────────────┐
+│  DARK full background                        │
+│                                              │
+│  ❝  Large ACCENT quote mark  72pt            │
+│                                              │
+│  ┌──────────────────────────────────────┐   │
+│  │  "This tool cut our testplan effort  │   │
+│  │   by 80%. Absolutely game-changing." │   │  ← WHITE 20pt italic
+│  └──────────────────────────────────────┘   │
+│                                              │
+│  ┌──────┐  John Smith          ← WHITE 13pt │
+│  │[img] │  Senior DV Engineer  ← MUTED 11pt │
+│  │circle│  Acme Semiconductor  ← SEAFOAM 10p│
+│  └──────┘                                   │
+│  ★★★★★  ACCENT  row of stars               │
+└──────────────────────────────────────────────┘
+```
+- Quote text: WHITE 20pt italic, centred, max width 7.5"
+- Avatar: circular crop image, x=0.5, y=3.8, w=h=0.7
+- Star row: 5 × ACCENT filled small rects (star shape approx. or ★ Unicode)
+- Use for testimonials, case study quotes, review highlights
+
+---
+
+### Layout AT — Animated-Feel Progress Rings / Donut Stats
+
+```
+┌──────────────────────────────────────────────┐
+│  DARK header                                 │
+│                                              │
+│   ┌──────────┐  ┌──────────┐  ┌──────────┐  │
+│   │  ○ 94%   │  │  ○ 78%   │  │  ○ 61%   │  │
+│   │  TEAL    │  │  SEAFOAM │  │  MINT    │  │
+│   │  ring    │  │  ring    │  │  ring    │  │
+│   │  label   │  │  label   │  │  label   │  │
+│   └──────────┘  └──────────┘  └──────────┘  │
+│   Metric A      Metric B      Metric C       │
+└──────────────────────────────────────────────┘
+```
+- Simulate donut ring: large outer circle (TEAL/SEAFOAM/MINT), smaller inner circle (DARK) on top
+- Percentage text: WHITE 22pt bold centred in the inner circle
+- Fill arc approximation: draw arc wedge rects or use two overlapping ovals
+- Label below ring: DARKTEXT 11pt bold; sub-label: MUTED 9pt
+- Use for KPI % metrics, coverage stats, completion rates
+
+---
+
+### ── TOP MANAGEMENT — SUCCINCT & GRAPHICAL ──
+
+---
+
+### Layout AU — Executive Summary (3 Key Messages)
+
+```
+┌──────────────────────────────────────────────┐
+│  DARK header — "Executive Summary"           │
+│                                              │
+│  ┌──────────────────────────────────────┐   │
+│  │  ★  KEY MESSAGE 1  TEAL left border  │   │
+│  │     One-sentence headline  14pt bold │   │
+│  │     Supporting detail  11pt MUTED    │   │
+│  ├──────────────────────────────────────┤   │
+│  │  ★  KEY MESSAGE 2  SEAFOAM border   │   │
+│  ├──────────────────────────────────────┤   │
+│  │  ★  KEY MESSAGE 3  MINT border      │   │
+│  └──────────────────────────────────────┘   │
+│  Bottom-right: "Recommended Action" badge   │
+└──────────────────────────────────────────────┘
+```
+- Each message row: WHITE card, 0.06" left border in TEAL/SEAFOAM/MINT
+- Star icon: ACCENT 14pt, left of heading
+- Recommended action: ACCENT bg rect, WHITE 11pt bold, bottom-right corner
+- Use for board slides, steering committee updates, C-suite briefings
+
+---
+
+### Layout AV — One-Page Status Dashboard
+
+```
+┌──────────────────────────────────────────────┐
+│  DARK header — "Project Status — Q2 2026"   │
+│  ┌─────────────────────┬────────────────────┐│
+│  │ TRAFFIC LIGHTS  3×  │  MILESTONE TRACKER ││
+│  │ ● GREEN  On Track   │  ◼ Done  ✓         ││
+│  │ ● ORANGE At Risk    │  ◼ In Prog ~        ││
+│  │ ● RED    Blocked    │  ◼ Blocked ✗        ││
+│  ├─────────────────────┼────────────────────┤│
+│  │ RISKS (top 3)       │  NEXT ACTIONS       ││
+│  │ ① risk  ORANGE      │  → action  SEAFOAM  ││
+│  │ ② risk  RED         │  → action           ││
+│  └─────────────────────┴────────────────────┘│
+└──────────────────────────────────────────────┘
+```
+- Traffic light: filled circle (GREEN/ORANGE/RED), label DARKTEXT 11pt
+- All four quadrants in one slide — minimal text, max information density
+- Use for weekly PM updates, sprint reviews, executive check-ins
+
+---
+
+### Layout AW — Risk Heat Map (5×5 Matrix)
+
+```
+┌──────────────────────────────────────────────┐
+│  DARK header — "Risk Register"               │
+│         IMPACT →                             │
+│  L  ┌────┬────┬────┬────┬────┐              │
+│  I  │ L  │ L  │ M  │ H  │ H  │  ← row 5     │
+│  K  ├────┼────┼────┼────┼────┤              │
+│  E  │ L  │ M  │ M  │ H  │ C  │              │
+│  L  ├────┼────┼────┼────┼────┤              │
+│  I  │ L  │ M  │ H  │ C  │ C  │  cells:     │
+│  H  └────┴────┴────┴────┴────┘  L=GREEN    │
+│  O  Risk items plotted as dots  M=ORANGE   │
+│  O  with ID labels              H=RED      │
+│  D  on the matrix               C=PURPLE   │
+└──────────────────────────────────────────────┘
+```
+- Cell fill by severity: GREEN (Low) / ORANGE (Med) / RED (High) / PURPLE (Critical)
+- Cell text: WHITE 8pt bold (L/M/H/C)
+- Risk items: small DARK circle with WHITE ID number, placed in correct cell
+- Axis labels: MUTED 9pt italic; Y-axis rotated 90°
+- Use for risk management slides, QBRs, programme reviews
+
+---
+
+### Layout AX — OKR / Goals Tracker
+
+```
+┌──────────────────────────────────────────────┐
+│  DARK header — "OKRs — Q2 2026"              │
+│  Objective: [headline] ← SEAFOAM 14pt italic │
+│                                              │
+│  KR1 ▓▓▓▓▓▓▓▓░░  80%  ● GREEN  On Track    │
+│  KR2 ▓▓▓▓▓░░░░░  50%  ● ORANGE At Risk     │
+│  KR3 ▓▓▓░░░░░░░  30%  ● RED    Behind      │
+│                                              │
+│  Progress bar: TEAL fill on MUTED bg         │
+│  w=5.0, h=0.2, fill proportional to %       │
+└──────────────────────────────────────────────┘
+```
+- Objective line: SEAFOAM 14pt italic, full width, below header
+- Each KR row: label DARK 11pt bold | progress bar | % value | RAG dot + status
+- Progress bar: MUTED bg rect full width, TEAL/ORANGE/RED fill rect on top
+- Use for strategy reviews, leadership all-hands, quarterly business reviews
+
+---
+
+### Layout AY — Financial / Trend Summary with Arrows
+
+```
+┌──────────────────────────────────────────────┐
+│  DARK header — "Key Metrics Trend"           │
+│  ┌──────────┬──────────┬──────────┬────────┐ │
+│  │ Metric   │  Q1      │  Q2      │ Trend  │ │
+│  ├──────────┼──────────┼──────────┼────────┤ │
+│  │ Coverage │  72%     │  94%     │ ▲ +22% │ │ ← GREEN arrow
+│  │ TC Count │  1,200   │  1,850   │ ▲ +54% │ │ ← GREEN arrow
+│  │ Defects  │  45      │  12      │ ▼ -73% │ │ ← GREEN down (good)
+│  │ Run Time │  8h      │  11h     │ ▲ +38% │ │ ← ORANGE arrow
+│  └──────────┴──────────┴──────────┴────────┘ │
+│  Footer note: MUTED 9pt italic               │
+└──────────────────────────────────────────────┘
+```
+- Trend column: triangle arrow (▲▼) + % change; colour GREEN if positive, RED if negative
+- Current period column: TEAL tint bg to draw eye
+- Best/worst row: subtle GREENBG / REDBG highlight
+- Use for QBRs, sprint velocity, engineering metrics briefings
+
+---
+
+### ── TEAM — DETAILED EXPLANATION ──
+
+---
+
+### Layout AZ — Step-by-Step Deep Dive (Accordion)
+
+```
+┌──────────────────────────────────────────────┐
+│  DARK header — "How the Skill Works"         │
+│                                              │
+│  ▶ STEP 1 — Spec Ingestion     TEAL bg full-│
+│    Detail: what happens, inputs, outputs    │
+│    Script: spec_ingester.py                 │
+│  ▶ STEP 2 — FID Extraction   SEAFOAM bg    │
+│    Detail...                                │
+│  ▶ STEP 3 — Testplan Gen     MINT bg       │
+│    Detail...                                │
+│  ▶ STEP 4 — Excel Formatter  DARK bg       │
+│    Detail...                                │
+└──────────────────────────────────────────────┘
+```
+- Each step: full-width rect, alternating TEALBG/SEAFOAMBG/LIGHTBG/GREENBG
+- Step header: TEAL/SEAFOAM/MINT/DARK left border 0.06" + step label 12pt bold DARK
+- Detail text: 10pt DARKTEXT indented under header
+- Expand indicator: ▶ triangle in matching accent colour
+- Use for technical walkthroughs, onboarding docs, design reviews
+
+---
+
+### Layout BA — Swimlane / RACI Chart
+
+```
+┌──────────────────────────────────────────────┐
+│  DARK header — "Responsibility Matrix"       │
+│         Person A  Person B  Person C  Tool   │
+│ Task 1 │   R    │         │    A    │   I   │
+│ Task 2 │        │    R    │    A    │   C   │
+│ Task 3 │   C    │    R    │         │   I   │
+│ ────── │────────│─────────│─────────│──────│
+│ Legend: R=Responsible A=Accountable          │
+│         C=Consulted   I=Informed             │
+└──────────────────────────────────────────────┘
+```
+- R cells: TEAL bg, WHITE bold; A cells: SEAFOAM; C cells: MINT; I cells: MUTED/light
+- Row headers: DARK bg, WHITE 10pt; Column headers: DARK bg, WHITE 10pt
+- Legend bar at bottom: coloured squares + MUTED 9pt labels
+- Use for project planning, sprint task boards, cross-team coordination
+
+---
+
+### Layout BB — Decision Tree / Flowchart
+
+```
+┌──────────────────────────────────────────────┐
+│  DARK header — "Decision Flow"               │
+│                                              │
+│          ┌─────────────┐                    │
+│          │  CONDITION? │ ← TEAL diamond     │
+│          └──────┬──────┘                    │
+│         YES ↙       ↘ NO                    │
+│   ┌──────────┐   ┌──────────┐               │
+│   │ Action A │   │ Action B │               │
+│   │ GREEN bg │   │ ORANGE bg│               │
+│   └──────────┘   └─────┬────┘               │
+│                        ↓                    │
+│                  ┌──────────┐               │
+│                  │ Action C │               │
+│                  │ DARK bg  │               │
+│                  └──────────┘               │
+└──────────────────────────────────────────────┘
+```
+- Decision diamond: TEAL bg, WHITE 11pt bold, built from 2 rotated rects (rhombus)
+- Action boxes: rounded rect with matching fill, WHITE text
+- Arrows: thin MUTED rects + triangle arrowheads
+- YES/NO labels: SEAFOAM 9pt bold on connector lines
+- Use for troubleshooting guides, process flows, if/else logic explanations
+
+---
+
+### Layout BC — Detailed Specification / Attribute Table
+
+```
+┌──────────────────────────────────────────────┐
+│  DARK header — "Spec: <component name>"      │
+│  ┌──────────────┬────────────────────────┐  │
+│  │ Attribute    │  Value / Description   │  │
+│  ├──────────────┼────────────────────────┤  │
+│  │ Type         │  AXI4-Stream           │  │
+│  │ Width        │  512-bit               │  │
+│  │ Clock Domain │  core_clk (500 MHz)    │  │
+│  │ Reset        │  Active-low async      │  │
+│  │ Protocol     │  TileLink / APB        │  │
+│  │ Notes        │  Multi-line note text  │  │
+│  └──────────────┴────────────────────────┘  │
+│  Tag row: TEAL "v2.1" + SEAFOAM "Verified"  │
+└──────────────────────────────────────────────┘
+```
+- Attribute column: DARK bg, WHITE 10pt bold, w=3.2"
+- Value column: alternating WHITE/STRIPALT, DARKTEXT 10pt, w=6.4"
+- Multi-line value rows: auto-height, 0.1" padding
+- Tag badges bottom: version, status, owner in pill badges
+- Use for interface specs, register maps, design constraints, test configs
+
+---
+
+### Layout BD — Retrospective / Lessons Learned (3-Column)
+
+```
+┌──────────────────────────────────────────────┐
+│  DARK header — "Retrospective"               │
+│  ┌────────────┬────────────┬────────────┐   │
+│  │ ✓ WORKED   │ ✗ IMPROVE  │ → NEXT     │   │
+│  │ GREEN hdr  │ RED hdr    │ TEAL hdr   │   │
+│  ├────────────┼────────────┼────────────┤   │
+│  │ • point    │ • point    │ • action   │   │
+│  │ • point    │ • point    │ • action   │   │
+│  │ • point    │ • point    │ • action   │   │
+│  └────────────┴────────────┴────────────┘   │
+│  Team vote dots (coloured circles) optional  │
+└──────────────────────────────────────────────┘
+```
+- Column headers: GREEN / RED / TEAL bg with WHITE icon + label 13pt bold
+- Bullet points: matching colour dots (GREEN/RED/TEAL) + DARKTEXT 11pt
+- Optional: small coloured dot clusters below each item = team vote count
+- 4th column variant: add "OWNER" column for action owners
+- Use for sprint retros, post-mortems, project close-outs, team learning sessions
+
+---
+
+## 5c. Layout Quick-Reference Index
+
+| ID | Name | Best For |
+|----|------|----------|
+| A | Dark Title | First slide, last slide |
+| B | Section Divider | Between major sections |
+| C | Light Content | Standard body slide |
+| D | Two-Column | Side-by-side comparisons |
+| E | Metric / Stats | KPI dashboards |
+| F | Table | Data tables |
+| G | Code Block | Technical/code content |
+| H | Picture Left | Image + bullets (image emphasis) |
+| I | Picture Right | Image + bullets (text emphasis) |
+| J | Top Picture Banner | Story / scene-setting opener |
+| K | Bottom Picture Strip | Content + visual footer |
+| L | 2×2 Picture Grid | Galleries, multi-product |
+| M | Polaroid Cards | Portfolio, case studies |
+| N | Hero Image Overlay | Impact opener, cover slide |
+| O | Magazine Mosaic | Editorial, news-style |
+| P | Comparison Table | Feature matrix, options |
+| Q | Scorecard (RAG) | Status reports, health checks |
+| R | Table + Findings | Data + insight side-by-side |
+| S | Table with Thumbnails | Product/asset catalogues |
+| T | Profile Cards Grid | Team, stakeholders |
+| U | Process Flow | Step-by-step workflow |
+| V | Cycle Diagram | Iterative / circular process |
+| W | Hierarchy / Org Chart | Org structure, dependency tree |
+| X | Pyramid | Priority levels, maturity model |
+| Y | Venn / Relations | Overlap, shared concepts |
+| Z | 2×2 Matrix | Strategy, prioritisation |
+| AA | Funnel | Pipeline, conversion stages |
+| AB | Timeline | Roadmap, milestones |
+| AC | Radial Hub-and-Spoke | Central concept + dependencies |
+| AD | Staircase | Growth, progression, maturity |
+| AE | Pros / Cons | Trade-off analysis |
+| AF | Icon Grid | Feature overview, capabilities |
+| AG | Numbered List | Top-N lists, ordered steps |
+| AH | Fishbone | Root-cause analysis |
+| AI | Agenda / TOC | Presentation structure slide |
+| AJ | Big Quote | Key finding, closing impact |
+| AK | Architecture Diagram | System block diagrams, dataflow |
+| AL | Code Walkthrough | Technical demos, code review |
+| AM | Before / After Diff | Refactors, A/B, version compare |
+| AN | API / Interface Spec | API docs, protocol definitions |
+| AO | Debug / Error Trace | Post-mortems, bug triage |
+| AP | Gradient Splash Stats | Product launches, headline metrics |
+| AQ | Product Spotlight | Sales pitches, feature showcases |
+| AR | Customer Journey Map | UX research, sales process |
+| AS | Testimonial Spotlight | Case studies, social proof |
+| AT | Progress Rings / Donut | Coverage %, KPI completion |
+| AU | Executive Summary | Board slides, C-suite briefings |
+| AV | Status Dashboard | PM updates, sprint reviews |
+| AW | Risk Heat Map | Risk register, programme reviews |
+| AX | OKR Tracker | Strategy reviews, all-hands |
+| AY | Trend Summary + Arrows | QBRs, engineering metrics |
+| AZ | Step-by-Step Deep Dive | Technical walkthroughs, onboarding |
+| BA | Swimlane / RACI | Sprint boards, cross-team planning |
+| BB | Decision Tree | Troubleshooting, logic flows |
+| BC | Spec / Attribute Table | Interface specs, register maps |
+| BD | Retrospective | Sprint retros, post-mortems |
+
+---
+
 ## 6. Spacing Rules
 
 | Rule | Value |

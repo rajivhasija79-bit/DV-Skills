@@ -36,6 +36,8 @@ class DVWizardHandler(http.server.SimpleHTTPRequestHandler):
             self._handle_load_project()
         elif parsed.path == '/api/save-project':
             self._handle_save_project()
+        elif parsed.path == '/api/scan-directory':
+            self._handle_scan_directory()
         else:
             self.send_error(404, 'Not Found')
 
@@ -93,6 +95,148 @@ class DVWizardHandler(http.server.SimpleHTTPRequestHandler):
             self._json_response(400, {'error': 'Invalid JSON'})
         except PermissionError:
             self._json_response(500, {'error': f'Permission denied writing to {tb_root}'})
+        except Exception as e:
+            self._json_response(500, {'error': str(e)})
+
+    def _handle_scan_directory(self):
+        """Scan TB root directory for IPs, VIPs, and SSes based on naming conventions.
+
+        Naming rules:
+          - IP directories contain '_ip' in their name (e.g., pcie_ip, dma_ip, usb_ip)
+          - VIP directories contain '_vip' in their name (e.g., axi_vip, apb_vip)
+          - SS directories contain '_ss' in their name (e.g., pcie_ss, dma_ss)
+        Directories not following these conventions are flagged with warnings.
+        """
+        import re
+
+        try:
+            content_length = int(self.headers.get('Content-Length', 0))
+            body = self.rfile.read(content_length)
+            payload = json.loads(body)
+
+            scan_path = payload.get('path', '')
+            scan_depth = payload.get('depth', 2)  # how many levels deep to scan
+
+            if not scan_path or not os.path.isdir(scan_path):
+                self._json_response(200, {'found': False, 'reason': 'Directory does not exist'})
+                return
+
+            ips = []
+            vips = []
+            sses = []
+            warnings = []
+
+            def classify_dir(dirpath, dirname, depth):
+                """Classify a directory based on naming convention."""
+                name_lower = dirname.lower()
+                rel_path = os.path.relpath(dirpath, scan_path)
+                has_ip = '_ip' in name_lower
+                has_vip = '_vip' in name_lower
+                has_ss = '_ss' in name_lower
+
+                # Count how many conventions match
+                matches = sum([has_ip, has_vip, has_ss])
+
+                if matches == 0:
+                    # Skip common known directories
+                    skip_names = {'dv', 'rtl', 'env', 'tb', 'tests', 'sequences', 'docs',
+                                  'common', 'scripts', 'firmware', '.git', '.claude',
+                                  'src', 'soc_top', 'test_project', '__pycache__'}
+                    if dirname.lower() not in skip_names and not dirname.startswith('.'):
+                        warnings.append({
+                            'path': rel_path,
+                            'name': dirname,
+                            'message': f"'{dirname}' does not follow naming convention (_ip, _vip, or _ss). Cannot auto-classify."
+                        })
+                    return
+
+                if matches > 1:
+                    warnings.append({
+                        'path': rel_path,
+                        'name': dirname,
+                        'message': f"'{dirname}' matches multiple conventions. Ambiguous classification."
+                    })
+
+                # Scan for sub-VIPs inside this directory
+                sub_vips = []
+                if os.path.isdir(dirpath):
+                    for sub in sorted(os.listdir(dirpath)):
+                        sub_full = os.path.join(dirpath, sub)
+                        if os.path.isdir(sub_full) and '_vip' in sub.lower():
+                            sub_vips.append({'name': sub, 'path': os.path.relpath(sub_full, scan_path)})
+                        # Also check inside dv/ subdirectory
+                    dv_dir = os.path.join(dirpath, 'dv')
+                    if os.path.isdir(dv_dir):
+                        for sub in sorted(os.listdir(dv_dir)):
+                            sub_full = os.path.join(dv_dir, sub)
+                            if os.path.isdir(sub_full) and '_vip' in sub.lower():
+                                sub_vips.append({'name': sub, 'path': os.path.relpath(sub_full, scan_path)})
+
+                entry = {
+                    'name': dirname,
+                    'path': rel_path,
+                    'full_path': dirpath,
+                    'vips': sub_vips,
+                }
+
+                if has_vip and not has_ip and not has_ss:
+                    vips.append(entry)
+                elif has_ip and not has_vip:
+                    ips.append(entry)
+                elif has_ss:
+                    # For SS, also scan for sub-IPs
+                    sub_ips = []
+                    for sub in sorted(os.listdir(dirpath)):
+                        sub_full = os.path.join(dirpath, sub)
+                        if os.path.isdir(sub_full) and '_ip' in sub.lower():
+                            # Get VIPs inside this sub-IP
+                            ip_vips = []
+                            for vdir in sorted(os.listdir(sub_full)):
+                                vfull = os.path.join(sub_full, vdir)
+                                if os.path.isdir(vfull) and '_vip' in vdir.lower():
+                                    ip_vips.append({'name': vdir, 'path': os.path.relpath(vfull, scan_path)})
+                            dv_sub = os.path.join(sub_full, 'dv')
+                            if os.path.isdir(dv_sub):
+                                for vdir in sorted(os.listdir(dv_sub)):
+                                    vfull = os.path.join(dv_sub, vdir)
+                                    if os.path.isdir(vfull) and '_vip' in vdir.lower():
+                                        ip_vips.append({'name': vdir, 'path': os.path.relpath(vfull, scan_path)})
+                            sub_ips.append({
+                                'name': sub,
+                                'path': os.path.relpath(sub_full, scan_path),
+                                'vips': ip_vips,
+                            })
+                    entry['ips'] = sub_ips
+                    sses.append(entry)
+
+            # Scan top-level directories
+            for item in sorted(os.listdir(scan_path)):
+                item_path = os.path.join(scan_path, item)
+                if not os.path.isdir(item_path) or item.startswith('.'):
+                    continue
+                classify_dir(item_path, item, 0)
+
+                # Scan one level deeper for IPs inside SSes (already handled in classify_dir for _ss)
+                # Also scan 'common' directory for VIPs
+                if item.lower() == 'common':
+                    for sub in sorted(os.listdir(item_path)):
+                        sub_path = os.path.join(item_path, sub)
+                        if os.path.isdir(sub_path):
+                            classify_dir(sub_path, sub, 1)
+
+            self._json_response(200, {
+                'found': True,
+                'ips': ips,
+                'vips': vips,
+                'sses': sses,
+                'warnings': warnings,
+                'scanned_path': scan_path,
+            })
+
+        except json.JSONDecodeError:
+            self._json_response(400, {'error': 'Invalid JSON'})
+        except PermissionError:
+            self._json_response(500, {'error': f'Permission denied reading directory'})
         except Exception as e:
             self._json_response(500, {'error': str(e)})
 

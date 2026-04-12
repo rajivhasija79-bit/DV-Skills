@@ -3957,6 +3957,23 @@ function refreshExecUI() {
     if (!hasAny) icon.classList.remove('has-file');
   }
   updateExecLoadedInfo();
+  // Update execute button text based on TB type
+  updateExecuteButtonText();
+}
+
+function getExecuteLabel() {
+  const tbType = state.tbType || 'IP';
+  const compName = state.tbComponentName || '';
+  const labels = { IP: 'Generate IP', SS: 'Generate SS', SoC: 'Generate SoC', VIP: 'Generate VIP' };
+  const label = labels[tbType] || 'Execute Task';
+  return compName ? label + ' — ' + compName : label;
+}
+
+function updateExecuteButtonText() {
+  const btn = document.getElementById('executeBtn');
+  if (btn && !btn.disabled) {
+    btn.innerHTML = '🚀 ' + getExecuteLabel();
+  }
 }
 
 function updateExecLoadedInfo() {
@@ -3998,60 +4015,172 @@ function executeTask() {
   const body = document.getElementById('terminalBody');
   body.innerHTML = '<span class="term-cursor" id="termCursor"></span>';
 
-  const task = state.tasks.find(t => t.id === state.selectedTask);
-  const taskName = task ? task.name : 'Task';
   const tbType = state.tbType || 'IP';
-  const proj = state.projectName || 'project';
+  const scriptMap = { IP: 'generate_ip.py', SS: 'generate_ss.py', SoC: 'generate_soc.py', VIP: 'generate_vip.py' };
+  const scriptName = scriptMap[tbType] || 'generate_ip.py';
 
-  const defaultLines = [
-    `<span class="prefix">[DV-Wizard]</span> <span class="info">Starting ${taskName}...</span>`,
-    `<span class="prefix">[DV-Wizard]</span> <span class="info">Reading configuration...</span>`,
-    `<span class="prefix">[DV-Wizard]</span> <span class="info">Project: <span class="highlight">${proj}</span></span>`,
-    `<span class="prefix">[DV-Wizard]</span> <span class="info">TB Type: <span class="highlight">${tbType}</span></span>`,
-    `<span class="prefix">[DV-Wizard]</span> <span class="info">${tbType} Name: <span class="highlight">${state.tbComponentName || proj}</span></span>`,
-    `<span class="prefix">[DV-Wizard]</span> <span class="info">Sim Tool: <span class="highlight">${state.simTool}</span></span>`,
-    `<span class="prefix">[DV-Wizard]</span> <span class="info">Executing: <span class="highlight">scripts/tb_generator.sh</span></span>`,
-    `<span class="prefix">[DV-Wizard]</span> <span class="info">Initializing workspace...</span>`,
-    `<span class="prefix">[DV-Wizard]</span> <span class="success">✓ Directory structure created</span>`,
-    `<span class="prefix">[DV-Wizard]</span> <span class="success">✓ UVM base classes resolved</span>`,
-    `<span class="prefix">[DV-Wizard]</span> <span class="success">✓ Top-level TB files generated</span>`,
-    `<span class="prefix">[DV-Wizard]</span> <span class="success">✓ Interface files created</span>`,
-    `<span class="prefix">[DV-Wizard]</span> <span class="success">✓ VIP integration complete</span>`,
-    `<span class="prefix">[DV-Wizard]</span> <span class="success">✓ Environment class generated</span>`,
-    `<span class="prefix">[DV-Wizard]</span> <span class="success">✓ Scoreboard &amp; coverage model added</span>`,
-    `<span class="prefix">[DV-Wizard]</span> <span class="success">✓ Makefile generated</span>`,
-    `<span class="prefix">[DV-Wizard]</span> <span class="success">✓ .f file lists compiled</span>`,
-    `<span class="prefix">[DV-Wizard]</span> <span class="highlight">🎉 ${taskName} Complete!</span>`,
-  ];
-
-  // Use custom script lines for this TB type if loaded, otherwise fall back to default
-  const activeScript = getActiveScriptLines();
-  const lines = activeScript
-    ? activeScript.map(l => `<span class="info">${escapeHtml(l)}</span>`)
-    : defaultLines;
+  // Build the config payload to send to the script
+  const execPayload = buildExecutePayload();
 
   const cursor = document.getElementById('termCursor');
-  let i = 0;
-  function printLine() {
-    if (i >= lines.length) {
-      if (cursor) cursor.remove();
-      btn.disabled = false;
-      btn.innerHTML = '✓ Completed — Run Again';
-      // Register generated components to localStorage
-      registerGeneratedComponents();
-      renderRegistryBadge();
-      updateStep1RegistryCount();
-      return;
-    }
+
+  // Helper to print a line in the terminal
+  function addTermLine(html) {
     const span = document.createElement('div');
     span.className = 'term-line';
-    span.innerHTML = lines[i];
+    span.innerHTML = html;
     body.insertBefore(span, cursor);
     body.scrollTop = body.scrollHeight;
-    i++;
-    setTimeout(printLine, 180 + Math.random() * 200);
   }
-  setTimeout(printLine, 300);
+
+  addTermLine(`<span class="prefix">[DV-Wizard]</span> <span class="info">Launching script: <span class="highlight">scripts/${escapeHtml(scriptName)}</span></span>`);
+  addTermLine(`<span class="prefix">[DV-Wizard]</span> <span class="info">Sending configuration...</span>`);
+
+  // Call the backend API
+  fetch('/api/execute', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(execPayload),
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.lines && data.lines.length > 0) {
+      // Stream the output lines with a delay for visual effect
+      let i = 0;
+      function printLine() {
+        if (i >= data.lines.length) {
+          if (cursor) cursor.remove();
+          // Show success/failure
+          if (data.success) {
+            addTermLine(`<span class="prefix">[DV-Wizard]</span> <span class="success">✓ Script completed successfully (exit code ${data.return_code})</span>`);
+            btn.innerHTML = '✓ ' + getExecuteLabel() + ' — Complete';
+          } else {
+            addTermLine(`<span class="prefix">[DV-Wizard]</span> <span style="color:var(--red)">✗ Script failed (exit code ${data.return_code})</span>`);
+            btn.innerHTML = '⚠ Failed — Retry ' + getExecuteLabel();
+          }
+          btn.disabled = false;
+          registerGeneratedComponents();
+          renderRegistryBadge();
+          updateStep1RegistryCount();
+          return;
+        }
+        const line = data.lines[i];
+        // Color-code based on content
+        let html;
+        if (line.includes('✓') || line.includes('🎉')) {
+          html = `<span class="success">${escapeHtml(line)}</span>`;
+        } else if (line.includes('[stderr]') || line.includes('ERROR') || line.includes('Error')) {
+          html = `<span style="color:var(--red)">${escapeHtml(line)}</span>`;
+        } else if (line.includes('───') || line.includes('Starting') || line.includes('Launching')) {
+          html = `<span class="highlight">${escapeHtml(line)}</span>`;
+        } else {
+          html = `<span class="info">${escapeHtml(line)}</span>`;
+        }
+        addTermLine(html);
+        i++;
+        setTimeout(printLine, 80 + Math.random() * 120);
+      }
+      setTimeout(printLine, 200);
+    } else {
+      addTermLine(`<span class="prefix">[DV-Wizard]</span> <span style="color:var(--red)">No output from script</span>`);
+      if (data.error) addTermLine(`<span style="color:var(--red)">${escapeHtml(data.error)}</span>`);
+      if (cursor) cursor.remove();
+      btn.disabled = false;
+      btn.innerHTML = '⚠ Failed — Retry ' + getExecuteLabel();
+    }
+  })
+  .catch(err => {
+    addTermLine(`<span class="prefix">[DV-Wizard]</span> <span style="color:var(--red)">Connection error: ${escapeHtml(err.message)}</span>`);
+    addTermLine(`<span class="info">Make sure the server is running: python3 serve.py</span>`);
+    if (cursor) cursor.remove();
+    btn.disabled = false;
+    btn.innerHTML = '⚠ Error — Retry ' + getExecuteLabel();
+  });
+}
+
+// Build the payload to send to the generation script
+function buildExecutePayload() {
+  const tbType = state.tbType || 'IP';
+  const payload = {
+    tb_type: tbType,
+    component_name: state.tbComponentName || 'unknown',
+    project: {
+      name: state.projectName || '',
+      tb_root: state.tbRootDir || '.',
+      project_root: state.projectRootDir || '',
+      rtl_root: state.rtlRootDir || '',
+      sim_root: state.simRoot || '',
+      sim_tool: state.simTool || 'VCS',
+    },
+  };
+
+  if (tbType === 'IP') {
+    payload.vips = (vipData.ip || []).filter(Boolean).map(v => ({
+      name: v.name, mode: v.mode, type: v.type, count: v.count,
+    }));
+    payload.ral = {
+      enabled: !!document.getElementById('ipRalYes')?.classList.contains('active'),
+      path: document.getElementById('ipRalPath')?.value || '',
+      interface: document.getElementById('ipRalRegIf')?.value || '',
+    };
+    payload.c_model = {
+      enabled: !!document.getElementById('ipCModelYes')?.classList.contains('active'),
+      c_code_dir: document.getElementById('ipCCodeDir')?.value || '',
+      makefile: document.getElementById('ipMakefilePath')?.value || '',
+    };
+  }
+
+  if (tbType === 'SS') {
+    payload.ips = ssIpData.filter(Boolean).map(ip => ({
+      name: ip.name, count: ip.count || 1,
+      vips: (ip.vips || []).filter(Boolean).map(v => ({ name: v.name, mode: v.mode })),
+    }));
+    payload.vips = (vipData.ss || []).filter(Boolean).map(v => ({
+      name: v.name, mode: v.mode, type: v.type, count: v.count,
+    }));
+    payload.ral = {
+      enabled: !!document.getElementById('ssRalYes')?.classList.contains('active'),
+      path: document.getElementById('ssRalPath')?.value || '',
+      interface: document.getElementById('ssRalRegIf')?.value || '',
+    };
+    payload.c_model = {
+      enabled: !!document.getElementById('ssCModelYes')?.classList.contains('active'),
+      c_code_dir: document.getElementById('ssCCodeDir')?.value || '',
+      makefile: document.getElementById('ssMakefilePath')?.value || '',
+    };
+  }
+
+  if (tbType === 'SoC') {
+    payload.components = socSsData.filter(Boolean).map(comp => ({
+      name: comp.name, type: comp.componentType || 'SS', count: comp.count || 1,
+      vips: (comp.vips || []).filter(Boolean).map(v => ({ name: v.name, mode: v.mode, source: v.source || '' })),
+    }));
+    payload.vips = (vipData.soc || []).filter(Boolean).map(v => ({
+      name: v.name, mode: v.mode, type: v.type, count: v.count,
+    }));
+    payload.ral = {
+      enabled: !!document.getElementById('socRalYes')?.classList.contains('active'),
+      path: document.getElementById('socRalPath')?.value || '',
+      interface: document.getElementById('socRalRegIf')?.value || '',
+    };
+    payload.c_model = {
+      enabled: !!document.getElementById('socCModelYes')?.classList.contains('active'),
+      c_code_dir: document.getElementById('socCCodeDir')?.value || '',
+      makefile: document.getElementById('socMakefilePath')?.value || '',
+    };
+  }
+
+  if (tbType === 'VIP') {
+    payload.vip_info = {
+      output_path: document.getElementById('vipOutputPath')?.value || '',
+      protocol: document.getElementById('vipProtocol')?.value || '',
+      bus_width: document.getElementById('vipBusWidth')?.value || '',
+      mode: state.vipGen_mode || 'Master',
+      spec_path: document.getElementById('vipSpecPath')?.value || '',
+    };
+  }
+
+  return payload;
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -4522,7 +4651,7 @@ function newTask() {
   document.getElementById('ssIpCount').textContent = '0';
   document.getElementById('terminalWrap').style.display = 'none';
   document.getElementById('executeBtn').disabled = false;
-  document.getElementById('executeBtn').innerHTML = '▶ Execute Task';
+  document.getElementById('executeBtn').innerHTML = '🚀 Execute Task';
   execClearFile();
 
   // Go to Step 2

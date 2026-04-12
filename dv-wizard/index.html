@@ -1562,6 +1562,11 @@
                   <span class="path-hint" title="Browse">📁</span>
                 </div>
                 <div class="form-error" id="err-tbRootDir">TB root directory is required</div>
+                <div id="resetAutoPopulateWrap" style="display:none;grid-column:1/-1;margin-top:4px">
+                  <div class="add-row-btn" onclick="resetAndRePopulate()" style="background:rgba(0,201,167,0.06);border-color:rgba(0,201,167,0.25);font-size:0.78rem;padding:8px 14px">
+                    🔄 Reset &amp; Re-populate from proj.config
+                  </div>
+                </div>
               </div>
               <div class="form-group">
                 <label class="form-label">Project Root Directory <span class="required">*</span></label>
@@ -4934,12 +4939,29 @@ function showConfigLoadedBanner(show) {
     banner.style.cssText = 'display:none;padding:10px 14px;background:rgba(0,201,167,0.08);border:1px solid rgba(0,201,167,0.2);border-radius:var(--radius-sm);font-size:0.8rem;color:var(--teal);margin-top:8px;grid-column:1/-1;display:flex;align-items:center;gap:8px';
     tbRootGroup.parentElement.appendChild(banner);
   }
+  const resetWrap = document.getElementById('resetAutoPopulateWrap');
   if (show) {
     banner.style.display = 'flex';
     banner.innerHTML = '<span>✓</span> <span>Existing <strong>proj.config</strong> found — all fields auto-populated from previous session.</span>';
+    if (resetWrap) resetWrap.style.display = '';
   } else {
     banner.style.display = 'none';
+    if (resetWrap) resetWrap.style.display = 'none';
   }
+}
+
+function resetAndRePopulate() {
+  const tbRoot = state.tbRootDir;
+  if (!tbRoot || !tbRoot.trim()) {
+    alert('Please enter a TB Root Directory first.');
+    return;
+  }
+  const proceed = confirm('This will reset ALL form fields and re-populate from the existing proj.config.\n\nAny unsaved changes will be lost. Continue?');
+  if (!proceed) return;
+
+  _projectLoadedFromConfig = false;
+  _userWarnedAboutOverride = false;
+  tryLoadProjectConfig(tbRoot.trim());
 }
 
 // Called when user changes any auto-populated field

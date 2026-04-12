@@ -1,0 +1,4684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DV Wizard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #101827;
+    --bg2: #0c1320;
+    --bg3: #161f30;
+    --card: rgba(255,255,255,0.035);
+    --card-hover: rgba(255,255,255,0.06);
+    --border: rgba(255,255,255,0.07);
+    --border-active: rgba(94,186,169,0.45);
+    --teal: #5EBAA9;
+    --teal2: #3D8B8B;
+    --teal-glow: rgba(94,186,169,0.1);
+    --teal-dim: rgba(94,186,169,0.55);
+    --text: #E2E8F0;
+    --text2: #94A3B8;
+    --text3: #4B5563;
+    --red: #F87171;
+    --red-dim: rgba(248,113,113,0.12);
+    --yellow: #FBBF24;
+    --sidebar-w: 260px;
+    --radius: 10px;
+    --radius-sm: 7px;
+    --shadow: 0 6px 24px rgba(0,0,0,0.35);
+    --shadow-teal: 0 0 24px rgba(94,186,169,0.1);
+  }
+
+  /* ── LIGHT MODE ── */
+  [data-theme="light"] {
+    --bg: #F8FAFC;
+    --bg2: #F1F5F9;
+    --bg3: #FFFFFF;
+    --card: rgba(255,255,255,0.9);
+    --card-hover: rgba(255,255,255,0.98);
+    --border: rgba(15,23,42,0.08);
+    --border-active: rgba(59,148,134,0.4);
+    --teal: #3B9486;
+    --teal2: #2D7A72;
+    --teal-glow: rgba(59,148,134,0.08);
+    --teal-dim: rgba(59,148,134,0.6);
+    --text: #1E293B;
+    --text2: #64748B;
+    --text3: #94A3B8;
+    --red: #EF4444;
+    --red-dim: rgba(239,68,68,0.08);
+    --yellow: #D97706;
+    --shadow: 0 2px 12px rgba(0,0,0,0.06);
+    --shadow-teal: 0 0 16px rgba(59,148,134,0.08);
+  }
+  [data-theme="light"] body::before {
+    background:
+      radial-gradient(ellipse 60% 40% at 15% 8%, rgba(59,148,134,0.03) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 50% at 85% 85%, rgba(45,122,114,0.02) 0%, transparent 60%);
+  }
+  [data-theme="light"] .sidebar {
+    background: rgba(255,255,255,0.95);
+    border-right-color: rgba(15,23,42,0.06);
+  }
+  [data-theme="light"] .progress-bar-wrap {
+    background: rgba(255,255,255,0.95);
+    border-bottom-color: rgba(15,23,42,0.06);
+  }
+  [data-theme="light"] .glass-card {
+    background: #FFFFFF;
+    border-color: rgba(15,23,42,0.07);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 0 0 1px rgba(15,23,42,0.03);
+  }
+  [data-theme="light"] .dynamic-row {
+    background: rgba(15,23,42,0.015);
+    border-color: rgba(15,23,42,0.06);
+  }
+  [data-theme="light"] .form-input {
+    background: rgba(15,23,42,0.03);
+    color: var(--text);
+    border-color: rgba(15,23,42,0.1);
+  }
+  [data-theme="light"] .form-input:focus {
+    background: rgba(59,148,134,0.03);
+    box-shadow: 0 0 0 3px rgba(59,148,134,0.06);
+  }
+  [data-theme="light"] .form-select {
+    background: rgba(15,23,42,0.03);
+    color: var(--text);
+  }
+  [data-theme="light"] #hierarchyTree {
+    background: rgba(0,0,0,0.04);
+  }
+  [data-theme="light"] .terminal-wrap {
+    background: #1a1a2e;
+  }
+  [data-theme="light"] .terminal-bar {
+    background: #151525;
+  }
+  [data-theme="light"] .terminal-body {
+    color: #E8F0FE;
+  }
+  [data-theme="light"] .json-preview {
+    background: #1a1a2e;
+    color: #E8F0FE;
+  }
+  [data-theme="light"] .toggle-pill {
+    background: rgba(15,23,42,0.03);
+    color: var(--text2);
+    border-color: rgba(15,23,42,0.08);
+  }
+  [data-theme="light"] .toggle-pill.active {
+    background: var(--teal);
+    color: #fff;
+    box-shadow: 0 1px 4px rgba(59,148,134,0.2);
+  }
+  [data-theme="light"] .modal {
+    background: #fff;
+    border-color: rgba(0,0,0,0.1);
+  }
+
+  /* Theme toggle switch */
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    cursor: pointer;
+  }
+  .theme-toggle-label {
+    font-size: 0.75rem;
+    color: var(--text2);
+  }
+  .theme-switch {
+    position: relative;
+    width: 40px;
+    height: 22px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 11px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  .theme-switch::after {
+    content: '';
+    position: absolute;
+    top: 2px; left: 2px;
+    width: 16px; height: 16px;
+    background: var(--teal);
+    border-radius: 50%;
+    transition: transform 0.3s;
+    box-shadow: 0 0 6px rgba(0,201,167,0.3);
+  }
+  .theme-switch.light::after {
+    transform: translateX(18px);
+  }
+  .theme-switch.light {
+    background: rgba(0,0,0,0.08);
+  }
+
+  html { font-size: 15px; scroll-behavior: smooth; }
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Animated background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 40% at 15% 8%, rgba(94,186,169,0.04) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 50% at 85% 85%, rgba(61,139,139,0.03) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── LAYOUT ── */
+  .app { display: flex; min-height: 100vh; position: relative; z-index: 1; }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: var(--sidebar-w);
+    background: rgba(12,19,32,0.88);
+    backdrop-filter: blur(24px);
+    border-right: 1px solid rgba(255,255,255,0.05);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    z-index: 100;
+    padding: 0;
+  }
+
+  /* Company logo placeholder */
+  .company-logo-wrap {
+    padding: 20px 24px 0;
+    display: flex;
+    justify-content: center;
+  }
+  .company-logo {
+    width: 150px; height: 150px;
+    border-radius: 10px;
+    border: 2px dashed var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    overflow: hidden;
+    background: rgba(255,255,255,0.02);
+    position: relative;
+  }
+  .company-logo:hover {
+    border-color: var(--teal);
+    background: var(--teal-glow);
+  }
+  .company-logo img {
+    width: 100%; height: 100%;
+    object-fit: contain;
+  }
+  .company-logo-placeholder {
+    text-align: center;
+    color: var(--text3);
+    font-size: 0.65rem;
+    line-height: 1.4;
+    padding: 8px;
+  }
+  .company-logo-placeholder span {
+    display: block;
+    font-size: 24px;
+    margin-bottom: 4px;
+    opacity: 0.4;
+  }
+  .company-logo.has-image {
+    border-style: solid;
+    border-color: var(--border);
+  }
+  .company-logo.has-image:hover {
+    border-color: var(--teal);
+  }
+  [data-theme="light"] .company-logo {
+    background: rgba(0,0,0,0.015);
+  }
+
+  .sidebar-logo {
+    padding: 16px 24px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .sidebar-logo .logo-mark {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 4px;
+  }
+  .logo-icon {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--teal), var(--teal2));
+    border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    box-shadow: 0 0 16px rgba(94,186,169,0.2);
+  }
+  .logo-text { font-size: 1.05rem; font-weight: 700; letter-spacing: -0.3px; }
+  .logo-sub { font-size: 0.72rem; color: var(--text3); letter-spacing: 0.05em; text-transform: uppercase; margin-top: 2px; }
+
+  .sidebar-steps { padding: 20px 16px; flex: 1; }
+  .sidebar-step {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 4px;
+    position: relative;
+  }
+  .sidebar-step:hover { background: var(--card-hover); }
+  .sidebar-step.active { background: rgba(0,201,167,0.1); }
+  .sidebar-step.completed .step-num { background: var(--teal); color: var(--bg); }
+  .sidebar-step.active .step-num {
+    background: linear-gradient(135deg, var(--teal), var(--teal2));
+    box-shadow: 0 0 10px rgba(94,186,169,0.25);
+    color: #fff;
+  }
+  .step-num {
+    width: 28px; height: 28px; min-width: 28px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.75rem; font-weight: 600;
+    transition: all 0.3s;
+    color: var(--text2);
+  }
+  .sidebar-step.completed .step-num::after { content: '✓'; }
+  .step-label { font-size: 0.82rem; font-weight: 500; color: var(--text2); transition: color 0.2s; }
+  .sidebar-step.active .step-label { color: var(--teal); }
+  .sidebar-step.completed .step-label { color: var(--text); }
+
+  .sidebar-connector {
+    width: 1px; height: 16px;
+    background: var(--border);
+    margin: 0 0 4px 27px;
+    transition: background 0.3s;
+  }
+
+  .sidebar-footer {
+    padding: 16px 20px;
+    border-top: 1px solid var(--border);
+    font-size: 0.72rem;
+    color: var(--text3);
+  }
+
+  /* ── MAIN CONTENT ── */
+  .main {
+    margin-left: var(--sidebar-w);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  /* Progress bar */
+  .progress-bar-wrap {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(12,19,32,0.92);
+    backdrop-filter: blur(24px);
+    border-bottom: 1px solid var(--border);
+    padding: 0;
+  }
+  .progress-bar-track {
+    height: 3px;
+    background: rgba(255,255,255,0.06);
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--teal), var(--teal2));
+    transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+    box-shadow: 0 0 8px var(--teal);
+  }
+  .progress-header {
+    padding: 14px 36px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .progress-step-info { font-size: 0.78rem; color: var(--text2); }
+  .progress-step-info strong { color: var(--teal); }
+  .progress-steps-dots {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+  .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--border);
+    transition: all 0.3s;
+  }
+  .dot.active { background: var(--teal); box-shadow: 0 0 6px var(--teal); }
+  .dot.done { background: var(--teal2); }
+
+  /* ── CONTENT AREA ── */
+  .content {
+    flex: 1;
+    padding: 40px 36px 60px;
+    max-width: 1000px;
+  }
+
+  .step-header {
+    margin-bottom: 36px;
+  }
+  .step-eyebrow {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 8px;
+  }
+  .step-title {
+    font-size: 1.9rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: var(--text);
+    line-height: 1.2;
+  }
+  .step-desc {
+    margin-top: 8px;
+    font-size: 0.88rem;
+    color: var(--text2);
+    line-height: 1.6;
+  }
+
+  /* ── STEP PANELS ── */
+  .step-panel {
+    display: none;
+    animation: fadeSlideIn 0.35s cubic-bezier(0.4,0,0.2,1);
+  }
+  .step-panel.active { display: block; }
+
+  @keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(18px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeSlideOut {
+    from { opacity: 1; transform: translateY(0); }
+    to { opacity: 0; transform: translateY(-18px); }
+  }
+
+  /* ── CARDS ── */
+  .glass-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    backdrop-filter: blur(10px);
+    padding: 24px;
+    margin-bottom: 20px;
+    transition: border-color 0.2s;
+  }
+  .glass-card:hover { border-color: rgba(255,255,255,0.1); }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    cursor: pointer;
+  }
+  .card-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-title-icon {
+    width: 28px; height: 28px;
+    background: var(--teal-glow);
+    border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+  }
+  .collapse-btn {
+    width: 24px; height: 24px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    color: var(--text2);
+    font-size: 12px;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+  .collapse-btn:hover { background: rgba(255,255,255,0.1); color: var(--text); }
+  .collapsible-body { transition: all 0.3s; overflow: hidden; }
+  .collapsible-body.collapsed { max-height: 0 !important; opacity: 0; }
+
+  /* ── FORM ELEMENTS ── */
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .form-grid.cols-1 { grid-template-columns: 1fr; }
+  .form-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .form-group.full-width { grid-column: 1 / -1; }
+
+  .form-label {
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--text2);
+    letter-spacing: 0.01em;
+  }
+  .form-label .required { color: var(--teal); margin-left: 2px; }
+
+  .form-input {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    font-size: 0.88rem;
+    font-family: inherit;
+    color: var(--text);
+    outline: none;
+    transition: all 0.2s;
+    width: 100%;
+  }
+  .form-input:focus {
+    border-color: var(--border-active);
+    background: rgba(94,186,169,0.04);
+    box-shadow: 0 0 0 3px rgba(94,186,169,0.06);
+  }
+  .form-input:hover:not(:focus) { border-color: rgba(255,255,255,0.12); }
+  .form-input.error { border-color: var(--red); background: var(--red-dim); }
+  .form-input::placeholder { color: var(--text3); }
+
+  .path-input-wrap {
+    position: relative;
+  }
+  .path-input-wrap .form-input { padding-right: 40px; }
+  .path-hint {
+    position: absolute;
+    right: 12px; top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+    cursor: pointer;
+    opacity: 0.5;
+    transition: opacity 0.2s;
+  }
+  .path-hint:hover { opacity: 1; }
+
+  .form-error {
+    font-size: 0.74rem;
+    color: var(--red);
+    display: none;
+  }
+  .form-error.show { display: block; }
+
+  /* Select */
+  .form-select {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    font-size: 0.88rem;
+    font-family: inherit;
+    color: var(--text);
+    outline: none;
+    transition: all 0.2s;
+    width: 100%;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238FA3B1' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+  }
+  .form-select:focus {
+    border-color: var(--border-active);
+    box-shadow: 0 0 0 3px rgba(0,201,167,0.08);
+  }
+  .form-select option { background: #1a2d3e; }
+
+  /* Toggle pills */
+  .toggle-group {
+    display: flex;
+    gap: 4px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 4px;
+  }
+  .toggle-pill {
+    flex: 1;
+    padding: 7px 12px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-align: center;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--text2);
+    user-select: none;
+    border: 1px solid transparent;
+  }
+  .toggle-pill.active {
+    background: linear-gradient(135deg, rgba(0,201,167,0.2), rgba(2,128,144,0.2));
+    border-color: rgba(0,201,167,0.3);
+    color: var(--teal);
+    box-shadow: 0 0 12px rgba(0,201,167,0.1);
+  }
+  .toggle-pill:hover:not(.active) { background: rgba(255,255,255,0.05); color: var(--text); }
+
+  /* Yes/No toggle */
+  .yn-toggle {
+    display: flex;
+    gap: 4px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 4px;
+    width: fit-content;
+  }
+  .yn-pill {
+    padding: 6px 18px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--text2);
+    user-select: none;
+  }
+  .yn-pill.yes.active { background: rgba(0,201,167,0.2); border: 1px solid rgba(0,201,167,0.3); color: var(--teal); }
+  .yn-pill.no.active { background: rgba(255,92,124,0.15); border: 1px solid rgba(255,92,124,0.3); color: var(--red); }
+  .yn-pill:hover:not(.active) { background: rgba(255,255,255,0.06); }
+
+  /* Counter */
+  .counter-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .counter-btn {
+    width: 30px; height: 30px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    font-size: 16px;
+    color: var(--text2);
+    transition: all 0.2s;
+    user-select: none;
+  }
+  .counter-btn:hover { background: rgba(0,201,167,0.15); border-color: var(--border-active); color: var(--teal); }
+  .counter-val {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text);
+    min-width: 24px;
+    text-align: center;
+  }
+
+  /* Dynamic rows */
+  .dynamic-rows { display: flex; flex-direction: column; gap: 12px; }
+  .dynamic-row {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 16px;
+    position: relative;
+    animation: fadeSlideIn 0.25s ease;
+  }
+  .dynamic-row:hover { border-color: rgba(255,255,255,0.1); }
+  .row-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .row-badge {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--teal);
+    background: var(--teal-glow);
+    border: 1px solid rgba(0,201,167,0.2);
+    padding: 3px 8px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .delete-btn {
+    width: 26px; height: 26px;
+    background: rgba(255,92,124,0.1);
+    border: 1px solid rgba(255,92,124,0.2);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    color: var(--red);
+    font-size: 14px;
+    transition: all 0.2s;
+  }
+  .delete-btn:hover { background: rgba(255,92,124,0.2); border-color: rgba(255,92,124,0.4); }
+
+  .add-row-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: rgba(0,201,167,0.06);
+    border: 1px dashed rgba(0,201,167,0.25);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    color: var(--teal);
+    font-size: 0.82rem;
+    font-weight: 500;
+    transition: all 0.2s;
+    width: 100%;
+    justify-content: center;
+    margin-top: 8px;
+  }
+  .add-row-btn:hover { background: rgba(0,201,167,0.1); border-color: rgba(0,201,167,0.4); }
+
+  /* ── STEP 2: TASK CARDS ── */
+  .task-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+
+  .task-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 18px;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
+    position: relative;
+    overflow: hidden;
+    group: true;
+  }
+  .task-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(0,201,167,0.05), transparent);
+    opacity: 0;
+    transition: opacity 0.25s;
+  }
+  .task-card:hover:not(.disabled) { border-color: rgba(94,186,169,0.25); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.2), var(--shadow-teal); }
+  .task-card:hover:not(.disabled)::before { opacity: 1; }
+  .task-card.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+    filter: grayscale(0.6);
+  }
+  .task-card .coming-soon {
+    position: absolute;
+    top: 8px; right: 8px;
+    font-size: 0.6rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text3);
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  .task-card.selected {
+    border-color: var(--teal);
+    background: rgba(94,186,169,0.06);
+    box-shadow: 0 0 0 1px var(--teal), var(--shadow-teal);
+  }
+  .task-card.selected::before { opacity: 1; }
+  .task-icon { font-size: 26px; margin-bottom: 10px; display: block; }
+  .task-name {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 6px;
+    line-height: 1.3;
+  }
+  .task-desc {
+    font-size: 0.75rem;
+    color: var(--text2);
+    line-height: 1.5;
+  }
+  .task-check {
+    position: absolute;
+    top: 12px; right: 12px;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: var(--teal);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px;
+    color: var(--bg);
+    opacity: 0;
+    transition: all 0.2s;
+    transform: scale(0);
+  }
+  .task-card.selected .task-check { opacity: 1; transform: scale(1); }
+
+  .add-custom-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 20px;
+    background: rgba(255,255,255,0.02);
+    border: 2px dashed rgba(255,255,255,0.1);
+    border-radius: var(--radius);
+    cursor: pointer;
+    color: var(--text2);
+    font-size: 0.82rem;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+  .add-custom-btn:hover { border-color: rgba(0,201,167,0.3); color: var(--teal); background: rgba(0,201,167,0.04); }
+
+  /* ── STEP 3: TB TYPE ── */
+  .tb-type-grid {
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .tb-type-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px 20px;
+    cursor: pointer;
+    transition: all 0.25s;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .tb-type-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--teal), var(--teal2));
+    transform: scaleX(0);
+    transition: transform 0.25s;
+  }
+  .tb-type-card:hover { border-color: rgba(0,201,167,0.3); transform: translateY(-3px); box-shadow: var(--shadow-teal); }
+  .tb-type-card:hover::after { transform: scaleX(1); }
+  .tb-type-card.selected { border-color: var(--teal); background: rgba(0,201,167,0.07); box-shadow: 0 0 0 1px var(--teal), var(--shadow-teal); }
+  .tb-type-card.selected::after { transform: scaleX(1); }
+  .tb-type-icon { font-size: 36px; margin-bottom: 12px; }
+  .tb-type-name { font-size: 1.05rem; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+  .tb-type-desc { font-size: 0.78rem; color: var(--text2); line-height: 1.5; }
+
+  /* Config sections */
+  .config-section { margin-bottom: 20px; }
+  .section-title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text2);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* Interface sub-table */
+  .interface-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 8px;
+  }
+  .interface-table th {
+    font-size: 0.72rem;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 6px 10px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  .interface-table td {
+    padding: 8px 10px;
+    font-size: 0.82rem;
+    color: var(--text2);
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .if-note {
+    font-size: 0.75rem;
+    color: var(--text3);
+    font-style: italic;
+    margin-top: 6px;
+  }
+
+  /* ── STEP 4: REVIEW ── */
+  .summary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .summary-item { display: flex; flex-direction: column; gap: 4px; }
+  .summary-label { font-size: 0.72rem; color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; }
+  .summary-value { font-size: 0.9rem; color: var(--text); font-weight: 500; }
+
+  .json-preview {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--text2);
+    overflow-x: auto;
+    max-height: 300px;
+    overflow-y: auto;
+    line-height: 1.6;
+  }
+  .json-key { color: var(--teal); }
+  .json-str { color: #FFD166; }
+  .json-num { color: #FF9F7F; }
+  .json-bool { color: #7EC8E3; }
+
+  /* Terminal */
+  .terminal-wrap {
+    background: rgba(0,0,0,0.5);
+    border: 1px solid rgba(0,201,167,0.2);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-top: 24px;
+  }
+  .terminal-bar {
+    background: rgba(0,0,0,0.4);
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .term-dot { width: 12px; height: 12px; border-radius: 50%; }
+  .term-dot.red { background: #FF5F56; }
+  .term-dot.yellow { background: #FFBD2E; }
+  .term-dot.green { background: #27C93F; }
+  .term-title { font-size: 0.75rem; color: var(--text3); margin-left: auto; font-family: 'JetBrains Mono', monospace; }
+  .terminal-body {
+    padding: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    line-height: 1.8;
+    min-height: 200px;
+    max-height: 400px;
+    overflow-y: auto;
+  }
+  .term-line { display: block; }
+  .term-line .prefix { color: var(--teal); }
+  .term-line .success { color: #27C93F; }
+  .term-line .info { color: var(--text2); }
+  .term-line .highlight { color: var(--yellow); }
+  .term-cursor {
+    display: inline-block;
+    width: 8px; height: 14px;
+    background: var(--teal);
+    animation: blink 1s infinite;
+    vertical-align: middle;
+    border-radius: 2px;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+  /* ── BUTTONS ── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 22px;
+    border-radius: var(--radius-sm);
+    font-size: 0.88rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+    outline: none;
+    text-decoration: none;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--teal), var(--teal2));
+    color: #fff;
+    box-shadow: 0 2px 10px rgba(94,186,169,0.2);
+  }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 18px rgba(94,186,169,0.3); }
+  .btn-primary:active { transform: translateY(0); }
+
+  .btn-execute {
+    background: linear-gradient(135deg, var(--teal), var(--teal2));
+    color: #fff;
+    padding: 16px 36px;
+    font-size: 1rem;
+    border-radius: var(--radius);
+    box-shadow: 0 0 30px rgba(0,201,167,0.3), 0 4px 16px rgba(0,0,0,0.3);
+    width: 100%;
+    justify-content: center;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+  }
+  .btn-execute:hover { box-shadow: 0 0 36px rgba(94,186,169,0.25), 0 6px 18px rgba(0,0,0,0.3); transform: translateY(-2px); }
+  .btn-execute:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--text2);
+    border: 1px solid var(--border);
+  }
+  .btn-ghost:hover { background: rgba(255,255,255,0.04); color: var(--text); border-color: rgba(255,255,255,0.12); }
+
+  .btn-secondary {
+    background: rgba(255,255,255,0.06);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .btn-secondary:hover { background: rgba(255,255,255,0.1); }
+
+  .nav-btns {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+  }
+
+  .nav-right { display: flex; gap: 10px; }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(6px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s;
+  }
+  .modal-overlay.show { opacity: 1; pointer-events: all; }
+  .modal {
+    background: #0f2030;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    width: 460px;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+    transform: translateY(20px) scale(0.97);
+    transition: transform 0.25s cubic-bezier(0.4,0,0.2,1);
+  }
+  .modal-overlay.show .modal { transform: translateY(0) scale(1); }
+  .modal-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 20px;
+  }
+  .modal-btns { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+
+  /* ── TAGS / BADGES ── */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 8px;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 600;
+  }
+  .badge-teal { background: var(--teal-glow); color: var(--teal); border: 1px solid rgba(0,201,167,0.2); }
+  .badge-blue { background: rgba(2,128,144,0.15); color: #7EC8E3; border: 1px solid rgba(2,128,144,0.2); }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+
+  /* Tooltip */
+  [data-tip] { position: relative; }
+  [data-tip]::after {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(10,21,32,0.98);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    font-size: 0.75rem;
+    padding: 7px 12px;
+    border-radius: 8px;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+    z-index: 200;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+    max-width: 260px;
+    white-space: normal;
+    text-align: center;
+    line-height: 1.5;
+  }
+  [data-tip]:hover::after { opacity: 1; }
+
+  /* Step indicator animation */
+  .step-transition-out {
+    animation: fadeSlideOut 0.2s cubic-bezier(0.4,0,0.2,1) forwards;
+  }
+
+  /* Responsive */
+  @media (max-width: 1100px) {
+    .task-grid { grid-template-columns: repeat(2,1fr); }
+    .form-grid { grid-template-columns: 1fr; }
+    .summary-grid { grid-template-columns: 1fr; }
+  }
+
+  /* Separator line */
+  .sep { height: 1px; background: var(--border); margin: 20px 0; }
+
+  /* ── EXECUTION SCRIPT UPLOAD ── */
+  /* Registry viewer */
+  .registry-viewer {
+    position: fixed;
+    top: 0; right: -420px;
+    width: 400px;
+    height: 100vh;
+    background: var(--bg3);
+    border-left: 1px solid var(--border);
+    box-shadow: -8px 0 32px rgba(0,0,0,0.3);
+    z-index: 500;
+    transition: right 0.3s cubic-bezier(0.4,0,0.2,1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .registry-viewer.open { right: 0; }
+  .rv-header {
+    padding: 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .rv-title { font-size: 1rem; font-weight: 700; }
+  .rv-close { cursor: pointer; font-size: 1.2rem; opacity: 0.5; transition: opacity 0.15s; }
+  .rv-close:hover { opacity: 1; }
+  .rv-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 20px;
+  }
+  .rv-section { margin-bottom: 20px; }
+  .rv-section-title {
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text2);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .rv-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .rv-item:hover { border-color: var(--teal); }
+  .rv-item-name { font-size: 0.88rem; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .rv-item-path { font-size: 0.72rem; color: var(--text3); margin-bottom: 6px; font-family: 'JetBrains Mono',monospace; }
+  .rv-item-detail { font-size: 0.75rem; color: var(--text2); }
+  .rv-item-vips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 6px;
+  }
+  .rv-vip-tag {
+    font-size: 0.68rem;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-family: 'JetBrains Mono',monospace;
+  }
+  .rv-vip-active { background: rgba(0,201,167,0.12); color: var(--teal); }
+  .rv-vip-passive { background: rgba(255,209,102,0.12); color: var(--yellow); }
+  .rv-empty { font-size: 0.8rem; color: var(--text3); font-style: italic; }
+  .rv-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.3);
+    z-index: 499;
+    display: none;
+  }
+  .rv-overlay.open { display: block; }
+
+  /* Description hover preview */
+  .desc-hover-preview {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 0; right: 0;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    font-size: 0.78rem;
+    color: var(--text2);
+    line-height: 1.5;
+    box-shadow: var(--shadow);
+    z-index: 100;
+    pointer-events: none;
+    white-space: pre-wrap;
+    max-height: 120px;
+    overflow: hidden;
+  }
+  .desc-hover-preview::after {
+    content: '';
+    position: absolute;
+    top: 100%; left: 20px;
+    border: 6px solid transparent;
+    border-top-color: var(--border);
+  }
+  .desc-hover-preview.has-text {
+    display: none; /* only show on hover of the input */
+  }
+  #tbComponentName:hover ~ .desc-hover-preview.has-text {
+    display: block;
+  }
+
+  /* Comment icon */
+  .comment-icon {
+    width: 26px; height: 26px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 5px;
+    opacity: 0.4;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+  .comment-icon:hover { opacity: 1; background: var(--teal-glow); }
+  .comment-icon.has-comment { opacity: 0.8; color: var(--teal); }
+  .comment-input input { font-style: italic; }
+
+  /* Restore registry picker */
+  .restore-picker {
+    display: none;
+    margin-top: 10px;
+    background: var(--card);
+    border: 1px solid var(--border-active);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    animation: fadeIn 0.15s ease;
+  }
+  .restore-picker.show { display: block; }
+  .restore-picker-title {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text2);
+    margin-bottom: 8px;
+  }
+  .restore-picker-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 10px;
+    border-radius: 6px;
+    margin-bottom: 4px;
+    background: rgba(0,201,167,0.04);
+    border: 1px solid var(--border);
+    transition: all 0.15s;
+  }
+  .restore-picker-item:hover {
+    border-color: var(--teal);
+    background: var(--teal-glow);
+  }
+  .restore-picker-item .rp-name {
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--text);
+  }
+  .restore-picker-item .rp-vips {
+    font-size: 0.7rem;
+    color: var(--text2);
+  }
+  .restore-picker-item .rp-add-btn {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--teal);
+    background: rgba(0,201,167,0.1);
+    border: 1px solid rgba(0,201,167,0.3);
+    border-radius: 5px;
+    padding: 3px 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .restore-picker-item .rp-add-btn:hover {
+    background: var(--teal);
+    color: var(--bg);
+  }
+  .restore-picker-empty {
+    font-size: 0.78rem;
+    color: var(--text3);
+    font-style: italic;
+    padding: 4px 0;
+  }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+
+  .exec-upload-icon-wrap {
+    position: relative;
+  }
+  .exec-upload-icon {
+    width: 42px; height: 42px;
+    border-radius: var(--radius-sm);
+    background: var(--card);
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .exec-upload-icon:hover {
+    border-color: var(--teal);
+    background: var(--teal-glow);
+    box-shadow: 0 0 12px rgba(0,201,167,0.2);
+  }
+  .exec-upload-icon.has-file {
+    border-color: #27C93F;
+    background: rgba(39,201,63,0.1);
+  }
+  .exec-upload-tooltip {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 10px);
+    right: 0;
+    width: 280px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    font-size: 0.8rem;
+    color: var(--text);
+    box-shadow: var(--shadow);
+    z-index: 200;
+    pointer-events: none;
+  }
+  .exec-upload-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%; right: 14px;
+    border: 6px solid transparent;
+    border-top-color: var(--border);
+  }
+  .exec-upload-icon-wrap:hover .exec-upload-tooltip {
+    display: block;
+  }
+
+  .exec-upload-area {
+    border: 2px dashed rgba(0,201,167,0.35);
+    border-radius: var(--radius);
+    padding: 24px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.25s;
+    background: rgba(0,201,167,0.03);
+    position: relative;
+  }
+  .exec-upload-area:hover,
+  .exec-upload-area.dragover {
+    border-color: var(--teal);
+    background: rgba(0,201,167,0.07);
+    box-shadow: 0 0 20px rgba(0,201,167,0.1);
+  }
+  .exec-upload-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+  .exec-upload-sub {
+    font-size: 0.78rem;
+    color: var(--text2);
+    line-height: 1.5;
+  }
+  .exec-file-loaded {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: rgba(39,201,63,0.08);
+    border: 1px solid rgba(39,201,63,0.25);
+    border-radius: var(--radius-sm);
+    margin-top: 12px;
+  }
+  .exec-file-loaded.show { display: flex; }
+  .exec-file-loaded .file-name {
+    font-size: 0.83rem;
+    font-weight: 500;
+    color: #27C93F;
+    flex: 1;
+  }
+  .exec-clear-btn {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text2);
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 3px 9px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .exec-clear-btn:hover { background: rgba(255,92,124,0.12); border-color: rgba(255,92,124,0.3); color: var(--red); }
+  .exec-script-preview {
+    display: none;
+    margin-top: 12px;
+    background: rgba(0,0,0,0.35);
+    border: 1px solid rgba(0,201,167,0.15);
+    border-radius: var(--radius-sm);
+    padding: 12px 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.76rem;
+    color: var(--text2);
+    line-height: 1.7;
+  }
+  .exec-script-preview.show { display: block; }
+  .exec-script-preview .preview-line { display: block; }
+  .exec-script-preview .preview-more {
+    color: var(--text3);
+    font-style: italic;
+    margin-top: 4px;
+    display: block;
+  }
+
+  /* Detected info note */
+  .info-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 14px;
+    background: rgba(0,201,167,0.05);
+    border: 1px solid rgba(0,201,167,0.15);
+    border-radius: var(--radius-sm);
+    font-size: 0.8rem;
+    color: var(--text2);
+    line-height: 1.5;
+    margin-bottom: 12px;
+  }
+  .info-note .note-icon { color: var(--teal); font-size: 14px; margin-top: 1px; flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="company-logo-wrap">
+      <div class="company-logo" id="companyLogo" onclick="document.getElementById('logoUpload').click()" title="Click to upload company logo">
+        <div class="company-logo-placeholder" id="logoPlaceholder">
+          <span>🏢</span>
+          Company Logo<br>(click to upload)
+        </div>
+        <input type="file" id="logoUpload" accept="image/*" style="display:none" onchange="handleLogoUpload(event)">
+      </div>
+    </div>
+    <div class="sidebar-logo">
+      <div class="logo-mark">
+        <div class="logo-icon">⚡</div>
+        <div>
+          <div class="logo-text">DV Wizard</div>
+        </div>
+      </div>
+      <div class="logo-sub">Design Verification Suite</div>
+    </div>
+
+    <nav class="sidebar-steps">
+      <div class="sidebar-step active" data-step="1" onclick="goToStep(1)">
+        <div class="step-num">1</div>
+        <div class="step-label">Project Setup</div>
+      </div>
+      <div class="sidebar-connector"></div>
+      <div class="sidebar-step" data-step="2" onclick="goToStep(2)">
+        <div class="step-num">2</div>
+        <div class="step-label">Select Task</div>
+      </div>
+      <div class="sidebar-connector"></div>
+      <div class="sidebar-step" data-step="3" onclick="goToStep(3)">
+        <div class="step-num">3</div>
+        <div class="step-label">Configuration</div>
+      </div>
+      <div class="sidebar-connector"></div>
+      <div class="sidebar-step" data-step="4" onclick="goToStep(4)">
+        <div class="step-num">4</div>
+        <div class="step-label">Review &amp; Execute</div>
+      </div>
+    </nav>
+
+    <div class="theme-toggle" onclick="toggleTheme()">
+      <span class="theme-toggle-label" id="themeLabel">🌙 Dark</span>
+      <div class="theme-switch" id="themeSwitch"></div>
+    </div>
+
+    <div class="sidebar-footer">
+      DV Wizard v1.0.0 &nbsp;·&nbsp; DV Suite
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <!-- Progress Bar -->
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-track">
+        <div class="progress-bar-fill" id="progressFill" style="width:25%"></div>
+      </div>
+      <div class="progress-header">
+        <div class="progress-step-info">Step <strong id="curStepLabel">1</strong> of 4 — <span id="curStepName">Project Setup</span></div>
+        <div class="progress-steps-dots">
+          <div class="dot active" id="dot1"></div>
+          <div class="dot" id="dot2"></div>
+          <div class="dot" id="dot3"></div>
+          <div class="dot" id="dot4"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+      <!-- ═══════════════════════════════════════════════════════════
+           STEP 1 — PROJECT SETUP
+      ════════════════════════════════════════════════════════════════ -->
+      <div class="step-panel active" id="step1">
+        <div class="step-header">
+          <div class="step-eyebrow">Step 01</div>
+          <h1 class="step-title">Project Setup</h1>
+          <p class="step-desc">Configure your project name, root directories, and tool environment variables before generating the testbench.</p>
+        </div>
+
+        <!-- Basic Info -->
+        <div class="glass-card">
+          <div class="card-header" onclick="toggleSection('basic-info')">
+            <div class="card-title">
+              <div class="card-title-icon">📝</div>
+              Basic Information
+            </div>
+            <div class="collapse-btn" id="basic-info-btn">−</div>
+          </div>
+          <div class="collapsible-body" id="basic-info-body" style="max-height:500px">
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">Project Name <span class="required">*</span></label>
+                <input class="form-input" id="projectName" placeholder="e.g. uart_tb" oninput="updateState('projectName', this.value)">
+                <div class="form-error" id="err-projectName">Project name is required</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">TB Root Directory <span class="required">*</span></label>
+                <div class="path-input-wrap">
+                  <input class="form-input" id="tbRootDir" placeholder="/path/to/tb/root" oninput="updateState('tbRootDir', this.value);updateStep1RegistryCount()">
+                  <span class="path-hint" title="Browse">📁</span>
+                </div>
+                <div class="form-error" id="err-tbRootDir">TB root directory is required</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Project Root Directory <span class="required">*</span></label>
+                <div class="path-input-wrap">
+                  <input class="form-input" id="projectRootDir" placeholder="/path/to/project" oninput="updateState('projectRootDir', this.value)">
+                  <span class="path-hint">📁</span>
+                </div>
+                <div class="form-error" id="err-projectRootDir">Project root is required</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">RTL Root Directory</label>
+                <div class="path-input-wrap">
+                  <input class="form-input" id="rtlRootDir" placeholder="/path/to/rtl" oninput="updateState('rtlRootDir', this.value)">
+                  <span class="path-hint">📁</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">SIM_ROOT (logs/fsdb dump)</label>
+                <div class="path-input-wrap">
+                  <input class="form-input" id="simRoot" placeholder="/path/to/sim_root" oninput="updateState('simRoot', this.value)">
+                  <span class="path-hint">📁</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tool Config -->
+        <div class="glass-card">
+          <div class="card-header" onclick="toggleSection('tool-config')">
+            <div class="card-title">
+              <div class="card-title-icon">🛠</div>
+              Tool Configuration
+            </div>
+            <div class="collapse-btn" id="tool-config-btn">−</div>
+          </div>
+          <div class="collapsible-body" id="tool-config-body" style="max-height:600px">
+            <div class="form-group" style="margin-bottom:16px">
+              <label class="form-label">Simulation Tool <span class="required">*</span></label>
+              <div class="toggle-group">
+                <div class="toggle-pill active" onclick="selectSimTool('VCS')">VCS</div>
+                <div class="toggle-pill" onclick="selectSimTool('Xcelium')">Xcelium</div>
+                <div class="toggle-pill" onclick="selectSimTool('Questa')">Questa</div>
+              </div>
+            </div>
+
+            <!-- VCS fields -->
+            <div id="vcs-fields" class="form-grid">
+              <div class="form-group">
+                <label class="form-label">VCS_HOME</label>
+                <div class="path-input-wrap">
+                  <input class="form-input" id="vcsHome" placeholder="/path/to/vcs" oninput="updateState('vcsHome', this.value)">
+                  <span class="path-hint">📁</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">VCS_VERSION</label>
+                <input class="form-input" id="vcsVersion" placeholder="e.g. R-2020.12-SP2" oninput="updateState('vcsVersion', this.value)">
+              </div>
+            </div>
+            <!-- Xcelium fields -->
+            <div id="xcelium-fields" class="form-grid" style="display:none">
+              <div class="form-group">
+                <label class="form-label">XCELIUM_HOME</label>
+                <div class="path-input-wrap">
+                  <input class="form-input" id="xceliumHome" placeholder="/path/to/xcelium" oninput="updateState('xceliumHome', this.value)">
+                  <span class="path-hint">📁</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">XCELIUM_VERSION</label>
+                <input class="form-input" id="xceliumVersion" placeholder="e.g. 20.09.001" oninput="updateState('xceliumVersion', this.value)">
+              </div>
+            </div>
+            <!-- Questa fields -->
+            <div id="questa-fields" class="form-grid" style="display:none">
+              <div class="form-group">
+                <label class="form-label">QUESTA_HOME</label>
+                <div class="path-input-wrap">
+                  <input class="form-input" id="questaHome" placeholder="/path/to/questa" oninput="updateState('questaHome', this.value)">
+                  <span class="path-hint">📁</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">QUESTA_VERSION</label>
+                <input class="form-input" id="questaVersion" placeholder="e.g. 2021.1" oninput="updateState('questaVersion', this.value)">
+              </div>
+            </div>
+
+            <div class="sep"></div>
+
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">VERDI_HOME</label>
+                <div class="path-input-wrap">
+                  <input class="form-input" id="verdiHome" placeholder="/path/to/verdi" oninput="updateState('verdiHome', this.value)">
+                  <span class="path-hint">📁</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">VERDI_VERSION</label>
+                <input class="form-input" id="verdiVersion" placeholder="e.g. S-2021.06-SP1" oninput="updateState('verdiVersion', this.value)">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Environment Variables -->
+        <div class="glass-card">
+          <div class="card-header" onclick="toggleSection('env-vars')">
+            <div class="card-title">
+              <div class="card-title-icon">🌐</div>
+              Environment Variables &amp; Paths
+            </div>
+            <div class="collapse-btn" id="env-vars-btn">−</div>
+          </div>
+          <div class="collapsible-body" id="env-vars-body" style="max-height:600px">
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">DESIGNWARE_HOME</label>
+                <div class="path-input-wrap">
+                  <input class="form-input" id="designwareHome" placeholder="/path/to/dw" oninput="updateState('designwareHome', this.value)">
+                  <span class="path-hint">📁</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">UVM_HOME</label>
+                <div class="path-input-wrap">
+                  <input class="form-input" id="uvmHome" placeholder="/path/to/uvm" oninput="updateState('uvmHome', this.value)">
+                  <span class="path-hint">📁</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">DV_UTILITY_HOME</label>
+                <div class="path-input-wrap">
+                  <input class="form-input" id="dvUtilityHome" placeholder="/path/to/dv_util" oninput="updateState('dvUtilityHome', this.value)">
+                  <span class="path-hint">📁</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">VIP_HOME</label>
+                <div class="path-input-wrap">
+                  <input class="form-input" id="vipHome" placeholder="/path/to/vip" oninput="updateState('vipHome', this.value)">
+                  <span class="path-hint">📁</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">COMMON_VIP_HOME</label>
+                <div class="path-input-wrap">
+                  <input class="form-input" id="commonVipHome" placeholder="/path/to/common_vip" oninput="updateState('commonVipHome', this.value)">
+                  <span class="path-hint">📁</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Registry Preview (always visible, updates live) -->
+        <div class="glass-card" id="step1RegistryCard" style="margin-top:20px">
+          <div class="card-header" style="cursor:pointer" onclick="toggleStep1Registry()">
+            <div class="card-title"><div class="card-title-icon">📦</div>Component Registry</div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span id="step1RegCount" style="font-size:0.75rem;color:var(--teal)"></span>
+              <div class="btn btn-ghost" style="padding:4px 12px;font-size:0.78rem" id="step1RegToggle">Show</div>
+            </div>
+          </div>
+          <div id="step1RegBody" style="display:none;margin-top:12px;max-height:400px;overflow-y:auto"></div>
+        </div>
+
+        <div class="nav-btns">
+          <div></div>
+          <div class="nav-right">
+            <button class="btn btn-primary" onclick="nextStep(1)">Continue to Task Selection →</button>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- ═══════════════════════════════════════════════════════════
+           STEP 2 — SELECT TASK
+      ════════════════════════════════════════════════════════════════ -->
+      <div class="step-panel" id="step2">
+        <div class="step-header">
+          <div class="step-eyebrow">Step 02</div>
+          <h1 class="step-title">Select Task</h1>
+          <p class="step-desc">Choose the operation you want to perform. Hover over a card for details. Click to select.</p>
+        </div>
+
+        <div class="task-grid" id="taskGrid">
+          <!-- populated by JS -->
+        </div>
+
+        <div class="add-custom-btn" onclick="openCustomModal()">
+          <span style="font-size:18px">＋</span>
+          Add Custom Task
+        </div>
+
+        <div class="form-error" id="err-task" style="margin-top:12px;font-size:0.82rem">Please select a task to continue</div>
+
+        <div class="nav-btns">
+          <button class="btn btn-ghost" onclick="prevStep(2)">← Back</button>
+          <div class="nav-right">
+            <button class="btn btn-primary" onclick="nextStep(2)">Continue to Configuration →</button>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- ═══════════════════════════════════════════════════════════
+           STEP 3 — TB TYPE & CONFIGURATION
+      ════════════════════════════════════════════════════════════════ -->
+      <div class="step-panel" id="step3">
+        <div class="step-header">
+          <div class="step-eyebrow">Step 03</div>
+          <h1 class="step-title">DV Type &amp; Configuration</h1>
+          <p class="step-desc">Select the type of testbench and configure its components, VIPs, and integration settings.</p>
+        </div>
+
+        <!-- TB Type Selector -->
+        <div class="tb-type-grid">
+          <div class="tb-type-card" id="type-IP" onclick="selectTbType('IP')">
+            <div class="tb-type-icon">🧊</div>
+            <div class="tb-type-name">IP</div>
+            <div class="tb-type-desc">Standalone IP-level testbench with direct VIP integration</div>
+          </div>
+          <div class="tb-type-card" id="type-SS" onclick="selectTbType('SS')">
+            <div class="tb-type-icon">🧩</div>
+            <div class="tb-type-name">SS</div>
+            <div class="tb-type-desc">Subsystem testbench integrating multiple IP DV components</div>
+          </div>
+          <div class="tb-type-card" id="type-SoC" onclick="selectTbType('SoC')">
+            <div class="tb-type-icon">🏛️</div>
+            <div class="tb-type-name">SoC</div>
+            <div class="tb-type-desc">Full chip SoC testbench with subsystem integration</div>
+          </div>
+          <div class="tb-type-card" id="type-VIP" onclick="selectTbType('VIP')">
+            <div class="tb-type-icon">🔌</div>
+            <div class="tb-type-name">VIP</div>
+            <div class="tb-type-desc">Generate a Verification IP component for interface protocol</div>
+          </div>
+        </div>
+
+        <div class="form-error" id="err-tbType" style="margin-bottom:16px">Please select a TB type to continue</div>
+
+        <!-- Component Name (shown after TB type selection) -->
+        <div id="tbNameCard" class="glass-card" style="display:none;margin-bottom:20px">
+          <div class="card-header">
+            <div class="card-title"><div class="card-title-icon" id="tbNameIcon">🧊</div><span id="tbNameLabel">IP Name</span></div>
+          </div>
+          <div class="form-group" style="margin-top:8px">
+            <div style="display:flex;align-items:center;gap:8px">
+              <label class="form-label" style="margin:0;flex:1"><span id="tbNameFieldLabel">IP</span> Name <span class="required">*</span></label>
+            </div>
+            <div style="position:relative;display:inline-block;width:100%">
+              <input class="form-input" id="tbComponentName" placeholder="e.g. pcie_ip" oninput="state.tbComponentName=this.value" style="width:100%">
+              <div class="desc-hover-preview" id="descHoverPreview"></div>
+            </div>
+            <div class="form-error" id="err-tbComponentName">Please enter a name for this component</div>
+          </div>
+          <!-- Collapsible Description -->
+          <div style="margin-top:10px">
+            <div style="display:flex;align-items:center;gap:6px;cursor:pointer" onclick="toggleDescSection()">
+              <span style="font-size:0.78rem;color:var(--text2)">📝 Description</span>
+              <span id="descToggleIcon" style="font-size:0.65rem;color:var(--text3)">▶</span>
+            </div>
+            <div id="descSection" style="display:none;margin-top:8px">
+              <textarea class="form-input" id="componentDescription" placeholder="Describe this component — functionality, architecture, key features for AI tool..." style="height:72px;resize:vertical;font-size:0.82rem" oninput="updateComponentDescription(this.value)"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hierarchy Viewer (SS/SoC only) -->
+        <div id="hierarchyCard" class="glass-card" style="display:none;margin-bottom:20px">
+          <div class="card-header" style="cursor:pointer" onclick="toggleHierarchy()">
+            <div class="card-title"><div class="card-title-icon">🌳</div>Component Hierarchy</div>
+            <div class="btn btn-ghost" style="padding:4px 12px;font-size:0.78rem" id="hierarchyToggleBtn">Show</div>
+          </div>
+          <div id="hierarchyBody" style="display:none">
+            <div id="hierarchyTree" style="font-family:'JetBrains Mono',monospace;font-size:0.8rem;line-height:1.8;padding:16px;background:rgba(0,0,0,0.2);border-radius:var(--radius-sm);color:var(--text);overflow-x:auto;white-space:pre"></div>
+          </div>
+        </div>
+
+        <!-- IP Config -->
+        <div id="ipConfig" style="display:none">
+          <!-- VIP Configuration -->
+          <div class="glass-card">
+            <div class="card-header">
+              <div class="card-title"><div class="card-title-icon">🔌</div>VIP Configuration</div>
+            </div>
+            <div class="config-section">
+              <div class="section-title">Interface VIPs</div>
+              <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px">
+                <span style="font-size:0.83rem;color:var(--text2)">Number of Interface VIPs:</span>
+                <div class="counter-wrap">
+                  <div class="counter-btn" onclick="changeVipCount('ip', -1)">−</div>
+                  <div class="counter-val" id="ipVipCount">0</div>
+                  <div class="counter-btn" onclick="changeVipCount('ip', 1)">+</div>
+                </div>
+              </div>
+              <div class="dynamic-rows" id="ipVipRows"></div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <div class="add-row-btn" onclick="addVipRow('ip')" style="flex:1">＋ Add New VIP</div>
+                <div class="add-row-btn" onclick="openCommonVipPicker('ip')" style="flex:1;background:rgba(0,201,167,0.06);border-color:rgba(0,201,167,0.25)">📋 Pick from Registry</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- C Model -->
+          <div class="glass-card">
+            <div class="card-header">
+              <div class="card-title"><div class="card-title-icon">⚙️</div>C Model Integration</div>
+            </div>
+            <div class="form-group" style="margin-bottom:14px">
+              <label class="form-label">Enable C Model Integration</label>
+              <div class="yn-toggle">
+                <div class="yn-pill no active" id="ipCModelNo" onclick="toggleCModel('ip',false)">No</div>
+                <div class="yn-pill yes" id="ipCModelYes" onclick="toggleCModel('ip',true)">Yes</div>
+              </div>
+            </div>
+            <div id="ipCModelFields" style="display:none">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="form-label">C Code Directory</label>
+                  <div class="path-input-wrap">
+                    <input class="form-input" id="ipCCodeDir" placeholder="/path/to/c_code" oninput="updateState('ipCCodeDir', this.value)">
+                    <span class="path-hint">📁</span>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Makefile Path</label>
+                  <div class="path-input-wrap">
+                    <input class="form-input" id="ipMakefilePath" placeholder="/path/to/Makefile" oninput="updateState('ipMakefilePath', this.value)">
+                    <span class="path-hint">📁</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- RAL Model -->
+          <div class="glass-card">
+            <div class="card-header">
+              <div class="card-title"><div class="card-title-icon">📋</div>RAL Model</div>
+            </div>
+            <div class="form-group" style="margin-bottom:14px">
+              <label class="form-label">Enable RAL Model</label>
+              <div class="yn-toggle">
+                <div class="yn-pill no active" id="ipRalNo" onclick="toggleRal('ip',false)">No</div>
+                <div class="yn-pill yes" id="ipRalYes" onclick="toggleRal('ip',true)">Yes</div>
+              </div>
+            </div>
+            <div id="ipRalFields" style="display:none">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="form-label">RAL Model Path</label>
+                  <div class="path-input-wrap">
+                    <input class="form-input" id="ipRalPath" placeholder="/path/to/ral_model.sv" oninput="updateState('ipRalPath', this.value)">
+                    <span class="path-hint">📁</span>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Register Interface</label>
+                  <select class="form-select" id="ipRalRegIf" onchange="updateState('ipRalRegIf', this.value)">
+                    <option value="">— Select Active VIP —</option>
+                  </select>
+                  <div class="form-error" id="err-ipRalRegIf">RAL interface must be selected (only Active VIPs available)</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SS Config -->
+        <div id="ssConfig" style="display:none">
+          <div id="ssRegistryBanner" class="info-note" style="display:none;margin-bottom:16px;border-left:3px solid var(--teal);padding:10px 14px;background:var(--teal-glow);border-radius:var(--radius-sm)">
+            <span class="note-icon">✓</span><span id="ssRegistryMsg">Previously generated IPs have been auto-populated below. You can add more or remove any.</span>
+          </div>
+          <div class="glass-card">
+            <div class="card-header">
+              <div class="card-title"><div class="card-title-icon">🧩</div>IP DV Components</div>
+            </div>
+            <div class="config-section">
+              <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px">
+                <span style="font-size:0.83rem;color:var(--text2)">Number of IPs in this SS:</span>
+                <div class="counter-wrap">
+                  <div class="counter-btn" onclick="changeSsIpCount(-1)">−</div>
+                  <div class="counter-val" id="ssIpCount">0</div>
+                  <div class="counter-btn" onclick="changeSsIpCount(1)">+</div>
+                </div>
+              </div>
+              <div class="dynamic-rows" id="ssIpRows"></div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <div class="add-row-btn" onclick="addSsIpRow()" style="flex:1">＋ Add New IP</div>
+                <div class="add-row-btn" id="restoreRegistryBtn" onclick="openRestoreRegistryPicker()" style="flex:1;background:rgba(0,201,167,0.06);border-color:rgba(0,201,167,0.25);display:none">⟳ Restore from Registry</div>
+              </div>
+              <div class="restore-picker" id="restorePicker"></div>
+            </div>
+          </div>
+
+          <div class="glass-card">
+            <div class="card-header">
+              <div class="card-title"><div class="card-title-icon">🔌</div>Extra Interface VIPs</div>
+            </div>
+            <div class="config-section">
+              <div class="info-note" style="margin-bottom:12px"><span class="note-icon">ℹ</span>Add additional VIPs at SS-level that are not part of any IP DV environment (e.g. new interfaces added at subsystem integration).</div>
+              <div class="dynamic-rows" id="ssVipRows"></div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <div class="add-row-btn" onclick="addVipRow('ss')" style="flex:1">＋ Add New VIP</div>
+                <div class="add-row-btn" onclick="openCommonVipPicker('ss')" style="flex:1;background:rgba(0,201,167,0.06);border-color:rgba(0,201,167,0.25)">📋 Pick from Registry</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SS C Model -->
+          <div class="glass-card">
+            <div class="card-header">
+              <div class="card-title"><div class="card-title-icon">⚙️</div>C Model Integration</div>
+            </div>
+            <div class="form-group" style="margin-bottom:14px">
+              <label class="form-label">Enable C Model Integration</label>
+              <div class="yn-toggle">
+                <div class="yn-pill no active" id="ssCModelNo" onclick="toggleCModel('ss',false)">No</div>
+                <div class="yn-pill yes" id="ssCModelYes" onclick="toggleCModel('ss',true)">Yes</div>
+              </div>
+            </div>
+            <div id="ssCModelFields" style="display:none">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="form-label">C Code Directory</label>
+                  <div class="path-input-wrap">
+                    <input class="form-input" id="ssCCodeDir" placeholder="/path/to/c_code" oninput="updateState('ssCCodeDir', this.value)">
+                    <span class="path-hint">📁</span>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Makefile Path</label>
+                  <div class="path-input-wrap">
+                    <input class="form-input" id="ssMakefilePath" placeholder="/path/to/Makefile" oninput="updateState('ssMakefilePath', this.value)">
+                    <span class="path-hint">📁</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SS RAL -->
+          <div class="glass-card">
+            <div class="card-header">
+              <div class="card-title"><div class="card-title-icon">📋</div>RAL Model</div>
+            </div>
+            <div class="form-group" style="margin-bottom:14px">
+              <label class="form-label">Enable RAL Model</label>
+              <div class="yn-toggle">
+                <div class="yn-pill no active" id="ssRalNo" onclick="toggleRal('ss',false)">No</div>
+                <div class="yn-pill yes" id="ssRalYes" onclick="toggleRal('ss',true)">Yes</div>
+              </div>
+            </div>
+            <div id="ssRalFields" style="display:none">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="form-label">RAL Model Path</label>
+                  <div class="path-input-wrap">
+                    <input class="form-input" id="ssRalPath" placeholder="/path/to/ral_model.sv">
+                    <span class="path-hint">📁</span>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Register Interface</label>
+                  <select class="form-select" id="ssRalRegIf">
+                    <option value="">— Select Active VIP —</option>
+                  </select>
+                  <div class="form-error" id="err-ssRalRegIf">RAL interface must be selected (only Active VIPs available)</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- VIP Config -->
+        <div id="vipConfig" style="display:none">
+          <div class="glass-card">
+            <div class="card-header">
+              <div class="card-title"><div class="card-title-icon">🔌</div>VIP Details</div>
+            </div>
+            <div class="config-section">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="form-label">VIP Output Path <span class="required">*</span></label>
+                  <div class="path-input-wrap">
+                    <input class="form-input" id="vipOutputPath" placeholder="e.g. common/axi_vip or pcie_ip/dv/custom_vip" oninput="updateState('vipOutputPath', this.value)">
+                    <span class="path-hint">📁</span>
+                  </div>
+                  <div style="font-size:0.7rem;color:var(--text3);margin-top:4px">Relative to TB Root. Use <code>common/</code> for shared VIPs or <code>ip_name/dv/</code> for IP-specific custom VIPs.</div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Protocol / Interface Type</label>
+                  <input class="form-input" id="vipProtocol" placeholder="e.g. AXI4, AHB-Lite, APB, UART, SPI, I2C" oninput="updateState('vipProtocol', this.value)">
+                </div>
+              </div>
+              <div class="form-grid" style="margin-top:12px">
+                <div class="form-group">
+                  <label class="form-label">Bus Width (bits)</label>
+                  <input class="form-input" id="vipBusWidth" placeholder="e.g. 32, 64, 128" oninput="updateState('vipBusWidth', this.value)">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">VIP Mode</label>
+                  <div class="toggle-group">
+                    <div class="toggle-pill active" onclick="setVipGenProp('mode','Master',this)">Master</div>
+                    <div class="toggle-pill" onclick="setVipGenProp('mode','Slave',this)">Slave</div>
+                    <div class="toggle-pill" onclick="setVipGenProp('mode','Monitor',this)">Monitor</div>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group" style="margin-top:12px">
+                <label class="form-label">Spec / Reference Doc Path (optional)</label>
+                <div class="path-input-wrap">
+                  <input class="form-input" id="vipSpecPath" placeholder="/path/to/protocol_spec.pdf" oninput="updateState('vipSpecPath', this.value)">
+                  <span class="path-hint">📁</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SoC Config -->
+        <div id="socConfig" style="display:none">
+          <div class="glass-card">
+            <div class="card-header">
+              <div class="card-title"><div class="card-title-icon">🏛️</div>DV Components (SS &amp; IP)</div>
+            </div>
+            <div class="config-section">
+              <div class="dynamic-rows" id="socSsRows"></div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <div class="add-row-btn" onclick="addSocSsRow()" style="flex:1">＋ Add Subsystem</div>
+                <div class="add-row-btn" onclick="addSocIpRow()" style="flex:1">＋ Add IP</div>
+                <div class="add-row-btn" onclick="openSocRegistryPicker()" style="flex-basis:100%;background:rgba(0,201,167,0.06);border-color:rgba(0,201,167,0.25)">📋 Pick IP/SS from Registry</div>
+              </div>
+              <div id="socRegistryPicker"></div>
+            </div>
+          </div>
+
+          <div class="glass-card">
+            <div class="card-header">
+              <div class="card-title"><div class="card-title-icon">🔌</div>Extra Interface VIPs</div>
+            </div>
+            <div class="config-section">
+              <div class="dynamic-rows" id="socVipRows"></div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <div class="add-row-btn" onclick="addVipRow('soc')" style="flex:1">＋ Add New VIP</div>
+                <div class="add-row-btn" onclick="openCommonVipPicker('soc')" style="flex:1;background:rgba(0,201,167,0.06);border-color:rgba(0,201,167,0.25)">📋 Pick from Registry</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SoC C Model -->
+          <div class="glass-card">
+            <div class="card-header">
+              <div class="card-title"><div class="card-title-icon">⚙️</div>C Model Integration</div>
+            </div>
+            <div class="form-group" style="margin-bottom:14px">
+              <label class="form-label">Enable C Model Integration</label>
+              <div class="yn-toggle">
+                <div class="yn-pill no active" id="socCModelNo" onclick="toggleCModel('soc',false)">No</div>
+                <div class="yn-pill yes" id="socCModelYes" onclick="toggleCModel('soc',true)">Yes</div>
+              </div>
+            </div>
+            <div id="socCModelFields" style="display:none">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="form-label">C Code Directory</label>
+                  <div class="path-input-wrap">
+                    <input class="form-input" id="socCCodeDir" placeholder="/path/to/c_code">
+                    <span class="path-hint">📁</span>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Makefile Path</label>
+                  <div class="path-input-wrap">
+                    <input class="form-input" id="socMakefilePath" placeholder="/path/to/Makefile">
+                    <span class="path-hint">📁</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SoC RAL -->
+          <div class="glass-card">
+            <div class="card-header">
+              <div class="card-title"><div class="card-title-icon">📋</div>RAL Model</div>
+            </div>
+            <div class="form-group" style="margin-bottom:14px">
+              <label class="form-label">Enable RAL Model</label>
+              <div class="yn-toggle">
+                <div class="yn-pill no active" id="socRalNo" onclick="toggleRal('soc',false)">No</div>
+                <div class="yn-pill yes" id="socRalYes" onclick="toggleRal('soc',true)">Yes</div>
+              </div>
+            </div>
+            <div id="socRalFields" style="display:none">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="form-label">RAL Model Path</label>
+                  <div class="path-input-wrap">
+                    <input class="form-input" id="socRalPath" placeholder="/path/to/ral_model.sv">
+                    <span class="path-hint">📁</span>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Register Interface</label>
+                  <select class="form-select" id="socRalRegIf">
+                    <option value="">— Select Active VIP —</option>
+                  </select>
+                  <div class="form-error" id="err-socRalRegIf">RAL interface must be selected (only Active VIPs available)</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="nav-btns">
+          <button class="btn btn-ghost" onclick="prevStep(3)">← Back</button>
+          <div class="nav-right">
+            <button class="btn btn-primary" onclick="nextStep(3)">Continue to Review →</button>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- ═══════════════════════════════════════════════════════════
+           STEP 4 — REVIEW & EXECUTE
+      ════════════════════════════════════════════════════════════════ -->
+      <div class="step-panel" id="step4">
+        <div class="step-header">
+          <div class="step-eyebrow">Step 04</div>
+          <h1 class="step-title">Review &amp; Execute</h1>
+          <p class="step-desc">Review your configuration, then launch the TB generation process.</p>
+        </div>
+
+        <!-- Summary -->
+        <div class="glass-card">
+          <div class="card-header">
+            <div class="card-title"><div class="card-title-icon">📋</div>Configuration Summary</div>
+          </div>
+          <div id="summaryContent"></div>
+        </div>
+
+        <!-- JSON Preview -->
+        <div class="glass-card">
+          <div class="card-header" onclick="toggleSection('json-preview')">
+            <div class="card-title"><div class="card-title-icon">{ }</div>JSON Configuration</div>
+            <div class="collapse-btn" id="json-preview-btn">−</div>
+          </div>
+          <div class="collapsible-body" id="json-preview-body" style="max-height:400px">
+            <div class="json-preview" id="jsonPreviewContent"></div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div style="display:flex;gap:10px;margin-bottom:16px">
+          <button class="btn btn-secondary" onclick="saveConfig()" style="flex:1;justify-content:center">
+            💾 Save Config
+          </button>
+          <label class="btn btn-secondary" style="flex:1;justify-content:center;cursor:pointer">
+            📂 Load Config
+            <input type="file" accept=".json" onchange="loadConfig(event)" style="display:none">
+          </label>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <button class="btn btn-execute" id="executeBtn" onclick="executeTask()" style="flex:1">
+            🚀 Execute Task
+          </button>
+
+          <!-- Small upload icon with tooltip -->
+          <div class="exec-upload-icon-wrap">
+            <div class="exec-upload-icon" onclick="document.getElementById('execScriptInput').click()" id="execUploadIcon">
+              📄
+            </div>
+            <div class="exec-upload-tooltip">
+              <div style="font-weight:600;margin-bottom:4px">Load Custom Execution Script</div>
+              <div style="font-size:0.72rem;color:var(--text2);line-height:1.4">Upload a .txt file per TB type (IP/SS/SoC). Each line streams in the terminal. Scripts are saved separately for each type.</div>
+              <div id="execLoadedInfo" style="margin-top:6px;font-size:0.72rem;color:var(--teal);display:none"></div>
+            </div>
+            <input type="file" id="execScriptInput" accept=".txt" style="display:none" onchange="execFileSelected(event)">
+          </div>
+          <div id="execFileLoaded" class="exec-file-loaded" style="flex-basis:100%">
+            <span class="file-name" id="execFileName"></span>
+            <span class="exec-clear-btn" onclick="execClearFile()">✕ Clear</span>
+          </div>
+        </div>
+
+        <!-- Terminal Output -->
+        <div class="terminal-wrap" id="terminalWrap" style="display:none">
+          <div class="terminal-bar">
+            <div class="term-dot red"></div>
+            <div class="term-dot yellow"></div>
+            <div class="term-dot green"></div>
+            <div class="term-title">DV-Wizard Terminal</div>
+          </div>
+          <div class="terminal-body" id="terminalBody">
+            <span class="term-cursor" id="termCursor"></span>
+          </div>
+        </div>
+
+        <div class="nav-btns">
+          <button class="btn btn-ghost" onclick="prevStep(4)">← Back</button>
+          <div class="nav-right">
+            <button class="btn btn-primary" onclick="newTask()" style="margin-right:8px">＋ New Task</button>
+            <button class="btn btn-ghost" onclick="resetWizard()">↺ Start Over</button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </main>
+</div>
+
+<!-- Registry Viewer Slide Panel -->
+<div class="rv-overlay" id="rvOverlay" onclick="closeRegistryViewer()"></div>
+<div class="registry-viewer" id="registryViewer">
+  <div class="rv-header">
+    <div class="rv-title">📦 Component Registry</div>
+    <div class="rv-close" onclick="closeRegistryViewer()">✕</div>
+  </div>
+  <div class="rv-body" id="rvBody"></div>
+</div>
+
+<!-- MODAL: Custom Task -->
+<div class="modal-overlay" id="customTaskModal">
+  <div class="modal">
+    <div class="modal-title">➕ Add Custom Task</div>
+    <div class="form-group" style="margin-bottom:14px">
+      <label class="form-label">Task Name <span class="required">*</span></label>
+      <input class="form-input" id="customTaskName" placeholder="e.g. Custom Verification Step">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Description</label>
+      <textarea class="form-input" id="customTaskDesc" placeholder="Describe what this task does..." style="height:80px;resize:none"></textarea>
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-ghost" onclick="closeCustomModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="addCustomTask()">Add Task</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════════════════════════
+const state = {
+  currentStep: 1,
+  projectName: '', tbRootDir: '', projectRootDir: '', rtlRootDir: '',
+  simRoot: '', simTool: 'VCS', vcsHome: '', vcsVersion: '',
+  xceliumHome: '', xceliumVersion: '', questaHome: '', questaVersion: '',
+  verdiHome: '', verdiVersion: '', designwareHome: '', uvmHome: '',
+  dvUtilityHome: '', vipHome: '', commonVipHome: '',
+  selectedTask: null,
+  tbType: null, tbComponentName: '',
+  ipVips: [], ssCModel: false, ssRal: false,
+  ipCModel: false, ipRal: false,
+  ssIps: [], ssVips: [],
+  socSsItems: [], socVips: [],
+  socCModel: false, socRal: false,
+  tasks: []
+};
+
+function updateState(key, val) { state[key] = val; }
+
+// ══════════════════════════════════════════════════════════════════
+//  TASKS
+// ══════════════════════════════════════════════════════════════════
+const defaultTasks = [
+  { icon:'🏗️', name:'TB Generation', desc:'Generate IP, SS or SoC testbench using AI-powered backend scripts', id:'tb-gen' },
+  { icon:'🔌', name:'VIP Integration', desc:'Integrate Verification IP components into existing testbench', id:'vip-int' },
+  { icon:'📋', name:'RAL Generation', desc:'Generate Register Abstraction Layer model from spec', id:'ral-gen' },
+  { icon:'🧪', name:'Testcase Generation', desc:'Generate testcases from testplan or single test from prompt', id:'tc-gen' },
+  { icon:'🚀', name:'Run Regression', desc:'Execute full regression suite and collect results', id:'run-reg' },
+  { icon:'📊', name:'Coverage Model', desc:'Generate functional and code coverage model', id:'cov-model' },
+  { icon:'🔍', name:'Review Testbench', desc:'AI-assisted review of testbench quality and completeness', id:'review-tb' },
+  { icon:'📄', name:'Review RTL', desc:'Review RTL against PRD and FID specifications', id:'review-rtl' },
+  { icon:'📈', name:'Regression Report', desc:'Generate detailed regression results report', id:'reg-report' },
+  { icon:'🏆', name:'Certify Testbench', desc:'Introduce bugs in RTL to verify testcase quality (mutation testing)', id:'certify-tb' },
+  { icon:'🐛', name:'Debug', desc:'Debug simulation failures with AI assistance', id:'debug' },
+];
+
+state.tasks = [...defaultTasks];
+
+const ENABLED_TASKS = new Set(['tb-gen']); // Only TB Generation is implemented
+
+function renderTasks() {
+  const grid = document.getElementById('taskGrid');
+  grid.innerHTML = '';
+  state.tasks.forEach(t => {
+    const isEnabled = ENABLED_TASKS.has(t.id);
+    const card = document.createElement('div');
+    card.className = 'task-card' + (state.selectedTask === t.id ? ' selected' : '') + (!isEnabled ? ' disabled' : '');
+    card.setAttribute('data-id', t.id);
+    card.innerHTML = `
+      <div class="task-check">✓</div>
+      ${!isEnabled ? '<div class="coming-soon">Coming Soon</div>' : ''}
+      <span class="task-icon">${t.icon}</span>
+      <div class="task-name">${t.name}</div>
+      <div class="task-desc">${t.desc}</div>
+    `;
+    if (isEnabled) card.onclick = () => selectTask(t.id);
+    grid.appendChild(card);
+  });
+}
+
+function selectTask(id) {
+  state.selectedTask = id;
+  document.querySelectorAll('.task-card').forEach(c => {
+    c.classList.toggle('selected', c.dataset.id === id);
+  });
+  document.getElementById('err-task').classList.remove('show');
+}
+
+// Custom task modal
+function openCustomModal() {
+  document.getElementById('customTaskModal').classList.add('show');
+}
+function closeCustomModal() {
+  document.getElementById('customTaskModal').classList.remove('show');
+  document.getElementById('customTaskName').value = '';
+  document.getElementById('customTaskDesc').value = '';
+}
+function addCustomTask() {
+  const name = document.getElementById('customTaskName').value.trim();
+  if (!name) return;
+  const desc = document.getElementById('customTaskDesc').value.trim() || 'Custom user-defined task';
+  const id = 'custom-' + Date.now();
+  state.tasks.push({ icon:'⚡', name, desc, id });
+  renderTasks();
+  closeCustomModal();
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  NAVIGATION
+// ══════════════════════════════════════════════════════════════════
+const stepNames = ['', 'Project Setup', 'Select Task', 'Configuration', 'Review & Execute'];
+
+function goToStep(n) {
+  if (n > state.currentStep) return; // can't skip forward
+  switchStep(n);
+}
+
+function nextStep(current) {
+  if (!validateStep(current)) return;
+  if (current === 4) return;
+  switchStep(current + 1);
+}
+
+function prevStep(current) {
+  if (current <= 1) return;
+  switchStep(current - 1);
+}
+
+function switchStep(n) {
+  const old = document.getElementById('step' + state.currentStep);
+  old.classList.remove('active');
+  state.currentStep = n;
+  const neu = document.getElementById('step' + n);
+  neu.classList.add('active');
+
+  // Restore form values from state
+  restoreStepValues(n);
+
+  // If entering step 4, build summary
+  if (n === 4) { buildSummary(); refreshExecUI(); }
+
+  updateProgressUI();
+}
+
+function restoreStepValues(n) {
+  if (n === 1) {
+    // Restore all Step 1 fields from state
+    const fields = ['projectName','tbRootDir','projectRootDir','rtlRootDir','simRoot',
+      'vcsHome','vcsVersion','xceliumHome','xceliumVersion','questaHome','questaVersion',
+      'verdiHome','verdiVersion','designwareHome','uvmHome','dvUtilityHome','vipHome','commonVipHome'];
+    fields.forEach(f => {
+      const el = document.getElementById(f);
+      if (el && state[f]) el.value = state[f];
+    });
+    if (state.simTool) selectSimTool(state.simTool);
+    updateStep1RegistryCount();
+  }
+  if (n === 2) {
+    // Restore task selection
+    if (state.selectedTask) {
+      document.querySelectorAll('.task-card').forEach(c => {
+        c.classList.toggle('selected', c.dataset.id === state.selectedTask);
+      });
+    }
+  }
+  if (n === 3) {
+    // Restore TB type selection and component name
+    if (state.tbType) {
+      ['IP','SS','SoC','VIP'].forEach(t => {
+        document.getElementById('type-' + t).classList.toggle('selected', t === state.tbType);
+      });
+      document.getElementById('ipConfig').style.display = state.tbType === 'IP' ? '' : 'none';
+      document.getElementById('ssConfig').style.display = state.tbType === 'SS' ? '' : 'none';
+      document.getElementById('socConfig').style.display = state.tbType === 'SoC' ? '' : 'none';
+      document.getElementById('vipConfig').style.display = state.tbType === 'VIP' ? '' : 'none';
+      document.getElementById('tbNameCard').style.display = '';
+      if (state.tbComponentName) document.getElementById('tbComponentName').value = state.tbComponentName;
+      updateHierarchyVisibility();
+    }
+  }
+}
+
+function updateProgressUI() {
+  const n = state.currentStep;
+  document.getElementById('progressFill').style.width = (n * 25) + '%';
+  document.getElementById('curStepLabel').textContent = n;
+  document.getElementById('curStepName').textContent = stepNames[n];
+
+  for (let i = 1; i <= 4; i++) {
+    const dot = document.getElementById('dot' + i);
+    dot.className = 'dot' + (i === n ? ' active' : (i < n ? ' done' : ''));
+    const sideStep = document.querySelector('.sidebar-step[data-step="' + i + '"]');
+    if (i < n) { sideStep.classList.remove('active'); sideStep.classList.add('completed'); sideStep.querySelector('.step-num').textContent = ''; }
+    else if (i === n) { sideStep.classList.add('active'); sideStep.classList.remove('completed'); sideStep.querySelector('.step-num').textContent = i; }
+    else { sideStep.classList.remove('active','completed'); sideStep.querySelector('.step-num').textContent = i; }
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  VALIDATION
+// ══════════════════════════════════════════════════════════════════
+function validateStep(n) {
+  let ok = true;
+  if (n === 1) {
+    ['projectName','tbRootDir','projectRootDir'].forEach(f => {
+      const el = document.getElementById(f);
+      const err = document.getElementById('err-' + f);
+      if (!el.value.trim()) {
+        el.classList.add('error');
+        err.classList.add('show');
+        ok = false;
+      } else {
+        el.classList.remove('error');
+        err.classList.remove('show');
+      }
+    });
+  }
+  if (n === 2) {
+    if (!state.selectedTask) {
+      document.getElementById('err-task').classList.add('show');
+      ok = false;
+    }
+  }
+  if (n === 3) {
+    if (!state.tbType) {
+      document.getElementById('err-tbType').classList.add('show');
+      ok = false;
+    }
+    const nameEl = document.getElementById('tbComponentName');
+    const nameErr = document.getElementById('err-tbComponentName');
+    if (state.tbType && !nameEl.value.trim()) {
+      nameEl.classList.add('error');
+      nameErr.classList.add('show');
+      ok = false;
+    } else {
+      nameEl.classList.remove('error');
+      nameErr.classList.remove('show');
+      state.tbComponentName = nameEl.value.trim();
+    }
+
+    // RAL validation: if RAL is enabled, interface must be selected
+    if (state.tbType) {
+      const ralScopes = {
+        IP:  { yesId: 'ipRalYes',  selId: 'ipRalRegIf',  errId: 'err-ipRalRegIf' },
+        SS:  { yesId: 'ssRalYes',  selId: 'ssRalRegIf',  errId: 'err-ssRalRegIf' },
+        SoC: { yesId: 'socRalYes', selId: 'socRalRegIf', errId: 'err-socRalRegIf' },
+      };
+      const ral = ralScopes[state.tbType];
+      if (ral) {
+        const ralEnabled = document.getElementById(ral.yesId)?.classList.contains('active');
+        const ralSel = document.getElementById(ral.selId);
+        const ralErr = document.getElementById(ral.errId);
+        if (ralEnabled && ralSel && !ralSel.value) {
+          ralSel.classList.add('error');
+          if (ralErr) ralErr.classList.add('show');
+          ok = false;
+          // Scroll to RAL section
+          ralSel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } else {
+          if (ralSel) ralSel.classList.remove('error');
+          if (ralErr) ralErr.classList.remove('show');
+        }
+      }
+    }
+  }
+  return ok;
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  SIM TOOL TOGGLE
+// ══════════════════════════════════════════════════════════════════
+function selectSimTool(tool) {
+  state.simTool = tool;
+  document.querySelectorAll('.toggle-pill').forEach(p => {
+    if (['VCS','Xcelium','Questa'].includes(p.textContent)) {
+      p.classList.toggle('active', p.textContent === tool);
+    }
+  });
+  ['vcs','xcelium','questa'].forEach(t => {
+    document.getElementById(t + '-fields').style.display = t.toLowerCase() === tool.toLowerCase() ? '' : 'none';
+  });
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  COLLAPSIBLE SECTIONS
+// ══════════════════════════════════════════════════════════════════
+function toggleSection(id) {
+  const body = document.getElementById(id + '-body');
+  const btn = document.getElementById(id + '-btn');
+  if (!body) return;
+  if (body.classList.contains('collapsed')) {
+    body.classList.remove('collapsed');
+    body.style.maxHeight = '2000px';
+    btn.textContent = '−';
+  } else {
+    body.classList.add('collapsed');
+    btn.textContent = '+';
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  TB TYPE
+// ══════════════════════════════════════════════════════════════════
+function selectTbType(type) {
+  state.tbType = type;
+  ['IP','SS','SoC','VIP'].forEach(t => {
+    document.getElementById('type-' + t).classList.toggle('selected', t === type);
+  });
+  document.getElementById('ipConfig').style.display = type === 'IP' ? '' : 'none';
+  document.getElementById('ssConfig').style.display = type === 'SS' ? '' : 'none';
+  document.getElementById('socConfig').style.display = type === 'SoC' ? '' : 'none';
+  document.getElementById('vipConfig').style.display = type === 'VIP' ? '' : 'none';
+  document.getElementById('err-tbType').classList.remove('show');
+
+  // Show component name card with correct label
+  const nameCard = document.getElementById('tbNameCard');
+  nameCard.style.display = '';
+  const icons = { IP: '🧊', SS: '🧩', SoC: '🏛️', VIP: '🔌' };
+  const labels = { IP: 'IP', SS: 'Subsystem', SoC: 'SoC', VIP: 'VIP' };
+  const placeholders = { IP: 'e.g. pcie_ip', SS: 'e.g. pcie_ss', SoC: 'e.g. my_soc', VIP: 'e.g. axi_vip' };
+  document.getElementById('tbNameIcon').textContent = icons[type];
+  document.getElementById('tbNameLabel').textContent = labels[type] + ' Name';
+  document.getElementById('tbNameFieldLabel').textContent = labels[type];
+  document.getElementById('tbComponentName').placeholder = placeholders[type];
+  // Restore previous value if switching back
+  if (state.tbComponentName) document.getElementById('tbComponentName').value = state.tbComponentName;
+  // Restore description for this type
+  const descKey = type.toLowerCase() + 'Description';
+  const descEl = document.getElementById('componentDescription');
+  const preview = document.getElementById('descHoverPreview');
+  if (descEl) {
+    descEl.value = state[descKey] || '';
+    descEl.placeholder = 'Describe this ' + labels[type] + ' — functionality, architecture, key features for AI tool...';
+  }
+  if (preview) {
+    const val = state[descKey] || '';
+    preview.textContent = val;
+    preview.classList.toggle('has-text', !!val.trim());
+  }
+
+  // Auto-populate from registry
+  if (type === 'SS') autoPopulateSSFromRegistry();
+  if (type === 'SoC') autoPopulateSoCFromRegistry();
+  updateHierarchyVisibility();
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  COMPANY LOGO
+// ══════════════════════════════════════════════════════════════════
+function handleLogoUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const dataUrl = e.target.result;
+    localStorage.setItem('dv-wizard-logo', dataUrl);
+    applyLogo(dataUrl);
+  };
+  reader.readAsDataURL(file);
+}
+
+function applyLogo(dataUrl) {
+  const container = document.getElementById('companyLogo');
+  const placeholder = document.getElementById('logoPlaceholder');
+  if (dataUrl) {
+    placeholder.style.display = 'none';
+    // Remove existing img if any
+    const existing = container.querySelector('img');
+    if (existing) existing.remove();
+    const img = document.createElement('img');
+    img.src = dataUrl;
+    img.alt = 'Company Logo';
+    container.appendChild(img);
+    container.classList.add('has-image');
+  }
+}
+
+function initLogo() {
+  const saved = localStorage.getItem('dv-wizard-logo');
+  if (saved) applyLogo(saved);
+}
+
+// Description section toggle and hover
+function toggleDescSection() {
+  const sec = document.getElementById('descSection');
+  const icon = document.getElementById('descToggleIcon');
+  if (sec.style.display === 'none') {
+    sec.style.display = '';
+    icon.textContent = '▼';
+  } else {
+    sec.style.display = 'none';
+    icon.textContent = '▶';
+  }
+}
+
+function updateComponentDescription(val) {
+  const tbType = state.tbType || 'IP';
+  const key = tbType.toLowerCase() + 'Description';
+  state[key] = val;
+  // Update hover preview
+  const preview = document.getElementById('descHoverPreview');
+  if (preview) {
+    if (val && val.trim()) {
+      preview.textContent = val;
+      preview.classList.add('has-text');
+    } else {
+      preview.textContent = '';
+      preview.classList.remove('has-text');
+    }
+  }
+}
+
+// VIP generation prop setter
+function setVipGenProp(prop, val, el) {
+  state['vipGen_' + prop] = val;
+  const group = el.closest('.toggle-group');
+  group.querySelectorAll('.toggle-pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  HIERARCHY VIEWER
+// ══════════════════════════════════════════════════════════════════
+function toggleHierarchy() {
+  const body = document.getElementById('hierarchyBody');
+  const btn = document.getElementById('hierarchyToggleBtn');
+  if (body.style.display === 'none') {
+    body.style.display = '';
+    btn.textContent = 'Hide';
+    buildHierarchyTree();
+  } else {
+    body.style.display = 'none';
+    btn.textContent = 'Show';
+  }
+}
+
+function updateHierarchyVisibility() {
+  const card = document.getElementById('hierarchyCard');
+  if (!card) return;
+  card.style.display = (state.tbType === 'IP' || state.tbType === 'SS' || state.tbType === 'SoC') ? '' : 'none';
+}
+
+function buildHierarchyTree() {
+  const tree = document.getElementById('hierarchyTree');
+  if (!tree) return;
+  const reg = getRegistryForTbRoot();
+  const A = 'color:#5EBAA9;font-weight:600'; // Active - soft teal
+  const P = 'color:#FBBF24;font-weight:600'; // Passive - soft amber
+  const teal = 'color:var(--teal)';
+  const dim = 'color:var(--text3)';
+  let lines = [];
+
+  // Helper to render VIP with full color
+  function vipLine(prefix, name, mode, isLast) {
+    const modeStyle = mode === 'Passive' ? P : A;
+    const modeLabel = mode === 'Passive' ? 'Passive' : 'Active';
+    const connector = isLast ? '└' : '├';
+    return `${prefix}${connector}── <span style="${modeStyle}">🔌 ${escapeHtml(name)}</span> <span style="${modeStyle}">[${modeLabel}]</span>`;
+  }
+
+  // Helper to get VIPs for an IP from registry or overrides
+  function getIpVips(ipName, overrides) {
+    if (overrides && overrides.length > 0) return overrides.filter(Boolean);
+    const regIp = (reg.ips || []).find(i => i.name === ipName);
+    return regIp ? (regIp.vips || []) : [];
+  }
+
+  if (state.tbType === 'IP') {
+    const ipName = state.tbComponentName || 'ip';
+    lines.push(`<span style="${teal}">🧊 ${escapeHtml(ipName)}</span> <span style="${dim}">(IP)</span>`);
+    const vips = (vipData.ip || []).filter(Boolean);
+    vips.forEach((v, vi) => {
+      lines.push(vipLine('  ', v.name, v.mode, vi === vips.length - 1));
+    });
+    if (vips.length === 0) lines.push(`  <span style="${dim}">└── (no VIPs configured)</span>`);
+  }
+
+  if (state.tbType === 'SS') {
+    const ssName = state.tbComponentName || 'subsystem';
+    lines.push(`<span style="${teal}">🧩 ${escapeHtml(ssName)}</span> <span style="${dim}">(SS)</span>`);
+    const allIps = ssIpData.filter(Boolean);
+    const extraVips = (vipData.ss || []).filter(Boolean);
+    const hasExtra = extraVips.length > 0;
+
+    allIps.forEach((ip, ii) => {
+      const ipIsLast = ii === allIps.length - 1 && !hasExtra;
+      const cnt = ip.count > 1 ? ` <span style="${P}">x${ip.count}</span>` : '';
+      const ipPrefix = ipIsLast ? '└' : '├';
+      const ipSub = ipIsLast ? ' ' : '│';
+      lines.push(`  ${ipPrefix}── <span style="${teal}">🧊 ${escapeHtml(ip.name)}</span>${cnt} <span style="${dim}">(IP)</span>`);
+      const vips = (ip.vips || []).filter(Boolean);
+      vips.forEach((v, vi) => {
+        lines.push(vipLine(`  ${ipSub}   `, v.name, v.mode, vi === vips.length - 1));
+      });
+    });
+    if (hasExtra) {
+      lines.push(`  └── <span style="${dim}">Extra VIPs</span>`);
+      extraVips.forEach((v, vi) => {
+        const cnt = v.count > 1 ? ` <span style="${P}">x${v.count}</span>` : '';
+        const modeStyle = v.mode === 'Passive' ? P : A;
+        const modeLabel = v.mode === 'Passive' ? 'Passive' : 'Active';
+        lines.push(`      ${vi === extraVips.length-1 ? '└' : '├'}── <span style="${modeStyle}">🔌 ${escapeHtml(v.name)}</span>${cnt} <span style="${modeStyle}">[${modeLabel}]</span>`);
+      });
+    }
+  }
+
+  if (state.tbType === 'SoC') {
+    const socName = state.tbComponentName || 'soc';
+    lines.push(`<span style="${teal}">🏛️ ${escapeHtml(socName)}</span> <span style="${dim}">(SoC)</span>`);
+    const components = socSsData.filter(Boolean);
+    const extraVips = (vipData.soc || []).filter(Boolean);
+    const hasExtra = extraVips.length > 0;
+
+    components.forEach((comp, ci) => {
+      const compIsLast = ci === components.length - 1 && !hasExtra;
+      const compPrefix = compIsLast ? '└' : '├';
+      const compSub = compIsLast ? ' ' : '│';
+      const cnt = comp.count > 1 ? ` <span style="${P}">x${comp.count}</span>` : '';
+      const isIP = (comp.componentType || 'SS') === 'IP';
+      const icon = isIP ? '🧊' : '🧩';
+      const label = isIP ? 'IP' : 'SS';
+      lines.push(`  ${compPrefix}── <span style="${teal}">${icon} ${escapeHtml(comp.name)}</span>${cnt} <span style="${dim}">(${label})</span>`);
+
+      if (isIP) {
+        // IP: show VIPs directly (use overrides from socSsData if available)
+        const vips = getIpVips(comp.name, comp.vips);
+        vips.forEach((v, vi) => {
+          lines.push(vipLine(`  ${compSub}   `, v.name, v.mode, vi === vips.length - 1));
+        });
+      } else {
+        // SS: show IPs, then each IP's VIPs
+        const regSs = (reg.sses || []).find(s => s.name === comp.name);
+        const ssIps = regSs ? (regSs.ips || []) : [];
+        // Group VIPs by source IP from comp.vips if available
+        const vipsByIp = {};
+        if (comp.vips && comp.vips.length > 0) {
+          comp.vips.filter(Boolean).forEach(v => {
+            const src = v.source || 'unknown';
+            if (!vipsByIp[src]) vipsByIp[src] = [];
+            vipsByIp[src].push(v);
+          });
+        }
+
+        ssIps.forEach((subIp, si) => {
+          const subIpIsLast = si === ssIps.length - 1;
+          const sub2 = subIpIsLast ? '└' : '├';
+          const sub3 = subIpIsLast ? ' ' : '│';
+          lines.push(`  ${compSub}   ${sub2}── <span style="${teal}">🧊 ${escapeHtml(subIp.name)}</span> <span style="${dim}">(IP)</span>`);
+          // Show VIPs for this sub-IP
+          const ipVips = vipsByIp[subIp.name] || getIpVips(subIp.name, null);
+          ipVips.forEach((v, vi) => {
+            lines.push(vipLine(`  ${compSub}   ${sub3}   `, v.name, v.mode, vi === ipVips.length - 1));
+          });
+        });
+      }
+    });
+
+    if (hasExtra) {
+      lines.push(`  └── <span style="${dim}">Extra VIPs</span>`);
+      extraVips.forEach((v, vi) => {
+        const cnt = v.count > 1 ? ` <span style="${P}">x${v.count}</span>` : '';
+        const modeStyle = v.mode === 'Passive' ? P : A;
+        const modeLabel = v.mode === 'Passive' ? 'Passive' : 'Active';
+        lines.push(`      ${vi === extraVips.length-1 ? '└' : '├'}── <span style="${modeStyle}">🔌 ${escapeHtml(v.name)}</span>${cnt} <span style="${modeStyle}">[${modeLabel}]</span>`);
+      });
+    }
+  }
+
+  tree.innerHTML = lines.join('\n');
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  VIP ROWS
+// ══════════════════════════════════════════════════════════════════
+let vipCounters = { ip: 0, ss: 0, soc: 0 };
+let vipData = { ip: [], ss: [], soc: [] };
+
+function changeVipCount(scope, delta) {
+  const activeCount = vipData[scope].filter(Boolean).length;
+  const target = Math.max(0, activeCount + delta);
+  if (delta > 0) {
+    for (let i = 0; i < delta; i++) addVipRow(scope);
+  } else {
+    for (let i = 0; i < -delta; i++) removeLastVipRow(scope);
+  }
+  vipCounters[scope] = vipData[scope].filter(Boolean).length;
+  document.getElementById(scope + 'VipCount').textContent = vipCounters[scope];
+}
+
+function addVipRow(scope) {
+  const container = scope === 'ip' ? 'ipVipRows' : scope === 'ss' ? 'ssVipRows' : 'socVipRows';
+  const rows = document.getElementById(container);
+  const idx = vipData[scope].length;
+  const data = { name:'', count:1, mode:'Active', type:'Common', comment:'' };
+  vipData[scope].push(data);
+  vipCounters[scope] = vipData[scope].filter(Boolean).length;
+  if (document.getElementById(scope + 'VipCount')) document.getElementById(scope + 'VipCount').textContent = vipCounters[scope];
+
+  const row = document.createElement('div');
+  row.className = 'dynamic-row';
+  row.id = scope + '-vip-' + idx;
+  row.innerHTML = `
+    <div class="row-header">
+      <div class="row-badge">VIP #${vipCounters[scope]}</div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <div class="comment-icon" onclick="toggleComment(this)" title="Add note for AI tool">💬</div>
+        <div class="delete-btn" onclick="removeVipRow('${scope}',${idx})">✕</div>
+      </div>
+    </div>
+    <div class="form-grid" style="grid-template-columns:2fr 1fr 1fr 1fr">
+      <div class="form-group">
+        <label class="form-label">VIP Name</label>
+        <input class="form-input" placeholder="e.g. AHB, AXI, APB" value="${data.name}"
+          oninput="vipData['${scope}'][${idx}].name=this.value;updateRalDropdowns()">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Count</label>
+        <input class="form-input" type="number" value="1" min="1" style="text-align:center"
+          oninput="vipData['${scope}'][${idx}].count=parseInt(this.value)||1">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Mode</label>
+        <div class="toggle-group">
+          <div class="toggle-pill active" onclick="setVipProp('${scope}',${idx},'mode','Active',this)">Active</div>
+          <div class="toggle-pill" onclick="setVipProp('${scope}',${idx},'mode','Passive',this)">Passive</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Type</label>
+        <div class="toggle-group">
+          <div class="toggle-pill" onclick="setVipProp('${scope}',${idx},'type','Common',this)">Common</div>
+          <div class="toggle-pill active" onclick="setVipProp('${scope}',${idx},'type','Custom',this)">Custom</div>
+        </div>
+      </div>
+    </div>
+    <div class="comment-input" style="display:none;margin-top:8px">
+      <input class="form-input" style="font-size:0.75rem;padding:5px 8px" placeholder="Note for AI tool (e.g. protocol version, bus width...)"
+        oninput="vipData['${scope}'][${idx}].comment=this.value">
+    </div>
+  `;
+  rows.appendChild(row);
+}
+
+function setVipProp(scope, idx, prop, val, el) {
+  vipData[scope][idx][prop] = val;
+  const group = el.closest('.toggle-group');
+  group.querySelectorAll('.toggle-pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  if (prop === 'name') updateRalDropdowns();
+}
+
+function removeVipRow(scope, idx) {
+  const row = document.getElementById(scope + '-vip-' + idx);
+  if (row) row.remove();
+  vipData[scope][idx] = null;
+  // Update counter display
+  const countEl = document.getElementById(scope + 'VipCount');
+  if (countEl) countEl.textContent = vipData[scope].filter(Boolean).length;
+  updateRalDropdowns();
+}
+
+function removeLastVipRow(scope) {
+  const container = scope === 'ip' ? 'ipVipRows' : scope === 'ss' ? 'ssVipRows' : 'socVipRows';
+  const rows = document.getElementById(container);
+  if (rows.lastChild) { rows.removeChild(rows.lastChild); vipData[scope].pop(); }
+}
+
+function updateRalDropdowns() {
+  // IP and SoC scopes use vipData as before — only Active VIPs for RAL
+  ['ip', 'soc'].forEach(scope => {
+    const sel = scope === 'ip' ? 'ipRalRegIf' : 'socRalRegIf';
+    const dropdown = document.getElementById(sel);
+    if (!dropdown) return;
+    const cur = dropdown.value;
+    dropdown.innerHTML = '<option value="">— Select interface —</option>';
+    (vipData[scope] || []).filter(Boolean).forEach(v => {
+      if (v.name && v.mode !== 'Passive') {
+        const opt = document.createElement('option');
+        opt.value = v.name; opt.textContent = v.name;
+        if (v.name === cur) opt.selected = true;
+        dropdown.appendChild(opt);
+      }
+    });
+  });
+
+  // SS scope is handled separately by updateSsRalDropdown
+  updateSsRalDropdown();
+}
+
+// SS RAL dropdown: all sub-IP VIPs + extra SS-level VIPs
+function updateSsRalDropdown() {
+  const dropdown = document.getElementById('ssRalRegIf');
+  if (!dropdown) return;
+  const cur = dropdown.value;
+  dropdown.innerHTML = '<option value="">— Select interface —</option>';
+
+  const seen = new Set();
+
+  // Collect Active VIPs from all sub-IPs (Passive cannot be used for RAL)
+  ssIpData.filter(Boolean).forEach(ip => {
+    const ipName = ip.name || 'unnamed';
+    (ip.vips || []).filter(Boolean).forEach(v => {
+      if (v.name && v.mode !== 'Passive') {
+        const label = v.name + ' (' + ipName + ')';
+        const val = v.name + '__' + ipName;
+        if (!seen.has(val)) {
+          seen.add(val);
+          const opt = document.createElement('option');
+          opt.value = val; opt.textContent = label;
+          if (val === cur) opt.selected = true;
+          dropdown.appendChild(opt);
+        }
+      }
+    });
+  });
+
+  // Add extra SS-level Active VIPs
+  (vipData.ss || []).filter(Boolean).forEach(v => {
+    if (v.name && v.mode !== 'Passive') {
+      const label = v.name + ' (SS-level)';
+      const val = v.name + '__ss';
+      if (!seen.has(val)) {
+        seen.add(val);
+        const opt = document.createElement('option');
+        opt.value = val; opt.textContent = label;
+        if (val === cur) opt.selected = true;
+        dropdown.appendChild(opt);
+      }
+    }
+  });
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  SS IP ROWS
+// ══════════════════════════════════════════════════════════════════
+let ssIpData = [];
+let ssIpCounter = 0;
+
+function getSsIpActiveCount() { return ssIpData.filter(Boolean).length; }
+
+function changeSsIpCount(delta) {
+  const current = getSsIpActiveCount();
+  const target = Math.max(0, current + delta);
+  if (delta > 0) for (let i = 0; i < delta; i++) addSsIpRow();
+  else for (let i = 0; i < -delta; i++) removeLastActiveSsIpRow();
+}
+
+function removeLastActiveSsIpRow() {
+  // Find last non-null entry and remove it
+  for (let i = ssIpData.length - 1; i >= 0; i--) {
+    if (ssIpData[i] !== null) {
+      removeSsIpRow(i);
+      return;
+    }
+  }
+}
+
+function addSsIpRow() {
+  const idx = ssIpData.length;
+  const data = { name:'', type:'Custom', path:'', count:1, vips:[], comment:'' };
+  ssIpData.push(data);
+  document.getElementById('ssIpCount').textContent = getSsIpActiveCount();
+
+  const row = document.createElement('div');
+  row.className = 'dynamic-row';
+  row.id = 'ss-ip-' + idx;
+  row.innerHTML = `
+    <div class="row-header">
+      <div class="row-badge">IP #${getSsIpActiveCount()}</div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <div class="comment-icon" onclick="toggleComment(this)" title="Add note for AI tool">💬</div>
+        <div class="delete-btn" onclick="removeSsIpRow(${idx})">✕</div>
+      </div>
+    </div>
+    <div class="form-grid" style="grid-template-columns:2fr 80px 1fr 2fr">
+      <div class="form-group">
+        <label class="form-label">IP Name</label>
+        <input class="form-input" placeholder="e.g. uart_ip" id="ssip-name-${idx}" value="${data.name}"
+          oninput="ssIpData[${idx}].name=this.value;autoFillSsIpPath(${idx});updateSsRalDropdown()">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Instances</label>
+        <input class="form-input" type="number" value="1" min="1" style="text-align:center"
+          oninput="ssIpData[${idx}].count=parseInt(this.value)||1">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Type</label>
+        <div class="toggle-group">
+          <div class="toggle-pill active" onclick="setSsIpType(${idx},'Custom',this)">Custom</div>
+          <div class="toggle-pill" onclick="setSsIpType(${idx},'Common',this)">Common</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">IP DV Path</label>
+        <div class="path-input-wrap">
+          <input class="form-input" id="ssip-path-${idx}" placeholder="Auto-filled based on type/name"
+            oninput="ssIpData[${idx}].path=this.value">
+          <span class="path-hint">📁</span>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:14px">
+      <div class="section-title" style="font-size:0.75rem">Interface VIPs</div>
+      <div style="display:flex;align-items:center;gap:16px;margin:8px 0 12px">
+        <span style="font-size:0.8rem;color:var(--text2)">Number of VIPs:</span>
+        <div class="counter-wrap">
+          <div class="counter-btn" onclick="changeSsIpVipCount(${idx}, -1)">−</div>
+          <div class="counter-val" id="ssip-vip-count-${idx}">0</div>
+          <div class="counter-btn" onclick="changeSsIpVipCount(${idx}, 1)">+</div>
+        </div>
+      </div>
+      <div id="ssip-vips-${idx}" class="dynamic-rows"></div>
+      <div class="add-row-btn" onclick="addSsIpFullVipRow(${idx})" style="margin-top:8px;font-size:0.78rem">＋ Add VIP</div>
+    </div>
+    <div class="comment-input" style="display:none;margin-top:10px">
+      <input class="form-input" style="font-size:0.75rem;padding:5px 8px" placeholder="Note for AI tool (e.g. IP purpose, integration notes...)"
+        oninput="ssIpData[${idx}].comment=this.value">
+    </div>
+  `;
+  document.getElementById('ssIpRows').appendChild(row);
+}
+
+// Add a VIP row inside an SS IP entry (auto-detected — no delete button, VIPs removed with IP)
+function addSsIpVipRow(ipIdx, prefill) {
+  const vipIdx = ssIpData[ipIdx].vips.length;
+  const data = prefill || { name:'', mode:'Active' };
+  ssIpData[ipIdx].vips.push(data);
+
+  const container = document.getElementById('ssip-vips-' + ipIdx);
+  const row = document.createElement('div');
+  row.className = 'dynamic-row';
+  row.id = 'ssip-vip-' + ipIdx + '-' + vipIdx;
+  row.style.padding = '10px 14px';
+  row.style.marginBottom = '6px';
+  const isFromRegistry = prefill && prefill.fromRegistry;
+  if (isFromRegistry) row.style.borderLeft = '3px solid var(--teal)';
+
+  row.innerHTML = `
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:6px;flex:1;min-width:180px">
+        <span class="row-badge" style="font-size:0.7rem;padding:2px 8px">${isFromRegistry ? '⚡ auto' : 'VIP'}</span>
+        <input class="form-input" style="font-size:0.82rem;padding:6px 10px" placeholder="VIP name" value="${escapeHtml(data.name)}"
+          oninput="ssIpData[${ipIdx}].vips[${vipIdx}].name=this.value">
+      </div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <span style="font-size:0.75rem;color:var(--text2)">Mode:</span>
+        <div class="toggle-group" style="width:150px">
+          <div class="toggle-pill ${data.mode==='Active'?'active':''}" style="font-size:0.72rem;padding:4px 10px"
+            onclick="setSsIpVipMode(${ipIdx},${vipIdx},'Active',this)">Active</div>
+          <div class="toggle-pill ${data.mode==='Passive'?'active':''}" style="font-size:0.72rem;padding:4px 10px"
+            onclick="setSsIpVipMode(${ipIdx},${vipIdx},'Passive',this)">Passive</div>
+        </div>
+      </div>
+      <div class="comment-icon" onclick="toggleComment(this)" title="Add note for AI tool">💬</div>
+      <div class="comment-input" style="display:none;flex-basis:100%;margin-top:4px">
+        <input class="form-input" style="font-size:0.75rem;padding:5px 8px" placeholder="Note for AI tool (e.g. purpose, protocol details...)"
+          oninput="ssIpData[${ipIdx}].vips[${vipIdx}].comment=this.value">
+      </div>
+    </div>
+  `;
+  container.appendChild(row);
+}
+
+// Full VIP row for manually added IPs in SS (matches IP task format)
+function addSsIpFullVipRow(ipIdx) {
+  const vipIdx = ssIpData[ipIdx].vips.length;
+  const data = { name:'', count:1, mode:'Active', type:'Common' };
+  ssIpData[ipIdx].vips.push(data);
+  document.getElementById('ssip-vip-count-' + ipIdx).textContent = ssIpData[ipIdx].vips.filter(Boolean).length;
+
+  const container = document.getElementById('ssip-vips-' + ipIdx);
+  const row = document.createElement('div');
+  row.className = 'dynamic-row';
+  row.id = 'ssip-vip-' + ipIdx + '-' + vipIdx;
+  row.style.padding = '12px 14px';
+  row.style.marginBottom = '6px';
+  row.innerHTML = `
+    <div class="row-header">
+      <div class="row-badge" style="font-size:0.7rem">VIP #${ssIpData[ipIdx].vips.filter(Boolean).length}</div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <div class="comment-icon" onclick="toggleComment(this)" title="Add note for AI tool">💬</div>
+        <div class="delete-btn" onclick="removeSsIpFullVipRow(${ipIdx},${vipIdx})" style="font-size:0.8rem">✕</div>
+      </div>
+    </div>
+    <div class="form-grid" style="grid-template-columns:2fr 1fr 1fr 1fr">
+      <div class="form-group">
+        <label class="form-label" style="font-size:0.75rem">VIP Name</label>
+        <input class="form-input" style="font-size:0.82rem;padding:6px 10px" placeholder="e.g. AHB, AXI, APB" value=""
+          oninput="ssIpData[${ipIdx}].vips[${vipIdx}].name=this.value;updateSsRalDropdown()">
+      </div>
+      <div class="form-group">
+        <label class="form-label" style="font-size:0.75rem">Count</label>
+        <input class="form-input" type="number" value="1" min="1" style="text-align:center;font-size:0.82rem;padding:6px 10px"
+          oninput="ssIpData[${ipIdx}].vips[${vipIdx}].count=parseInt(this.value)||1">
+      </div>
+      <div class="form-group">
+        <label class="form-label" style="font-size:0.75rem">Mode</label>
+        <div class="toggle-group">
+          <div class="toggle-pill active" style="font-size:0.72rem;padding:4px 8px" onclick="setSsIpVipProp(${ipIdx},${vipIdx},'mode','Active',this)">Active</div>
+          <div class="toggle-pill" style="font-size:0.72rem;padding:4px 8px" onclick="setSsIpVipProp(${ipIdx},${vipIdx},'mode','Passive',this)">Passive</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" style="font-size:0.75rem">Type</label>
+        <div class="toggle-group">
+          <div class="toggle-pill active" style="font-size:0.72rem;padding:4px 8px" onclick="setSsIpVipProp(${ipIdx},${vipIdx},'type','Common',this)">Common</div>
+          <div class="toggle-pill" style="font-size:0.72rem;padding:4px 8px" onclick="setSsIpVipProp(${ipIdx},${vipIdx},'type','Custom',this)">Custom</div>
+        </div>
+      </div>
+    </div>
+    <div class="comment-input" style="display:none;margin-top:8px">
+      <input class="form-input" style="font-size:0.75rem;padding:5px 8px" placeholder="Note for AI tool (e.g. protocol, bus width...)"
+        oninput="ssIpData[${ipIdx}].vips[${vipIdx}].comment=this.value">
+    </div>
+  `;
+  container.appendChild(row);
+  updateSsRalDropdown();
+}
+
+function setSsIpVipProp(ipIdx, vipIdx, prop, val, el) {
+  ssIpData[ipIdx].vips[vipIdx][prop] = val;
+  const group = el.closest('.toggle-group');
+  group.querySelectorAll('.toggle-pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  if (prop === 'name') updateSsRalDropdown();
+}
+
+function removeSsIpFullVipRow(ipIdx, vipIdx) {
+  const row = document.getElementById('ssip-vip-' + ipIdx + '-' + vipIdx);
+  if (row) row.remove();
+  ssIpData[ipIdx].vips[vipIdx] = null;
+  document.getElementById('ssip-vip-count-' + ipIdx).textContent = ssIpData[ipIdx].vips.filter(Boolean).length;
+  updateSsRalDropdown();
+}
+
+function changeSsIpVipCount(ipIdx, delta) {
+  const current = ssIpData[ipIdx].vips.filter(Boolean).length;
+  const target = Math.max(0, current + delta);
+  if (delta > 0) {
+    for (let i = 0; i < delta; i++) addSsIpFullVipRow(ipIdx);
+  } else {
+    // Remove from end
+    for (let i = 0; i < -delta; i++) {
+      const lastIdx = ssIpData[ipIdx].vips.length - 1;
+      if (lastIdx >= 0) {
+        const row = document.getElementById('ssip-vip-' + ipIdx + '-' + lastIdx);
+        if (row) row.remove();
+        ssIpData[ipIdx].vips.pop();
+      }
+    }
+    document.getElementById('ssip-vip-count-' + ipIdx).textContent = ssIpData[ipIdx].vips.filter(Boolean).length;
+    updateSsRalDropdown();
+  }
+}
+
+// Toggle comment input visibility
+function toggleComment(iconEl) {
+  const commentDiv = iconEl.closest('.dynamic-row, div').querySelector('.comment-input') ||
+                     iconEl.parentElement.querySelector('.comment-input');
+  if (!commentDiv) return;
+  const showing = commentDiv.style.display !== 'none';
+  commentDiv.style.display = showing ? 'none' : '';
+  if (!showing) {
+    const input = commentDiv.querySelector('input');
+    if (input) input.focus();
+  }
+}
+
+function setSsIpVipMode(ipIdx, vipIdx, mode, el) {
+  ssIpData[ipIdx].vips[vipIdx].mode = mode;
+  const group = el.closest('.toggle-group');
+  group.querySelectorAll('.toggle-pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function removeSsIpVipRow(ipIdx, vipIdx) {
+  const row = document.getElementById('ssip-vip-' + ipIdx + '-' + vipIdx);
+  if (row) row.remove();
+  ssIpData[ipIdx].vips[vipIdx] = null;
+}
+
+function setSsIpType(idx, type, el) {
+  ssIpData[idx].type = type;
+  const group = el.closest('.toggle-group');
+  group.querySelectorAll('.toggle-pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  autoFillSsIpPath(idx);
+}
+
+function autoFillSsIpPath(idx) {
+  const name = ssIpData[idx].name;
+  const type = ssIpData[idx].type;
+  const tbRoot = state.tbRootDir || '{TB_ROOT}';
+  const commonVip = state.commonVipHome || '{COMMON_VIP_HOME}';
+  const pathEl = document.getElementById('ssip-path-' + idx);
+  if (pathEl && name) {
+    const autoPath = type === 'Custom' ? tbRoot + '/' + name : commonVip + '/' + name;
+    pathEl.value = autoPath;
+    ssIpData[idx].path = autoPath;
+  }
+}
+
+function removeSsIpRow(idx) {
+  const row = document.getElementById('ss-ip-' + idx);
+  if (row) row.remove();
+  ssIpData[idx] = null;
+  document.getElementById('ssIpCount').textContent = getSsIpActiveCount();
+  updateRestoreRegistryBtn();
+  updateSsRalDropdown();
+}
+
+function removeLastSsIpRow() {
+  const rows = document.getElementById('ssIpRows');
+  if (rows.lastChild) { rows.removeChild(rows.lastChild); ssIpData.pop(); }
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  SOC SS ROWS
+// ══════════════════════════════════════════════════════════════════
+let socSsData = [];
+
+function addSocSsRow() {
+  const idx = socSsData.length;
+  const data = { name:'', type:'Custom', path:'', count:1, componentType:'SS' };
+  socSsData.push(data);
+
+  const row = document.createElement('div');
+  row.className = 'dynamic-row';
+  row.id = 'soc-ss-' + idx;
+  row.innerHTML = `
+    <div class="row-header">
+      <div class="row-badge">SS #${socSsData.filter(d=>d&&(d.componentType||'SS')==='SS').length}</div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <div class="comment-icon" onclick="toggleComment(this)" title="Add note for AI tool">💬</div>
+        <div class="delete-btn" onclick="removeSocSsRow(${idx})">✕</div>
+      </div>
+    </div>
+    <div class="form-grid" style="grid-template-columns:2fr 80px 1fr 2fr">
+      <div class="form-group">
+        <label class="form-label">SS Name</label>
+        <input class="form-input" placeholder="e.g. audio_ss" id="socss-name-${idx}"
+          oninput="socSsData[${idx}].name=this.value;autoFillSocSsPath(${idx})">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Instances</label>
+        <input class="form-input" type="number" value="1" min="1" style="text-align:center"
+          oninput="socSsData[${idx}].count=parseInt(this.value)||1">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Type</label>
+        <div class="toggle-group">
+          <div class="toggle-pill active" onclick="setSocSsType(${idx},'Custom',this)">Custom</div>
+          <div class="toggle-pill" onclick="setSocSsType(${idx},'Common',this)">Common</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">SS DV Path</label>
+        <div class="path-input-wrap">
+          <input class="form-input" id="socss-path-${idx}" placeholder="Auto-filled"
+            oninput="socSsData[${idx}].path=this.value">
+          <span class="path-hint">📁</span>
+        </div>
+      </div>
+    </div>
+    <div class="comment-input" style="display:none;margin-top:8px">
+      <input class="form-input" style="font-size:0.75rem;padding:5px 8px" placeholder="Note for AI tool..."
+        oninput="socSsData[${idx}].comment=this.value">
+    </div>
+  `;
+  document.getElementById('socSsRows').appendChild(row);
+}
+
+function setSocSsType(idx, type, el) {
+  socSsData[idx].type = type;
+  const group = el.closest('.toggle-group');
+  group.querySelectorAll('.toggle-pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  autoFillSocSsPath(idx);
+}
+
+function autoFillSocSsPath(idx) {
+  const name = socSsData[idx].name;
+  const type = socSsData[idx].type;
+  const tbRoot = state.tbRootDir || '{TB_ROOT}';
+  const commonVip = state.commonVipHome || '{COMMON_VIP_HOME}';
+  const pathEl = document.getElementById('socss-path-' + idx);
+  if (pathEl && name) {
+    pathEl.value = type === 'Custom' ? tbRoot + '/' + name : commonVip + '/' + name;
+    socSsData[idx].path = pathEl.value;
+  }
+}
+
+function removeSocSsRow(idx) {
+  const row = document.getElementById('soc-ss-' + idx);
+  if (row) row.remove();
+  socSsData[idx] = null;
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  SOC REGISTRY PICKER (pick IP or SS from registry)
+// ══════════════════════════════════════════════════════════════════
+function openSocRegistryPicker() {
+  const picker = document.getElementById('socRegistryPicker');
+  if (picker.classList && picker.classList.contains('show')) {
+    picker.classList.remove('show');
+    picker.innerHTML = '';
+    return;
+  }
+  const reg = getRegistryForTbRoot();
+  const allItems = [];
+  // Add IPs
+  (reg.ips || []).forEach(ip => allItems.push({ name: ip.name, compType: 'IP', vipCount: (ip.vips||[]).length, path: ip.dvPath || ip.path }));
+  // Add SSes
+  (reg.sses || []).forEach(ss => allItems.push({ name: ss.name, compType: 'SS', ipCount: (ss.ips||[]).length, path: ss.dvPath || ss.path }));
+
+  if (allItems.length === 0) {
+    alert('No IPs or SSes in registry. Generate components first.');
+    return;
+  }
+
+  const currentNames = new Set(socSsData.filter(Boolean).map(c => c.name));
+
+  picker.className = 'restore-picker show';
+  picker.innerHTML = `
+    <div class="restore-picker-title">Pick IP or SS from Registry:</div>
+    ${allItems.map(item => {
+      const added = currentNames.has(item.name);
+      const desc = item.compType === 'IP'
+        ? `${item.vipCount} VIP${item.vipCount!==1?'s':''}`
+        : `${item.ipCount} IP${item.ipCount!==1?'s':''}`;
+      return `
+        <div class="restore-picker-item" ${added ? 'style="opacity:0.4"' : ''}>
+          <div>
+            <div class="rp-name"><span class="badge" style="font-size:0.65rem;padding:1px 6px;margin-right:4px;${item.compType==='IP'?'background:rgba(0,201,167,0.15);color:var(--teal)':'background:rgba(255,209,102,0.15);color:var(--yellow)'}">${item.compType}</span>${escapeHtml(item.name)}</div>
+            <div class="rp-vips">${desc} · ${item.path}</div>
+          </div>
+          ${added
+            ? '<span style="font-size:0.72rem;color:var(--text3)">added</span>'
+            : `<div class="rp-add-btn" onclick="event.stopPropagation();addSocFromRegistry('${escapeHtml(item.name)}','${item.compType}')">+ Add</div>`
+          }
+        </div>
+      `;
+    }).join('')}
+  `;
+}
+
+function addSocFromRegistry(name, compType) {
+  const reg = getRegistryForTbRoot();
+  let item;
+  if (compType === 'IP') {
+    item = reg.ips.find(i => i.name === name);
+  } else {
+    item = reg.sses.find(s => s.name === name);
+  }
+  if (!item) return;
+
+  // Collect all VIPs: for IP directly, for SS gather from all sub-IPs
+  let allVips = [];
+  if (compType === 'IP') {
+    allVips = (item.vips || []).map(v => ({ name: v.name, mode: v.mode || 'Active', source: item.name }));
+  } else {
+    // SS: gather VIPs from each sub-IP in registry
+    (item.ips || []).forEach(subIp => {
+      const regIp = reg.ips.find(i => i.name === subIp.name);
+      if (regIp && regIp.vips) {
+        regIp.vips.forEach(v => {
+          allVips.push({ name: v.name, mode: v.mode || 'Active', source: subIp.name });
+        });
+      }
+    });
+  }
+
+  const idx = socSsData.length;
+  const data = { name: item.name, type: 'Custom', path: item.dvPath || item.path, count: 1, componentType: compType, vips: allVips };
+  socSsData.push(data);
+
+  const badge = compType === 'IP'
+    ? `<div class="row-badge" style="background:rgba(0,201,167,0.15);color:var(--teal)">🧊 IP — from registry</div>`
+    : `<div class="row-badge" style="background:var(--teal);color:var(--bg)">🧩 SS — from registry</div>`;
+
+  const vipCount = allVips.length;
+
+  const row = document.createElement('div');
+  row.className = 'dynamic-row';
+  row.id = 'soc-ss-' + idx;
+  row.style.borderLeft = '3px solid var(--teal)';
+  row.innerHTML = `
+    <div class="row-header">
+      ${badge}
+      <div style="display:flex;align-items:center;gap:6px">
+        <div class="comment-icon" onclick="toggleComment(this)" title="Add note for AI tool">💬</div>
+        <div class="delete-btn" onclick="removeSocSsRow(${idx})">✕</div>
+      </div>
+    </div>
+    <div class="form-grid" style="grid-template-columns:2fr 80px 1fr 2fr">
+      <div class="form-group">
+        <label class="form-label">${compType} Name</label>
+        <input class="form-input" value="${escapeHtml(item.name)}" id="socss-name-${idx}"
+          oninput="socSsData[${idx}].name=this.value;autoFillSocSsPath(${idx})">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Instances</label>
+        <input class="form-input" type="number" value="1" min="1" style="text-align:center"
+          oninput="socSsData[${idx}].count=parseInt(this.value)||1">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Type</label>
+        <div class="toggle-group">
+          <div class="toggle-pill active" onclick="setSocSsType(${idx},'Custom',this)">Custom</div>
+          <div class="toggle-pill" onclick="setSocSsType(${idx},'Common',this)">Common</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">${compType} DV Path</label>
+        <div class="path-input-wrap">
+          <input class="form-input" id="socss-path-${idx}" value="${data.path}"
+            oninput="socSsData[${idx}].path=this.value">
+          <span class="path-hint">📁</span>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:14px">
+      <div class="section-title" style="font-size:0.75rem">Interface VIPs <span style="color:var(--teal);font-weight:400">(${vipCount} from registry)</span></div>
+      <div id="soc-comp-vips-${idx}" class="dynamic-rows" style="margin-top:8px"></div>
+    </div>
+    <div class="comment-input" style="display:none;margin-top:8px">
+      <input class="form-input" style="font-size:0.75rem;padding:5px 8px" placeholder="Note for AI tool..."
+        oninput="socSsData[${idx}].comment=this.value">
+    </div>
+  `;
+  document.getElementById('socSsRows').appendChild(row);
+
+  // Render VIP rows grouped by source IP
+  renderSocCompVips(idx, allVips);
+
+  // Close picker
+  const picker = document.getElementById('socRegistryPicker');
+  picker.innerHTML = '';
+  picker.className = '';
+}
+
+// Render SoC component VIPs grouped by source IP
+function renderSocCompVips(compIdx, allVips) {
+  const container = document.getElementById('soc-comp-vips-' + compIdx);
+  if (!container) return;
+
+  // Group by source IP
+  const groups = {};
+  allVips.forEach((v, vi) => {
+    const src = v.source || 'unknown';
+    if (!groups[src]) groups[src] = [];
+    groups[src].push({ ...v, globalIdx: vi });
+  });
+
+  Object.keys(groups).forEach(ipName => {
+    // IP sub-header
+    const header = document.createElement('div');
+    header.style.cssText = 'font-size:0.75rem;font-weight:600;color:var(--text2);margin:10px 0 4px 4px;display:flex;align-items:center;gap:6px';
+    header.innerHTML = `<span>🧊</span> ${escapeHtml(ipName)}`;
+    container.appendChild(header);
+
+    // VIP rows under this IP
+    groups[ipName].forEach(v => {
+      const vi = v.globalIdx;
+      const vipRow = document.createElement('div');
+      vipRow.className = 'dynamic-row';
+      vipRow.style.padding = '8px 14px 8px 24px';
+      vipRow.style.marginBottom = '4px';
+      vipRow.style.borderLeft = '3px solid var(--teal)';
+      vipRow.innerHTML = `
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:6px;flex:1;min-width:140px">
+            <span class="row-badge" style="font-size:0.65rem;padding:1px 6px">⚡</span>
+            <span style="font-size:0.82rem;font-weight:500;color:var(--text)">${escapeHtml(v.name)}</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <span style="font-size:0.72rem;color:var(--text2)">Mode:</span>
+            <div class="toggle-group" style="width:150px">
+              <div class="toggle-pill ${v.mode==='Active'?'active':''}" style="font-size:0.72rem;padding:4px 10px"
+                onclick="setSocCompVipMode(${compIdx},${vi},'Active',this)">Active</div>
+              <div class="toggle-pill ${v.mode==='Passive'?'active':''}" style="font-size:0.72rem;padding:4px 10px"
+                onclick="setSocCompVipMode(${compIdx},${vi},'Passive',this)">Passive</div>
+            </div>
+          </div>
+        </div>
+      `;
+      container.appendChild(vipRow);
+    });
+  });
+}
+
+function setSocCompVipMode(compIdx, vipIdx, mode, el) {
+  if (socSsData[compIdx] && socSsData[compIdx].vips && socSsData[compIdx].vips[vipIdx]) {
+    socSsData[compIdx].vips[vipIdx].mode = mode;
+  }
+  const group = el.closest('.toggle-group');
+  group.querySelectorAll('.toggle-pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// Add an IP row to SoC (same structure as SS row but labeled as IP)
+function addSocIpRow() {
+  const idx = socSsData.length;
+  const data = { name:'', type:'Custom', path:'', count:1, componentType:'IP' };
+  socSsData.push(data);
+
+  const row = document.createElement('div');
+  row.className = 'dynamic-row';
+  row.id = 'soc-ss-' + idx;
+  row.innerHTML = `
+    <div class="row-header">
+      <div class="row-badge" style="background:rgba(0,201,167,0.15);color:var(--teal)">IP #${socSsData.filter(d => d && d.componentType === 'IP').length}</div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <div class="comment-icon" onclick="toggleComment(this)" title="Add note for AI tool">💬</div>
+        <div class="delete-btn" onclick="removeSocSsRow(${idx})">✕</div>
+      </div>
+    </div>
+    <div class="form-grid" style="grid-template-columns:2fr 80px 1fr 2fr">
+      <div class="form-group">
+        <label class="form-label">IP Name</label>
+        <input class="form-input" placeholder="e.g. uart_ip" id="socss-name-${idx}"
+          oninput="socSsData[${idx}].name=this.value;autoFillSocSsPath(${idx})">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Instances</label>
+        <input class="form-input" type="number" value="1" min="1" style="text-align:center"
+          oninput="socSsData[${idx}].count=parseInt(this.value)||1">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Type</label>
+        <div class="toggle-group">
+          <div class="toggle-pill active" onclick="setSocSsType(${idx},'Custom',this)">Custom</div>
+          <div class="toggle-pill" onclick="setSocSsType(${idx},'Common',this)">Common</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">IP DV Path</label>
+        <div class="path-input-wrap">
+          <input class="form-input" id="socss-path-${idx}" placeholder="Auto-filled"
+            oninput="socSsData[${idx}].path=this.value">
+          <span class="path-hint">📁</span>
+        </div>
+      </div>
+    </div>
+    <div class="comment-input" style="display:none;margin-top:8px">
+      <input class="form-input" style="font-size:0.75rem;padding:5px 8px" placeholder="Note for AI tool..."
+        oninput="socSsData[${idx}].comment=this.value">
+    </div>
+  `;
+  document.getElementById('socSsRows').appendChild(row);
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  COMMON VIP PICKER (from registry)
+// ══════════════════════════════════════════════════════════════════
+function getCommonVipsFromRegistry() {
+  return getAvailableVipsForIP();
+}
+
+function openCommonVipPicker(scope) {
+  // Check if picker already exists for this scope, toggle it
+  const existingPicker = document.getElementById('commonVipPicker-' + scope);
+  if (existingPicker) {
+    if (existingPicker.classList.contains('show')) {
+      existingPicker.classList.remove('show');
+      return;
+    }
+    existingPicker.remove();
+  }
+
+  const commonVips = getCommonVipsFromRegistry();
+  if (commonVips.length === 0) {
+    alert('No Common VIPs found in registry. Generate an IP with Common-type VIPs first.');
+    return;
+  }
+
+  // Find already added VIP names in this scope
+  const currentNames = new Set((vipData[scope] || []).filter(Boolean).map(v => v.name));
+
+  const container = scope === 'ip' ? 'ipVipRows' : scope === 'ss' ? 'ssVipRows' : 'socVipRows';
+  const parentEl = document.getElementById(container).parentElement;
+
+  const picker = document.createElement('div');
+  picker.className = 'restore-picker show';
+  picker.id = 'commonVipPicker-' + scope;
+  picker.innerHTML = `
+    <div class="restore-picker-title">Common VIPs from Registry — click to add:</div>
+    ${commonVips.map(v => {
+      const alreadyAdded = currentNames.has(v.name);
+      return `
+        <div class="restore-picker-item" ${alreadyAdded ? 'style="opacity:0.4"' : ''}>
+          <div>
+            <div class="rp-name">${escapeHtml(v.name)}</div>
+            <div class="rp-vips">${v.mode} · Common VIP</div>
+          </div>
+          ${alreadyAdded
+            ? '<span style="font-size:0.72rem;color:var(--text3)">already added</span>'
+            : `<div class="rp-add-btn" onclick="event.stopPropagation();addCommonVipFromRegistry('${scope}','${escapeHtml(v.name)}','${v.mode}')">+ Add</div>`
+          }
+        </div>
+      `;
+    }).join('')}
+  `;
+  parentEl.appendChild(picker);
+}
+
+function addCommonVipFromRegistry(scope, name, mode) {
+  // Add VIP row with pre-filled data
+  const container = scope === 'ip' ? 'ipVipRows' : scope === 'ss' ? 'ssVipRows' : 'socVipRows';
+  const rows = document.getElementById(container);
+  const idx = vipData[scope].length;
+  const data = { name: name, count: 1, mode: mode, type: 'Common', comment: '' };
+  vipData[scope].push(data);
+  vipCounters[scope] = vipData[scope].filter(Boolean).length;
+  if (document.getElementById(scope + 'VipCount')) document.getElementById(scope + 'VipCount').textContent = vipCounters[scope];
+
+  const row = document.createElement('div');
+  row.className = 'dynamic-row';
+  row.id = scope + '-vip-' + idx;
+  row.style.borderLeft = '3px solid var(--teal)';
+  row.innerHTML = `
+    <div class="row-header">
+      <div class="row-badge" style="background:var(--teal);color:var(--bg);font-size:0.7rem">from registry</div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <div class="comment-icon" onclick="toggleComment(this)" title="Add note for AI tool">💬</div>
+        <div class="delete-btn" onclick="removeVipRow('${scope}',${idx})">✕</div>
+      </div>
+    </div>
+    <div class="form-grid" style="grid-template-columns:2fr 1fr 1fr 1fr">
+      <div class="form-group">
+        <label class="form-label">VIP Name</label>
+        <input class="form-input" value="${escapeHtml(name)}"
+          oninput="vipData['${scope}'][${idx}].name=this.value;updateRalDropdowns()">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Count</label>
+        <input class="form-input" type="number" value="1" min="1" style="text-align:center"
+          oninput="vipData['${scope}'][${idx}].count=parseInt(this.value)||1">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Mode</label>
+        <div class="toggle-group">
+          <div class="toggle-pill ${mode==='Active'?'active':''}" onclick="setVipProp('${scope}',${idx},'mode','Active',this)">Active</div>
+          <div class="toggle-pill ${mode==='Passive'?'active':''}" onclick="setVipProp('${scope}',${idx},'mode','Passive',this)">Passive</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Type</label>
+        <div class="toggle-group">
+          <div class="toggle-pill active" onclick="setVipProp('${scope}',${idx},'type','Common',this)">Common</div>
+          <div class="toggle-pill" onclick="setVipProp('${scope}',${idx},'type','Custom',this)">Custom</div>
+        </div>
+      </div>
+    </div>
+    <div class="comment-input" style="display:none;margin-top:8px">
+      <input class="form-input" style="font-size:0.75rem;padding:5px 8px" placeholder="Note for AI tool..."
+        oninput="vipData['${scope}'][${idx}].comment=this.value">
+    </div>
+  `;
+  rows.appendChild(row);
+  updateRalDropdowns();
+
+  // Close picker
+  const picker = document.getElementById('commonVipPicker-' + scope);
+  if (picker) picker.remove();
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  C MODEL & RAL TOGGLES
+// ══════════════════════════════════════════════════════════════════
+function toggleCModel(scope, val) {
+  const yesEl = document.getElementById(scope + 'CModelYes');
+  const noEl = document.getElementById(scope + 'CModelNo');
+  const fields = document.getElementById(scope + 'CModelFields');
+  yesEl.classList.toggle('active', val);
+  noEl.classList.toggle('active', !val);
+  fields.style.display = val ? '' : 'none';
+}
+
+function toggleRal(scope, val) {
+  const yesEl = document.getElementById(scope + 'RalYes');
+  const noEl = document.getElementById(scope + 'RalNo');
+  const fields = document.getElementById(scope + 'RalFields');
+  yesEl.classList.toggle('active', val);
+  noEl.classList.toggle('active', !val);
+  fields.style.display = val ? '' : 'none';
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  STEP 4: SUMMARY & JSON
+// ══════════════════════════════════════════════════════════════════
+function buildSummary() {
+  const task = state.tasks.find(t => t.id === state.selectedTask);
+  const summaryEl = document.getElementById('summaryContent');
+
+  const rows = [
+    { label: 'Project Name', value: state.projectName || '—' },
+    { label: 'TB Root', value: state.tbRootDir || '—' },
+    { label: 'Project Root', value: state.projectRootDir || '—' },
+    { label: 'Sim Tool', value: state.simTool },
+    { label: 'Selected Task', value: task ? task.icon + ' ' + task.name : '—' },
+    { label: 'TB Type', value: state.tbType || '—' },
+    { label: (state.tbType || 'Component') + ' Name', value: state.tbComponentName || '—' },
+    { label: 'UVM Home', value: state.uvmHome || '—' },
+    { label: 'VIP Home', value: state.vipHome || '—' },
+  ];
+
+  summaryEl.innerHTML = `
+    <div class="summary-grid">
+      ${rows.map(r => `
+        <div class="summary-item">
+          <div class="summary-label">${r.label}</div>
+          <div class="summary-value">${r.value}</div>
+        </div>
+      `).join('')}
+    </div>
+    ${state.tbType === 'IP' && vipData.ip.filter(Boolean).length ? `
+      <div class="sep"></div>
+      <div class="section-title">VIPs Configured</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">
+        ${vipData.ip.filter(Boolean).map(v => `<span class="badge badge-teal">${v.name || 'unnamed'} (${v.mode})</span>`).join('')}
+      </div>
+    ` : ''}
+    ${state.tbType === 'SS' && ssIpData.filter(Boolean).length ? `
+      <div class="sep"></div>
+      <div class="section-title">IP DV Components</div>
+      ${ssIpData.filter(Boolean).map(ip => `
+        <div style="margin-bottom:8px">
+          <span class="badge badge-teal" style="margin-right:6px">${ip.name || 'unnamed'}</span>
+          ${(ip.vips||[]).filter(Boolean).map(v => `<span class="badge" style="background:${v.mode==='Active'?'rgba(0,201,167,0.15)':'rgba(255,209,102,0.15)'};color:${v.mode==='Active'?'var(--teal)':'var(--yellow)'};font-size:0.72rem">${v.name} (${v.mode})</span>`).join(' ')}
+        </div>
+      `).join('')}
+    ` : ''}
+  `;
+
+  // Build JSON
+  const cfg = buildConfig();
+  document.getElementById('jsonPreviewContent').innerHTML = syntaxHighlight(cfg);
+}
+
+function buildConfig() {
+  const task = state.tasks.find(t => t.id === state.selectedTask);
+  return {
+    project: {
+      name: state.projectName,
+      tb_root: state.tbRootDir,
+      project_root: state.projectRootDir,
+      rtl_root: state.rtlRootDir,
+      sim_root: state.simRoot,
+    },
+    tool: {
+      sim_tool: state.simTool,
+      vcs_home: state.vcsHome, vcs_version: state.vcsVersion,
+      xcelium_home: state.xceliumHome, xcelium_version: state.xceliumVersion,
+      questa_home: state.questaHome, questa_version: state.questaVersion,
+      verdi_home: state.verdiHome, verdi_version: state.verdiVersion,
+    },
+    env: {
+      designware_home: state.designwareHome,
+      uvm_home: state.uvmHome,
+      dv_utility_home: state.dvUtilityHome,
+      vip_home: state.vipHome,
+      common_vip_home: state.commonVipHome,
+    },
+    task: task ? { id: task.id, name: task.name } : null,
+    tb_type: state.tbType,
+    tb_component_name: state.tbComponentName,
+    ip_config: state.tbType === 'IP' ? {
+      vips: vipData.ip.filter(Boolean),
+      c_model: { enabled: document.getElementById('ipCModelYes')?.classList.contains('active') || false },
+      ral: { enabled: document.getElementById('ipRalYes')?.classList.contains('active') || false },
+    } : undefined,
+    ss_config: state.tbType === 'SS' ? {
+      ips: ssIpData.filter(Boolean).map(ip => ({
+        name: ip.name, type: ip.type, path: ip.path,
+        vips: (ip.vips || []).filter(Boolean).map(v => ({ name: v.name, mode: v.mode }))
+      })),
+      extra_vips: vipData.ss.filter(Boolean),
+    } : undefined,
+    soc_config: state.tbType === 'SoC' ? {
+      components: socSsData.filter(Boolean).map(c => ({
+        name: c.name, type: c.type, path: c.path,
+        componentType: c.componentType || 'SS'
+      })),
+      extra_vips: vipData.soc.filter(Boolean),
+    } : undefined,
+    vip_config: state.tbType === 'VIP' ? {
+      protocol: state.vipProtocol || '',
+      bus_width: state.vipBusWidth || '',
+      mode: state.vipGen_mode || 'Master',
+      spec_path: state.vipSpecPath || '',
+      description: state.vipDescription || '',
+    } : undefined,
+  };
+}
+
+function syntaxHighlight(json) {
+  const str = JSON.stringify(json, null, 2);
+  return str.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, match => {
+    let cls = 'json-num';
+    if (/^"/.test(match)) {
+      cls = /:$/.test(match) ? 'json-key' : 'json-str';
+    } else if (/true|false/.test(match)) { cls = 'json-bool'; }
+    else if (/null/.test(match)) { cls = 'json-bool'; }
+    return `<span class="${cls}">${match}</span>`;
+  });
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  EXECUTION SCRIPT UPLOAD
+// ══════════════════════════════════════════════════════════════════
+// Per-TB-type script storage: { IP: [...lines], SS: [...lines], SoC: [...lines] }
+let customScriptsByType = {};
+
+function getActiveScriptLines() {
+  const tbType = state.tbType || 'IP';
+  return customScriptsByType[tbType] || null;
+}
+
+function execFileSelected(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  loadExecFile(file);
+}
+
+// Drag-drop removed — upload is now via icon click only
+
+function loadExecFile(file) {
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const raw = e.target.result;
+    const lines = raw.split('\n').map(l => l.trimEnd()).filter(l => l.length > 0);
+    const tbType = state.tbType || 'IP';
+    customScriptsByType[tbType] = lines;
+
+    // Show loaded state
+    const loadedEl = document.getElementById('execFileLoaded');
+    const nameEl = document.getElementById('execFileName');
+    nameEl.textContent = '✓ ' + file.name + ' loaded for ' + tbType + ' (' + lines.length + ' lines)';
+    loadedEl.classList.add('show');
+
+    // Update icon state
+    document.getElementById('execUploadIcon').classList.add('has-file');
+    updateExecLoadedInfo();
+  };
+  reader.readAsText(file);
+}
+
+function refreshExecUI() {
+  const tbType = state.tbType || 'IP';
+  const script = customScriptsByType[tbType];
+  const loadedEl = document.getElementById('execFileLoaded');
+  const nameEl = document.getElementById('execFileName');
+  const icon = document.getElementById('execUploadIcon');
+  if (script && script.length > 0) {
+    nameEl.textContent = '✓ Custom script loaded for ' + tbType + ' (' + script.length + ' lines)';
+    loadedEl.classList.add('show');
+    icon.classList.add('has-file');
+  } else {
+    loadedEl.classList.remove('show');
+    nameEl.textContent = '';
+    const hasAny = Object.keys(customScriptsByType).some(k => customScriptsByType[k]);
+    if (!hasAny) icon.classList.remove('has-file');
+  }
+  updateExecLoadedInfo();
+}
+
+function updateExecLoadedInfo() {
+  const info = document.getElementById('execLoadedInfo');
+  const loaded = Object.keys(customScriptsByType).filter(k => customScriptsByType[k]);
+  if (loaded.length > 0) {
+    info.style.display = '';
+    info.textContent = 'Scripts loaded: ' + loaded.join(', ');
+  } else {
+    info.style.display = 'none';
+  }
+}
+
+function execClearFile() {
+  const tbType = state.tbType || 'IP';
+  delete customScriptsByType[tbType];
+  document.getElementById('execFileLoaded').classList.remove('show');
+  document.getElementById('execFileName').textContent = '';
+  document.getElementById('execScriptInput').value = '';
+  const hasAny = Object.keys(customScriptsByType).some(k => customScriptsByType[k]);
+  if (!hasAny) document.getElementById('execUploadIcon').classList.remove('has-file');
+  updateExecLoadedInfo();
+}
+
+function escapeHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  EXECUTE TASK
+// ══════════════════════════════════════════════════════════════════
+function executeTask() {
+  const btn = document.getElementById('executeBtn');
+  btn.disabled = true;
+  btn.innerHTML = '⏳ Running...';
+
+  const wrap = document.getElementById('terminalWrap');
+  wrap.style.display = '';
+  const body = document.getElementById('terminalBody');
+  body.innerHTML = '<span class="term-cursor" id="termCursor"></span>';
+
+  const task = state.tasks.find(t => t.id === state.selectedTask);
+  const taskName = task ? task.name : 'Task';
+  const tbType = state.tbType || 'IP';
+  const proj = state.projectName || 'project';
+
+  const defaultLines = [
+    `<span class="prefix">[DV-Wizard]</span> <span class="info">Starting ${taskName}...</span>`,
+    `<span class="prefix">[DV-Wizard]</span> <span class="info">Reading configuration...</span>`,
+    `<span class="prefix">[DV-Wizard]</span> <span class="info">Project: <span class="highlight">${proj}</span></span>`,
+    `<span class="prefix">[DV-Wizard]</span> <span class="info">TB Type: <span class="highlight">${tbType}</span></span>`,
+    `<span class="prefix">[DV-Wizard]</span> <span class="info">${tbType} Name: <span class="highlight">${state.tbComponentName || proj}</span></span>`,
+    `<span class="prefix">[DV-Wizard]</span> <span class="info">Sim Tool: <span class="highlight">${state.simTool}</span></span>`,
+    `<span class="prefix">[DV-Wizard]</span> <span class="info">Executing: <span class="highlight">scripts/tb_generator.sh</span></span>`,
+    `<span class="prefix">[DV-Wizard]</span> <span class="info">Initializing workspace...</span>`,
+    `<span class="prefix">[DV-Wizard]</span> <span class="success">✓ Directory structure created</span>`,
+    `<span class="prefix">[DV-Wizard]</span> <span class="success">✓ UVM base classes resolved</span>`,
+    `<span class="prefix">[DV-Wizard]</span> <span class="success">✓ Top-level TB files generated</span>`,
+    `<span class="prefix">[DV-Wizard]</span> <span class="success">✓ Interface files created</span>`,
+    `<span class="prefix">[DV-Wizard]</span> <span class="success">✓ VIP integration complete</span>`,
+    `<span class="prefix">[DV-Wizard]</span> <span class="success">✓ Environment class generated</span>`,
+    `<span class="prefix">[DV-Wizard]</span> <span class="success">✓ Scoreboard &amp; coverage model added</span>`,
+    `<span class="prefix">[DV-Wizard]</span> <span class="success">✓ Makefile generated</span>`,
+    `<span class="prefix">[DV-Wizard]</span> <span class="success">✓ .f file lists compiled</span>`,
+    `<span class="prefix">[DV-Wizard]</span> <span class="highlight">🎉 ${taskName} Complete!</span>`,
+  ];
+
+  // Use custom script lines for this TB type if loaded, otherwise fall back to default
+  const activeScript = getActiveScriptLines();
+  const lines = activeScript
+    ? activeScript.map(l => `<span class="info">${escapeHtml(l)}</span>`)
+    : defaultLines;
+
+  const cursor = document.getElementById('termCursor');
+  let i = 0;
+  function printLine() {
+    if (i >= lines.length) {
+      if (cursor) cursor.remove();
+      btn.disabled = false;
+      btn.innerHTML = '✓ Completed — Run Again';
+      // Register generated components to localStorage
+      registerGeneratedComponents();
+      renderRegistryBadge();
+      updateStep1RegistryCount();
+      return;
+    }
+    const span = document.createElement('div');
+    span.className = 'term-line';
+    span.innerHTML = lines[i];
+    body.insertBefore(span, cursor);
+    body.scrollTop = body.scrollHeight;
+    i++;
+    setTimeout(printLine, 180 + Math.random() * 200);
+  }
+  setTimeout(printLine, 300);
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  SAVE / LOAD CONFIG
+// ══════════════════════════════════════════════════════════════════
+function saveConfig() {
+  const cfg = buildConfig();
+  const blob = new Blob([JSON.stringify(cfg, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = (state.projectName || 'dv-wizard') + '-config.json';
+  a.click();
+}
+
+function loadConfig(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const cfg = JSON.parse(e.target.result);
+      // Restore project fields
+      if (cfg.project) {
+        Object.entries(cfg.project).forEach(([k,v]) => {
+          const map = { name:'projectName', tb_root:'tbRootDir', project_root:'projectRootDir', rtl_root:'rtlRootDir', sim_root:'simRoot' };
+          if (map[k]) { state[map[k]] = v; const el = document.getElementById(map[k]); if (el) el.value = v; }
+        });
+      }
+      alert('Configuration loaded successfully!');
+    } catch(err) { alert('Invalid config file.'); }
+  };
+  reader.readAsText(file);
+}
+
+function resetWizard() {
+  if (!confirm('Reset all wizard state and start over?')) return;
+  location.reload();
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  THEME TOGGLE
+// ══════════════════════════════════════════════════════════════════
+function toggleTheme() {
+  const html = document.documentElement;
+  const isLight = html.getAttribute('data-theme') === 'light';
+  const newTheme = isLight ? 'dark' : 'light';
+  html.setAttribute('data-theme', newTheme);
+  localStorage.setItem('dv-wizard-theme', newTheme);
+  updateThemeUI(newTheme);
+}
+
+function updateThemeUI(theme) {
+  const sw = document.getElementById('themeSwitch');
+  const label = document.getElementById('themeLabel');
+  if (theme === 'light') {
+    sw.classList.add('light');
+    label.textContent = '☀️ Light';
+  } else {
+    sw.classList.remove('light');
+    label.textContent = '🌙 Dark';
+  }
+}
+
+function initTheme() {
+  const saved = localStorage.getItem('dv-wizard-theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', saved);
+  updateThemeUI(saved);
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  GENERATED COMPONENTS REGISTRY (persists across Start Over)
+// ══════════════════════════════════════════════════════════════════
+const STORAGE_KEY = 'dv-wizard-generated';
+
+function getGeneratedRegistry() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || { ips: [], sses: [] };
+  } catch { return { ips: [], sses: [] }; }
+}
+
+function saveToRegistry(type, entry) {
+  const reg = getGeneratedRegistry();
+  // Avoid duplicates by name
+  const list = type === 'ip' ? reg.ips : reg.sses;
+  const existing = list.findIndex(e => e.name === entry.name);
+  if (existing >= 0) list[existing] = entry;
+  else list.push(entry);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(reg));
+}
+
+function removeFromRegistry(type, name) {
+  const reg = getGeneratedRegistry();
+  if (type === 'ip') reg.ips = reg.ips.filter(e => e.name !== name);
+  else reg.sses = reg.sses.filter(e => e.name !== name);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(reg));
+}
+
+// Save current config to registry after successful execution
+function registerGeneratedComponents() {
+  const tbType = state.tbType;
+  const compName = state.tbComponentName || state.projectName || 'project';
+  const tbRoot = state.tbRootDir || '';
+
+  if (tbType === 'IP') {
+    saveToRegistry('ip', {
+      name: compName,
+      tbRoot: tbRoot,
+      path: tbRoot + '/' + compName,
+      dvPath: tbRoot + '/' + compName + '/dv',
+      vips: vipData.ip.filter(Boolean).map(v => ({ name: v.name, count: v.count, mode: v.mode, type: v.type })),
+      generatedAt: new Date().toISOString()
+    });
+  } else if (tbType === 'SS') {
+    const ips = ssIpData.filter(Boolean).map(ip => ({ name: ip.name, type: ip.type, path: ip.path, count: ip.count || 1 }));
+    saveToRegistry('ss', {
+      name: compName,
+      tbRoot: tbRoot,
+      path: tbRoot + '/' + compName,
+      dvPath: tbRoot + '/' + compName + '/dv',
+      ips: ips,
+      generatedAt: new Date().toISOString()
+    });
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  REGISTRY FILTERING (path-aware)
+// ══════════════════════════════════════════════════════════════════
+
+// Get registry items that are under the current TB Root Directory
+function getRegistryForTbRoot() {
+  const reg = getGeneratedRegistry();
+  const tbRoot = state.tbRootDir || '';
+  if (!tbRoot) return reg;
+  return {
+    ips: reg.ips.filter(ip => (ip.tbRoot || ip.path || '').startsWith(tbRoot) || (ip.path || '').startsWith(tbRoot)),
+    sses: reg.sses.filter(ss => (ss.tbRoot || ss.path || '').startsWith(tbRoot) || (ss.path || '').startsWith(tbRoot)),
+  };
+}
+
+// For IP task: get VIPs available = common VIPs (under TB_ROOT/common) + custom VIPs already in other IPs marked as Common type
+function getAvailableVipsForIP() {
+  const reg = getRegistryForTbRoot();
+  const seen = new Set();
+  const vips = [];
+  // Common VIPs from all registered IPs under this TB root
+  reg.ips.forEach(ip => {
+    (ip.vips || []).forEach(v => {
+      if (v.type === 'Common' && v.name && !seen.has(v.name)) {
+        seen.add(v.name);
+        vips.push({ name: v.name, mode: v.mode || 'Active', type: 'Common' });
+      }
+    });
+  });
+  return vips;
+}
+
+// For SS task: get IPs available = top-level IPs under TB_ROOT (not nested inside other SSes)
+function getAvailableIpsForSS() {
+  const reg = getRegistryForTbRoot();
+  const tbRoot = state.tbRootDir || '';
+  // Only IPs whose path is directly under TB_ROOT (one level), not nested in SS dirs
+  return reg.ips.filter(ip => {
+    const path = ip.path || '';
+    if (!tbRoot || !path.startsWith(tbRoot)) return false;
+    // Check it's a direct child: TB_ROOT/ip_name (not TB_ROOT/ss_name/ip_name)
+    const relative = path.slice(tbRoot.length).replace(/^\//, '');
+    const parts = relative.split('/').filter(Boolean);
+    // Direct child = 1 part, or IP inside a known SS = not eligible
+    return parts.length <= 1;
+  });
+}
+
+// Auto-populate SS config with previously generated IPs
+function autoPopulateSSFromRegistry() {
+  const filteredIps = getAvailableIpsForSS();
+  const reg = { ips: filteredIps };
+  const banner = document.getElementById('ssRegistryBanner');
+  if (reg.ips.length === 0) { if (banner) banner.style.display = 'none'; return; }
+  if (banner) {
+    banner.style.display = '';
+    document.getElementById('ssRegistryMsg').textContent =
+      reg.ips.length + ' previously generated IP' + (reg.ips.length!==1?'s':'') + ' auto-populated below with their VIPs. You can configure Active/Passive mode for each.';
+  }
+
+  // Clear existing rows
+  document.getElementById('ssIpRows').innerHTML = '';
+  ssIpData = [];
+  ssIpCounter = 0;
+
+  reg.ips.forEach(ip => {
+    const idx = ssIpData.length;
+    const ipVips = (ip.vips || []).map(v => ({ name: v.name, mode: v.mode || 'Active', fromRegistry: true }));
+    const data = { name: ip.name, type: 'Custom', path: ip.dvPath || ip.path, count: 1, vips: [] };
+    ssIpData.push(data);
+    ssIpCounter++;
+
+    const vipCount = ipVips.length;
+    const row = document.createElement('div');
+    row.className = 'dynamic-row';
+    row.id = 'ss-ip-' + idx;
+    row.style.borderLeft = '3px solid var(--teal)';
+
+    row.innerHTML = `
+      <div class="row-header">
+        <div class="row-badge" style="background:var(--teal);color:var(--bg)">IP #${idx+1} — from registry</div>
+        <div class="delete-btn" onclick="removeSsIpRow(${idx})">✕</div>
+      </div>
+      <div class="form-grid" style="grid-template-columns:2fr 80px 1fr 2fr">
+        <div class="form-group">
+          <label class="form-label">IP Name</label>
+          <input class="form-input" id="ssip-name-${idx}" value="${data.name}"
+            oninput="ssIpData[${idx}].name=this.value;autoFillSsIpPath(${idx})">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Instances</label>
+          <input class="form-input" type="number" value="1" min="1" style="text-align:center"
+            oninput="ssIpData[${idx}].count=parseInt(this.value)||1">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Type</label>
+          <div class="toggle-group">
+            <div class="toggle-pill active" onclick="setSsIpType(${idx},'Custom',this)">Custom</div>
+            <div class="toggle-pill" onclick="setSsIpType(${idx},'Common',this)">Common</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">IP DV Path</label>
+          <div class="path-input-wrap">
+            <input class="form-input" id="ssip-path-${idx}" value="${data.path}"
+              oninput="ssIpData[${idx}].path=this.value">
+            <span class="path-hint">📁</span>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:14px">
+        <div class="section-title" style="font-size:0.75rem">Interface VIPs${vipCount > 0 ? ' <span style="color:var(--teal);font-weight:400">(' + vipCount + ' auto-detected)</span>' : ''}</div>
+        <div id="ssip-vips-${idx}" class="dynamic-rows" style="margin-top:8px"></div>
+      </div>
+    `;
+    document.getElementById('ssIpRows').appendChild(row);
+
+    // Populate VIP rows from registry (read-only, no add button)
+    ipVips.forEach(v => addSsIpVipRow(idx, v));
+  });
+  document.getElementById('ssIpCount').textContent = ssIpCounter;
+  updateSsRalDropdown();
+  updateRestoreRegistryBtn();
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  RESTORE REGISTRY IPs
+// ══════════════════════════════════════════════════════════════════
+function getMissingRegistryIps() {
+  // For SS: show IPs from TB_ROOT level (not nested in other SSes)
+  const availableIps = getAvailableIpsForSS();
+  const currentNames = new Set(ssIpData.filter(Boolean).map(ip => ip.name));
+  return availableIps.filter(ip => !currentNames.has(ip.name));
+}
+
+function updateRestoreRegistryBtn() {
+  const btn = document.getElementById('restoreRegistryBtn');
+  if (!btn) return;
+  const missing = getMissingRegistryIps();
+  btn.style.display = missing.length > 0 ? '' : 'none';
+  // Close picker if no more items
+  if (missing.length === 0) {
+    const picker = document.getElementById('restorePicker');
+    if (picker) picker.classList.remove('show');
+  }
+}
+
+function openRestoreRegistryPicker() {
+  const picker = document.getElementById('restorePicker');
+  if (picker.classList.contains('show')) {
+    picker.classList.remove('show');
+    return;
+  }
+  const missing = getMissingRegistryIps();
+  if (missing.length === 0) {
+    picker.classList.remove('show');
+    return;
+  }
+
+  picker.innerHTML = `
+    <div class="restore-picker-title">Select IP to restore:</div>
+    ${missing.map(ip => {
+      const vipCount = (ip.vips || []).length;
+      return `
+        <div class="restore-picker-item">
+          <div>
+            <div class="rp-name">${escapeHtml(ip.name)}</div>
+            <div class="rp-vips">${vipCount} VIP${vipCount!==1?'s':''} · ${ip.dvPath || ip.path}</div>
+          </div>
+          <div class="rp-add-btn" onclick="event.stopPropagation();restoreRegistryIp('${escapeHtml(ip.name)}')">+ Add</div>
+        </div>
+      `;
+    }).join('')}
+  `;
+  picker.classList.add('show');
+}
+
+function restoreRegistryIp(name) {
+  const reg = getGeneratedRegistry();
+  const ip = reg.ips.find(i => i.name === name);
+  if (!ip) return;
+
+  const idx = ssIpData.length;
+  const ipVips = (ip.vips || []).map(v => ({ name: v.name, mode: v.mode || 'Active', fromRegistry: true }));
+  const data = { name: ip.name, type: 'Custom', path: ip.dvPath || ip.path, vips: [] };
+  ssIpData.push(data);
+  ssIpCounter++;
+
+  const vipCount = ipVips.length;
+  const row = document.createElement('div');
+  row.className = 'dynamic-row';
+  row.id = 'ss-ip-' + idx;
+  row.style.borderLeft = '3px solid var(--teal)';
+
+  row.innerHTML = `
+    <div class="row-header">
+      <div class="row-badge" style="background:var(--teal);color:var(--bg)">IP #${idx+1} — restored</div>
+      <div class="delete-btn" onclick="removeSsIpRow(${idx})">✕</div>
+    </div>
+    <div class="form-grid" style="grid-template-columns:2fr 1fr 2fr">
+      <div class="form-group">
+        <label class="form-label">IP Name</label>
+        <input class="form-input" id="ssip-name-${idx}" value="${data.name}"
+          oninput="ssIpData[${idx}].name=this.value;autoFillSsIpPath(${idx})">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Type</label>
+        <div class="toggle-group">
+          <div class="toggle-pill active" onclick="setSsIpType(${idx},'Custom',this)">Custom</div>
+          <div class="toggle-pill" onclick="setSsIpType(${idx},'Common',this)">Common</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">IP DV Path</label>
+        <div class="path-input-wrap">
+          <input class="form-input" id="ssip-path-${idx}" value="${data.path}"
+            oninput="ssIpData[${idx}].path=this.value">
+          <span class="path-hint">📁</span>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:14px">
+      <div class="section-title" style="font-size:0.75rem">Interface VIPs${vipCount > 0 ? ' <span style="color:var(--teal);font-weight:400">(' + vipCount + ' auto-detected)</span>' : ''}</div>
+      <div id="ssip-vips-${idx}" class="dynamic-rows" style="margin-top:8px"></div>
+    </div>
+  `;
+  document.getElementById('ssIpRows').appendChild(row);
+  ipVips.forEach(v => addSsIpVipRow(idx, v));
+
+  document.getElementById('ssIpCount').textContent = ssIpData.filter(Boolean).length;
+  updateRestoreRegistryBtn();
+  updateSsRalDropdown();
+}
+
+// Auto-populate SoC config with previously generated SSes
+function autoPopulateSoCFromRegistry() {
+  const reg = getRegistryForTbRoot();
+  if (reg.sses.length === 0) return;
+
+  document.getElementById('socSsRows').innerHTML = '';
+  socSsData = [];
+
+  reg.sses.forEach(ss => {
+    const idx = socSsData.length;
+    // Gather VIPs from all sub-IPs
+    const allVips = [];
+    (ss.ips || []).forEach(subIp => {
+      const regIp = reg.ips.find(i => i.name === subIp.name);
+      if (regIp && regIp.vips) {
+        regIp.vips.forEach(v => {
+          allVips.push({ name: v.name, mode: v.mode || 'Active', source: subIp.name });
+        });
+      }
+    });
+    const data = { name: ss.name, type: 'Custom', path: ss.dvPath || ss.path, count: 1, componentType: 'SS', vips: allVips };
+    socSsData.push(data);
+
+    const vipCount = allVips.length;
+    const row = document.createElement('div');
+    row.className = 'dynamic-row';
+    row.id = 'soc-ss-' + idx;
+    row.style.borderLeft = '3px solid var(--teal)';
+
+    row.innerHTML = `
+      <div class="row-header">
+        <div class="row-badge" style="background:var(--teal);color:var(--bg)">🧩 SS #${idx+1} — from registry</div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <div class="comment-icon" onclick="toggleComment(this)" title="Add note for AI tool">💬</div>
+          <div class="delete-btn" onclick="removeSocSsRow(${idx})">✕</div>
+        </div>
+      </div>
+      <div class="form-grid" style="grid-template-columns:2fr 80px 1fr 2fr">
+        <div class="form-group">
+          <label class="form-label">SS Name</label>
+          <input class="form-input" id="socss-name-${idx}" value="${data.name}"
+            oninput="socSsData[${idx}].name=this.value;autoFillSocSsPath(${idx})">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Instances</label>
+          <input class="form-input" type="number" value="1" min="1" style="text-align:center"
+            oninput="socSsData[${idx}].count=parseInt(this.value)||1">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Type</label>
+          <div class="toggle-group">
+            <div class="toggle-pill active" onclick="setSocSsType(${idx},'Custom',this)">Custom</div>
+            <div class="toggle-pill" onclick="setSocSsType(${idx},'Common',this)">Common</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">SS DV Path</label>
+          <div class="path-input-wrap">
+            <input class="form-input" id="socss-path-${idx}" value="${data.path}"
+              oninput="socSsData[${idx}].path=this.value">
+            <span class="path-hint">📁</span>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:14px">
+        <div class="section-title" style="font-size:0.75rem">Interface VIPs${vipCount > 0 ? ' <span style="color:var(--teal);font-weight:400">(' + vipCount + ' from sub-IPs)</span>' : ''}</div>
+        <div id="soc-comp-vips-${idx}" class="dynamic-rows" style="margin-top:8px"></div>
+      </div>
+      <div class="comment-input" style="display:none;margin-top:8px">
+        <input class="form-input" style="font-size:0.75rem;padding:5px 8px" placeholder="Note for AI tool..."
+          oninput="socSsData[${idx}].comment=this.value">
+      </div>
+    `;
+    document.getElementById('socSsRows').appendChild(row);
+
+    // Render VIP rows grouped by source IP
+    renderSocCompVips(idx, allVips);
+  });
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  NEW TASK (skip Start Over — keep project config, go to Step 2)
+// ══════════════════════════════════════════════════════════════════
+function newTask() {
+  // Reset task-specific state but keep project setup
+  state.selectedTask = null;
+  state.tbType = null;
+  state.tbComponentName = '';
+  vipCounters = { ip: 0, ss: 0, soc: 0 };
+  vipData = { ip: [], ss: [], soc: [] };
+  ssIpData = [];
+  ssIpCounter = 0;
+  socSsData = [];
+
+  // Reset UI for Steps 2-4
+  document.querySelectorAll('.task-card').forEach(c => c.classList.remove('selected'));
+  ['IP','SS','SoC'].forEach(t => document.getElementById('type-' + t).classList.remove('selected'));
+  document.getElementById('tbNameCard').style.display = 'none';
+  document.getElementById('tbComponentName').value = '';
+  document.getElementById('ipConfig').style.display = 'none';
+  document.getElementById('ssConfig').style.display = 'none';
+  document.getElementById('socConfig').style.display = 'none';
+  document.getElementById('ipVipRows').innerHTML = '';
+  document.getElementById('ssIpRows').innerHTML = '';
+  document.getElementById('ssVipRows').innerHTML = '';
+  document.getElementById('socSsRows').innerHTML = '';
+  document.getElementById('socVipRows').innerHTML = '';
+  document.getElementById('ipVipCount').textContent = '0';
+  document.getElementById('ssIpCount').textContent = '0';
+  document.getElementById('terminalWrap').style.display = 'none';
+  document.getElementById('executeBtn').disabled = false;
+  document.getElementById('executeBtn').innerHTML = '▶ Execute Task';
+  execClearFile();
+
+  // Go to Step 2
+  switchStep(2);
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  initTheme();
+  initLogo();
+  renderTasks();
+  updateProgressUI();
+  renderRegistryBadge();
+  updateStep1RegistryCount();
+
+  // Close modal on overlay click
+  document.getElementById('customTaskModal').addEventListener('click', function(e) {
+    if (e.target === this) closeCustomModal();
+  });
+});
+
+// Show a badge in sidebar footer with registry count
+function renderRegistryBadge() {
+  const reg = getGeneratedRegistry();
+  const footer = document.querySelector('.sidebar-footer');
+  if (!footer) return;
+  const total = reg.ips.length + reg.sses.length;
+  if (total > 0) {
+    footer.innerHTML = `DV Wizard v1.0<br>
+      <span style="color:var(--teal);cursor:pointer;text-decoration:underline dotted" onclick="openRegistryViewer()" title="Click to inspect registry">📦 ${reg.ips.length} IP${reg.ips.length!==1?'s':''}, ${reg.sses.length} SS${reg.sses.length!==1?'es':''}</span>
+      <span style="cursor:pointer;color:var(--red);font-size:0.68rem;margin-left:8px" onclick="event.stopPropagation();if(confirm('Clear all generated component history?')){localStorage.removeItem('${STORAGE_KEY}');renderRegistryBadge();}">✕</span>`;
+  } else {
+    footer.innerHTML = 'DV Wizard v1.0<br><span style="color:var(--text3)">No components in registry</span>';
+  }
+}
+
+// Step 1 inline registry
+function toggleStep1Registry() {
+  const body = document.getElementById('step1RegBody');
+  const btn = document.getElementById('step1RegToggle');
+  if (body.style.display === 'none') {
+    body.style.display = '';
+    btn.textContent = 'Hide';
+    renderStep1Registry();
+  } else {
+    body.style.display = 'none';
+    btn.textContent = 'Show';
+  }
+}
+
+function updateStep1RegistryCount() {
+  const card = document.getElementById('step1RegistryCard');
+  const tbRoot = state.tbRootDir || '';
+  // Hide entire card if no TB Root entered
+  if (card) card.style.display = tbRoot.trim() ? '' : 'none';
+  if (!tbRoot.trim()) return;
+
+  const reg = getRegistryForTbRoot();
+  const el = document.getElementById('step1RegCount');
+  if (el) {
+    const total = reg.ips.length + reg.sses.length;
+    el.textContent = total > 0 ? `${reg.ips.length} IPs, ${reg.sses.length} SSes` : 'empty';
+  }
+  // If body is visible, refresh it
+  const body = document.getElementById('step1RegBody');
+  if (body && body.style.display !== 'none') renderStep1Registry();
+}
+
+function renderStep1Registry() {
+  const reg = getRegistryForTbRoot();
+  const body = document.getElementById('step1RegBody');
+  if (!body) return;
+
+  let html = '';
+  if (reg.ips.length === 0 && reg.sses.length === 0) {
+    html = '<div style="font-size:0.8rem;color:var(--text3);font-style:italic;padding:8px 0">No components in registry yet. Generate IPs and SSes to populate.</div>';
+  } else {
+    // IPs
+    if (reg.ips.length > 0) {
+      html += '<div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--text2);margin-bottom:6px">🧊 IPs (' + reg.ips.length + ')</div>';
+      html += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px">';
+      reg.ips.forEach(ip => {
+        const vc = (ip.vips||[]).length;
+        html += `<span class="badge badge-teal" style="cursor:pointer;font-size:0.72rem" onclick="openRegistryViewer()" title="${vc} VIPs · Click to inspect">${escapeHtml(ip.name)} <span style="opacity:0.6">(${vc})</span></span>`;
+      });
+      html += '</div>';
+    }
+    // SSes
+    if (reg.sses.length > 0) {
+      html += '<div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--text2);margin-bottom:6px">🧩 Subsystems (' + reg.sses.length + ')</div>';
+      html += '<div style="display:flex;flex-wrap:wrap;gap:6px">';
+      reg.sses.forEach(ss => {
+        const ic = (ss.ips||[]).length;
+        html += `<span class="badge badge-teal" style="cursor:pointer;font-size:0.72rem" onclick="openRegistryViewer()" title="${ic} IPs · Click to inspect">${escapeHtml(ss.name)} <span style="opacity:0.6">(${ic})</span></span>`;
+      });
+      html += '</div>';
+    }
+  }
+  body.innerHTML = html;
+}
+
+function openRegistryViewer() {
+  const reg = getGeneratedRegistry();
+  const body = document.getElementById('rvBody');
+
+  let html = '';
+
+  // IPs section
+  html += '<div class="rv-section"><div class="rv-section-title">🧊 IPs (' + reg.ips.length + ')</div>';
+  if (reg.ips.length === 0) {
+    html += '<div class="rv-empty">No IPs generated yet</div>';
+  } else {
+    reg.ips.forEach(ip => {
+      const vips = ip.vips || [];
+      html += `<div class="rv-item">
+        <div class="rv-item-name">🧊 ${escapeHtml(ip.name)}</div>
+        <div class="rv-item-path">${escapeHtml(ip.dvPath || ip.path || '')}</div>
+        <div class="rv-item-detail">${vips.length} VIP${vips.length!==1?'s':''}</div>
+        <div class="rv-item-vips">
+          ${vips.map(v => `<span class="rv-vip-tag ${v.mode==='Passive'?'rv-vip-passive':'rv-vip-active'}">🔌 ${escapeHtml(v.name)} [${v.mode==='Passive'?'P':'A'}] ${v.type||''}</span>`).join('')}
+        </div>
+      </div>`;
+    });
+  }
+  html += '</div>';
+
+  // SSes section
+  html += '<div class="rv-section"><div class="rv-section-title">🧩 Subsystems (' + reg.sses.length + ')</div>';
+  if (reg.sses.length === 0) {
+    html += '<div class="rv-empty">No Subsystems generated yet</div>';
+  } else {
+    reg.sses.forEach(ss => {
+      const ips = ss.ips || [];
+      html += `<div class="rv-item">
+        <div class="rv-item-name">🧩 ${escapeHtml(ss.name)}</div>
+        <div class="rv-item-path">${escapeHtml(ss.dvPath || ss.path || '')}</div>
+        <div class="rv-item-detail">${ips.length} IP${ips.length!==1?'s':''}</div>
+        <div class="rv-item-vips">
+          ${ips.map(ip => `<span class="rv-vip-tag rv-vip-active">🧊 ${escapeHtml(ip.name)}</span>`).join('')}
+        </div>
+      </div>`;
+    });
+  }
+  html += '</div>';
+
+  body.innerHTML = html;
+  document.getElementById('registryViewer').classList.add('open');
+  document.getElementById('rvOverlay').classList.add('open');
+}
+
+function closeRegistryViewer() {
+  document.getElementById('registryViewer').classList.remove('open');
+  document.getElementById('rvOverlay').classList.remove('open');
+}
+</script>
+</body>
+</html>

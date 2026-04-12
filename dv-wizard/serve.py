@@ -126,8 +126,13 @@ class DVWizardHandler(http.server.SimpleHTTPRequestHandler):
             sses = []
             warnings = []
 
-            def classify_dir(dirpath, dirname, depth):
-                """Classify a directory based on naming convention."""
+            def classify_dir(dirpath, dirname, depth, inside_common=False):
+                """Classify a directory based on naming convention.
+
+                Args:
+                    inside_common: If True, this directory is inside common/.
+                        Non-conforming dirs inside common/ are classified as VIP with a warning.
+                """
                 name_lower = dirname.lower()
                 rel_path = os.path.relpath(dirpath, scan_path)
                 has_ip = '_ip' in name_lower
@@ -138,17 +143,34 @@ class DVWizardHandler(http.server.SimpleHTTPRequestHandler):
                 matches = sum([has_ip, has_vip, has_ss])
 
                 if matches == 0:
-                    # Skip common known directories
-                    skip_names = {'dv', 'rtl', 'env', 'tb', 'tests', 'sequences', 'docs',
-                                  'common', 'scripts', 'firmware', '.git', '.claude',
-                                  'src', 'soc_top', 'test_project', '__pycache__'}
-                    if dirname.lower() not in skip_names and not dirname.startswith('.'):
+                    if inside_common:
+                        # Inside common/, non-conforming folders default to VIP with warning
                         warnings.append({
                             'path': rel_path,
                             'name': dirname,
-                            'message': f"'{dirname}' does not follow naming convention (_ip, _vip, or _ss). Cannot auto-classify."
+                            'message': f"'{dirname}' inside common/ does not follow naming convention (_ip, _vip, or _ss). Auto-classified as VIP."
                         })
-                    return
+                        entry = {
+                            'name': dirname,
+                            'path': rel_path,
+                            'full_path': dirpath,
+                            'vips': [],
+                            'auto_classified': True,
+                        }
+                        vips.append(entry)
+                        return
+                    else:
+                        # Skip common known directories at top level
+                        skip_names = {'dv', 'rtl', 'env', 'tb', 'tests', 'sequences', 'docs',
+                                      'common', 'scripts', 'firmware', '.git', '.claude',
+                                      'src', 'soc_top', 'test_project', '__pycache__'}
+                        if dirname.lower() not in skip_names and not dirname.startswith('.'):
+                            warnings.append({
+                                'path': rel_path,
+                                'name': dirname,
+                                'message': f"'{dirname}' does not follow naming convention (_ip, _vip, or _ss). Cannot auto-classify."
+                            })
+                        return
 
                 if matches > 1:
                     warnings.append({
@@ -217,12 +239,13 @@ class DVWizardHandler(http.server.SimpleHTTPRequestHandler):
                 classify_dir(item_path, item, 0)
 
                 # Scan one level deeper for IPs inside SSes (already handled in classify_dir for _ss)
-                # Also scan 'common' directory for VIPs
+                # Also scan 'common' directory — all subdirs must follow naming convention
+                # Non-conforming dirs inside common/ are auto-classified as VIP
                 if item.lower() == 'common':
                     for sub in sorted(os.listdir(item_path)):
                         sub_path = os.path.join(item_path, sub)
                         if os.path.isdir(sub_path):
-                            classify_dir(sub_path, sub, 1)
+                            classify_dir(sub_path, sub, 1, inside_common=True)
 
             self._json_response(200, {
                 'found': True,

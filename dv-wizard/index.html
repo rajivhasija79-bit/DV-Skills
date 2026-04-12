@@ -1558,7 +1558,7 @@
               <div class="form-group">
                 <label class="form-label">TB Root Directory <span class="required">*</span></label>
                 <div class="path-input-wrap">
-                  <input class="form-input" id="tbRootDir" placeholder="/path/to/tb/root" oninput="updateState('tbRootDir', this.value);updateStep1RegistryCount()">
+                  <input class="form-input" id="tbRootDir" placeholder="/path/to/tb/root" oninput="onTbRootDirInput(this.value)">
                   <span class="path-hint" title="Browse">📁</span>
                 </div>
                 <div class="form-error" id="err-tbRootDir">TB root directory is required</div>
@@ -4062,6 +4062,8 @@ function executeTask() {
           registerGeneratedComponents();
           renderRegistryBadge();
           updateStep1RegistryCount();
+          // Auto-save proj.config to TB root directory
+          if (data.success) saveProjectConfig();
           return;
         }
         const line = data.lines[i];
@@ -4193,6 +4195,8 @@ function saveConfig() {
   a.href = URL.createObjectURL(blob);
   a.download = (state.projectName || 'dv-wizard') + '-config.json';
   a.click();
+  // Also save proj.config to TB root directory
+  saveProjectConfig();
 }
 
 function loadConfig(event) {
@@ -4656,6 +4660,242 @@ function newTask() {
 
   // Go to Step 2
   switchStep(2);
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  PROJECT CONFIG PERSISTENCE (proj.config)
+// ══════════════════════════════════════════════════════════════════
+let _projectLoadedFromConfig = false;  // true when auto-populated from proj.config
+let _loadedConfigPath = '';            // path of the loaded proj.config
+let _userWarnedAboutOverride = false;  // true after user has been warned about overriding
+
+// Debounce timer for TB root dir input
+let _tbRootDebounce = null;
+
+function onTbRootDirInput(value) {
+  updateState('tbRootDir', value);
+  updateStep1RegistryCount();
+
+  // Debounce — wait 600ms after user stops typing, then check for proj.config
+  clearTimeout(_tbRootDebounce);
+  _tbRootDebounce = setTimeout(() => {
+    if (value.trim()) tryLoadProjectConfig(value.trim());
+  }, 600);
+}
+
+function tryLoadProjectConfig(tbRoot) {
+  fetch('/api/load-project', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ tb_root: tbRoot }),
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.found && data.config) {
+      _projectLoadedFromConfig = true;
+      _loadedConfigPath = data.path || '';
+      _userWarnedAboutOverride = false;
+      applyFullConfig(data.config);
+      showConfigLoadedBanner(true);
+    } else {
+      _projectLoadedFromConfig = false;
+      _loadedConfigPath = '';
+      showConfigLoadedBanner(false);
+    }
+  })
+  .catch(() => {
+    // Server not reachable or error — silently ignore
+    _projectLoadedFromConfig = false;
+  });
+}
+
+function showConfigLoadedBanner(show) {
+  let banner = document.getElementById('configLoadedBanner');
+  if (!banner) {
+    // Create banner element after the TB root dir form-group
+    const tbRootGroup = document.getElementById('tbRootDir').closest('.form-group');
+    banner = document.createElement('div');
+    banner.id = 'configLoadedBanner';
+    banner.style.cssText = 'display:none;padding:10px 14px;background:rgba(0,201,167,0.08);border:1px solid rgba(0,201,167,0.2);border-radius:var(--radius-sm);font-size:0.8rem;color:var(--teal);margin-top:8px;grid-column:1/-1;display:flex;align-items:center;gap:8px';
+    tbRootGroup.parentElement.appendChild(banner);
+  }
+  if (show) {
+    banner.style.display = 'flex';
+    banner.innerHTML = '<span>✓</span> <span>Existing <strong>proj.config</strong> found — all fields auto-populated from previous session.</span>';
+  } else {
+    banner.style.display = 'none';
+  }
+}
+
+// Called when user changes any auto-populated field
+function onFormFieldModified(fieldName) {
+  if (_projectLoadedFromConfig && !_userWarnedAboutOverride) {
+    const proceed = confirm(
+      'A proj.config already exists in this TB root directory.\n\n' +
+      'You are modifying auto-populated values. Your changes will overwrite the existing proj.config when you execute.\n\n' +
+      'Do you want to proceed with modifications?'
+    );
+    if (!proceed) {
+      // Revert — reload the original config
+      tryLoadProjectConfig(state.tbRootDir);
+      return false;
+    }
+    _userWarnedAboutOverride = true;
+    // Update banner to show modification notice
+    const banner = document.getElementById('configLoadedBanner');
+    if (banner) {
+      banner.innerHTML = '<span>⚠</span> <span>proj.config exists — your modifications will be saved on execution.</span>';
+      banner.style.borderColor = 'rgba(251,191,36,0.3)';
+      banner.style.background = 'rgba(251,191,36,0.06)';
+      banner.style.color = 'var(--yellow)';
+    }
+  }
+  return true;
+}
+
+// Wrap updateState to detect modifications to auto-populated fields
+const _originalUpdateState = updateState;
+function updateState(key, val) {
+  // Fields that trigger the override warning (Step 1 project setup fields)
+  const watchedFields = ['projectName','projectRootDir','rtlRootDir','simRoot',
+    'vcsHome','vcsVersion','xceliumHome','xceliumVersion','questaHome','questaVersion',
+    'verdiHome','verdiVersion','designwareHome','uvmHome','dvUtilityHome','vipHome','commonVipHome'];
+
+  if (_projectLoadedFromConfig && watchedFields.includes(key) && state[key] !== val) {
+    if (!onFormFieldModified(key)) return; // User chose to revert
+  }
+  state[key] = val;
+}
+
+function applyFullConfig(cfg) {
+  // ── Step 1: Project Setup ──
+  if (cfg.project) {
+    const projMap = {
+      name: 'projectName', tb_root: 'tbRootDir', project_root: 'projectRootDir',
+      rtl_root: 'rtlRootDir', sim_root: 'simRoot'
+    };
+    Object.entries(projMap).forEach(([jsonKey, stateKey]) => {
+      const val = cfg.project[jsonKey] || '';
+      state[stateKey] = val;
+      const el = document.getElementById(stateKey);
+      if (el) el.value = val;
+    });
+  }
+
+  // ── Tool Config ──
+  if (cfg.tool) {
+    const toolMap = {
+      sim_tool: 'simTool',
+      vcs_home: 'vcsHome', vcs_version: 'vcsVersion',
+      xcelium_home: 'xceliumHome', xcelium_version: 'xceliumVersion',
+      questa_home: 'questaHome', questa_version: 'questaVersion',
+      verdi_home: 'verdiHome', verdi_version: 'verdiVersion',
+    };
+    Object.entries(toolMap).forEach(([jsonKey, stateKey]) => {
+      const val = cfg.tool[jsonKey] || '';
+      state[stateKey] = val;
+      const el = document.getElementById(stateKey);
+      if (el) el.value = val;
+    });
+    if (cfg.tool.sim_tool) selectSimTool(cfg.tool.sim_tool);
+  }
+
+  // ── Environment Variables ──
+  if (cfg.env) {
+    const envMap = {
+      designware_home: 'designwareHome', uvm_home: 'uvmHome',
+      dv_utility_home: 'dvUtilityHome', vip_home: 'vipHome',
+      common_vip_home: 'commonVipHome',
+    };
+    Object.entries(envMap).forEach(([jsonKey, stateKey]) => {
+      const val = cfg.env[jsonKey] || '';
+      state[stateKey] = val;
+      const el = document.getElementById(stateKey);
+      if (el) el.value = val;
+    });
+  }
+
+  // ── Task Selection ──
+  if (cfg.task && cfg.task.id) {
+    state.selectedTask = cfg.task.id;
+  }
+
+  // ── TB Type & Component Name ──
+  if (cfg.tb_type) {
+    state.tbType = cfg.tb_type;
+  }
+  if (cfg.tb_component_name) {
+    state.tbComponentName = cfg.tb_component_name;
+  }
+
+  // ── IP Config ──
+  if (cfg.ip_config && cfg.tb_type === 'IP') {
+    // Clear existing VIP rows
+    document.getElementById('ipVipRows').innerHTML = '';
+    vipData.ip = [];
+    vipCounters.ip = 0;
+
+    const cfgVips = cfg.ip_config.vips || [];
+    cfgVips.forEach(v => {
+      addVipRow('ip');
+      const idx = vipData.ip.length - 1;
+      const data = vipData.ip[idx];
+      if (data) {
+        data.name = v.name || '';
+        data.mode = v.mode || 'Active';
+        data.type = v.type || 'Common';
+        data.count = v.count || 1;
+        // Update the row DOM
+        const row = document.getElementById('ip-vip-' + idx);
+        if (row) {
+          const nameInput = row.querySelector('input[placeholder*="VIP"]') || row.querySelector('input');
+          if (nameInput) nameInput.value = v.name || '';
+          // Update mode toggle
+          row.querySelectorAll('.toggle-pill').forEach(pill => {
+            if (pill.textContent === data.mode) pill.classList.add('active');
+            else pill.classList.remove('active');
+          });
+        }
+      }
+    });
+    document.getElementById('ipVipCount').textContent = vipData.ip.filter(Boolean).length;
+  }
+
+  // ── SS Config ──
+  if (cfg.ss_config && cfg.tb_type === 'SS') {
+    // IPs will be handled by autoPopulateSSFromRegistry when selectTbType('SS') is called
+    // Store extra VIPs for later
+    state._pendingSsExtraVips = cfg.ss_config.extra_vips || [];
+  }
+
+  // ── SoC Config ──
+  if (cfg.soc_config && cfg.tb_type === 'SoC') {
+    state._pendingSocExtraVips = cfg.soc_config.extra_vips || [];
+  }
+
+  // Update registry count
+  updateStep1RegistryCount();
+}
+
+function saveProjectConfig() {
+  const tbRoot = state.tbRootDir;
+  if (!tbRoot || !tbRoot.trim()) return;
+
+  const cfg = buildConfig();
+  fetch('/api/save-project', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ tb_root: tbRoot, config: cfg }),
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      console.log('[DV-Wizard] proj.config saved to', data.path);
+    } else {
+      console.warn('[DV-Wizard] Failed to save proj.config:', data.error);
+    }
+  })
+  .catch(err => console.warn('[DV-Wizard] Error saving proj.config:', err));
 }
 
 // ══════════════════════════════════════════════════════════════════

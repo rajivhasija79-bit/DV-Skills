@@ -25,13 +25,76 @@ SCRIPT_MAP = {
 class DVWizardHandler(http.server.SimpleHTTPRequestHandler):
     """Custom handler that adds POST /api/execute endpoint."""
 
+    CONFIG_FILENAME = 'proj.config'
+
     def do_POST(self):
         parsed = urlparse(self.path)
 
         if parsed.path == '/api/execute':
             self._handle_execute()
+        elif parsed.path == '/api/load-project':
+            self._handle_load_project()
+        elif parsed.path == '/api/save-project':
+            self._handle_save_project()
         else:
             self.send_error(404, 'Not Found')
+
+    def _handle_load_project(self):
+        """Check if proj.config exists in the given TB root directory and return its contents."""
+        try:
+            content_length = int(self.headers.get('Content-Length', 0))
+            body = self.rfile.read(content_length)
+            payload = json.loads(body)
+            tb_root = payload.get('tb_root', '')
+
+            if not tb_root or not os.path.isdir(tb_root):
+                self._json_response(200, {'found': False, 'reason': 'Directory does not exist'})
+                return
+
+            config_path = os.path.join(tb_root, self.CONFIG_FILENAME)
+            if not os.path.isfile(config_path):
+                self._json_response(200, {'found': False, 'reason': 'No proj.config found'})
+                return
+
+            with open(config_path, 'r') as f:
+                config = json.load(f)
+
+            self._json_response(200, {'found': True, 'config': config, 'path': config_path})
+
+        except json.JSONDecodeError:
+            self._json_response(400, {'error': 'Invalid JSON in request or proj.config'})
+        except Exception as e:
+            self._json_response(500, {'error': str(e)})
+
+    def _handle_save_project(self):
+        """Save the wizard config as proj.config in the TB root directory."""
+        try:
+            content_length = int(self.headers.get('Content-Length', 0))
+            body = self.rfile.read(content_length)
+            payload = json.loads(body)
+
+            tb_root = payload.get('tb_root', '')
+            config = payload.get('config', {})
+
+            if not tb_root:
+                self._json_response(400, {'error': 'tb_root is required'})
+                return
+
+            # Create directory if it doesn't exist
+            os.makedirs(tb_root, exist_ok=True)
+
+            config_path = os.path.join(tb_root, self.CONFIG_FILENAME)
+            with open(config_path, 'w') as f:
+                json.dump(config, f, indent=2)
+
+            self._json_response(200, {'success': True, 'path': config_path})
+
+        except json.JSONDecodeError:
+            self._json_response(400, {'error': 'Invalid JSON'})
+        except PermissionError:
+            self._json_response(500, {'error': f'Permission denied writing to {tb_root}'})
+        except Exception as e:
+            self._json_response(500, {'error': str(e)})
 
     def _handle_execute(self):
         try:

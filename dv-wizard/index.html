@@ -1960,10 +1960,11 @@
               <div class="dynamic-rows" id="ssIpRows"></div>
               <div style="display:flex;gap:8px;flex-wrap:wrap">
                 <div class="add-row-btn" onclick="addSsIpRow()" style="flex:1">＋ Add New IP</div>
-                <div class="add-row-btn" id="restoreRegistryBtn" onclick="openRestoreRegistryPicker()" style="flex:1;background:rgba(0,201,167,0.06);border-color:rgba(0,201,167,0.25);display:none">⟳ Restore from Registry</div>
+                <div class="add-row-btn" onclick="openRegistryIpPicker()" style="flex:1;background:rgba(94,186,169,0.08);border-color:rgba(94,186,169,0.3)">📋 Pick IP from Registry</div>
                 <div class="add-row-btn" onclick="openDirIpPicker()" style="flex-basis:100%;background:rgba(0,201,167,0.06);border-color:rgba(0,201,167,0.25)">📂 Add IP from TB Root Directory</div>
               </div>
-              <div class="restore-picker" id="restorePicker"></div>
+              <div class="restore-picker" id="registryIpPicker"></div>
+              <div class="restore-picker" id="restorePicker" style="display:none"></div>
               <div class="restore-picker" id="dirIpPicker"></div>
               <div id="dirScanWarnings" style="display:none;margin-top:10px"></div>
             </div>
@@ -4444,7 +4445,134 @@ function autoPopulateSSFromRegistry() {
 }
 
 // ══════════════════════════════════════════════════════════════════
-//  RESTORE REGISTRY IPs
+//  PICK IP FROM REGISTRY (all registered IPs)
+// ══════════════════════════════════════════════════════════════════
+function openRegistryIpPicker() {
+  const picker = document.getElementById('registryIpPicker');
+  if (picker.classList.contains('show')) {
+    picker.classList.remove('show');
+    return;
+  }
+
+  const reg = getGeneratedRegistry();
+  const allIps = reg.ips || [];
+  const currentNames = new Set(ssIpData.filter(Boolean).map(ip => ip.name));
+  const available = allIps.filter(ip => !currentNames.has(ip.name));
+
+  if (allIps.length === 0) {
+    picker.innerHTML = '<div class="restore-picker-empty">No IPs in registry yet. Generate an IP testbench first to populate the registry.</div>';
+    picker.classList.add('show');
+    return;
+  }
+
+  if (available.length === 0) {
+    picker.innerHTML = '<div class="restore-picker-empty">All registry IPs are already added to this SS.</div>';
+    picker.classList.add('show');
+    return;
+  }
+
+  let html = '<div class="restore-picker-title">📋 Pick IP from Registry:</div>';
+  available.forEach(ip => {
+    const vipCount = (ip.vips || []).length;
+    const vipList = (ip.vips || []).map(v => v.name).join(', ');
+    const path = ip.dvPath || ip.path || '';
+    html += `
+      <div class="restore-picker-item">
+        <div>
+          <div class="rp-name">🧊 ${escapeHtml(ip.name)}</div>
+          <div class="rp-vips">${path ? escapeHtml(path) : 'No path'}${vipCount > 0 ? ' · VIPs: ' + escapeHtml(vipList) : ''}</div>
+        </div>
+        <div class="rp-add-btn" onclick="event.stopPropagation();addRegistryIpToSS('${escapeHtml(ip.name)}')">+ Add</div>
+      </div>`;
+  });
+  picker.innerHTML = html;
+  picker.classList.add('show');
+}
+
+function addRegistryIpToSS(name) {
+  const reg = getGeneratedRegistry();
+  const ip = reg.ips.find(i => i.name === name);
+  if (!ip) return;
+
+  const idx = ssIpData.length;
+  const ipVips = (ip.vips || []).map(v => ({ name: v.name, mode: v.mode || 'Active', fromRegistry: true }));
+  const data = { name: ip.name, type: 'Custom', path: ip.dvPath || ip.path, count: 1, vips: [] };
+  ssIpData.push(data);
+  ssIpCounter++;
+
+  const rows = document.getElementById('ssIpRows');
+  const row = document.createElement('div');
+  row.className = 'dynamic-row';
+  row.id = 'ss-ip-' + idx;
+  row.style.borderLeft = '3px solid var(--teal)';
+
+  row.innerHTML = `
+    <div class="row-header">
+      <div class="row-badge" style="background:var(--teal);color:var(--bg)">IP #${ssIpCounter} — from registry</div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:0.78rem;color:var(--text2)">Instances:</span>
+          <div class="counter-wrap">
+            <div class="counter-btn" onclick="changeSsIpInstanceCount(${idx},-1)">−</div>
+            <div class="counter-val" id="ss-ip-count-${idx}">1</div>
+            <div class="counter-btn" onclick="changeSsIpInstanceCount(${idx},1)">+</div>
+          </div>
+        </div>
+        <div class="delete-btn" onclick="removeSsIpRow(${idx})">✕</div>
+      </div>
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">IP Name</label>
+        <input class="form-input" value="${escapeHtml(ip.name)}" oninput="ssIpData[${idx}].name=this.value;buildHierarchyTree()" placeholder="IP name">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Path</label>
+        <input class="form-input" value="${escapeHtml(ip.dvPath || ip.path || '')}" oninput="ssIpData[${idx}].path=this.value" placeholder="IP path" style="font-size:0.78rem">
+      </div>
+    </div>
+    ${ipVips.length > 0 ? `
+      <div style="margin-top:10px">
+        <div class="section-title" style="font-size:0.72rem">Interface VIPs (${ipVips.length} from registry)</div>
+        <div id="ss-ip-${idx}-vips"></div>
+      </div>
+    ` : '<div style="margin-top:8px;font-size:0.75rem;color:var(--text3);font-style:italic">No VIPs in registry for this IP</div>'}
+  `;
+  rows.appendChild(row);
+
+  // Add VIP sub-rows
+  ipVips.forEach(v => {
+    data.vips.push(v);
+    const vipContainer = document.getElementById('ss-ip-' + idx + '-vips');
+    if (vipContainer) {
+      const vi = data.vips.length - 1;
+      const vipRow = document.createElement('div');
+      vipRow.style.cssText = 'display:flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:6px;margin-bottom:4px';
+      vipRow.innerHTML = `
+        <span style="font-size:0.78rem;color:var(--text);flex:1">🔌 ${escapeHtml(v.name)}</span>
+        <div class="toggle-group" style="width:auto;min-width:160px">
+          <div class="toggle-pill${v.mode==='Active'?' active':''}" onclick="this.parentNode.querySelectorAll('.toggle-pill').forEach(p=>p.classList.remove('active'));this.classList.add('active');ssIpData[${idx}].vips[${vi}].mode='Active';buildHierarchyTree()">Active</div>
+          <div class="toggle-pill${v.mode==='Passive'?' active':''}" onclick="this.parentNode.querySelectorAll('.toggle-pill').forEach(p=>p.classList.remove('active'));this.classList.add('active');ssIpData[${idx}].vips[${vi}].mode='Passive';buildHierarchyTree()">Passive</div>
+        </div>
+      `;
+      vipContainer.appendChild(vipRow);
+    }
+  });
+
+  document.getElementById('ssIpCount').textContent = ssIpData.filter(Boolean).length;
+  updateSsRalDropdown();
+  buildHierarchyTree();
+
+  // Refresh the picker to remove the added IP
+  const picker = document.getElementById('registryIpPicker');
+  if (picker.classList.contains('show')) {
+    openRegistryIpPicker(); // re-toggle will close
+    openRegistryIpPicker(); // re-open with updated list
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  RESTORE REGISTRY IPs (legacy — for removed IPs)
 // ══════════════════════════════════════════════════════════════════
 function getMissingRegistryIps() {
   // For SS: show IPs from TB_ROOT level (not nested in other SSes)

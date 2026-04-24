@@ -1,0 +1,20 @@
+# benign_messages.yaml
+# Messages that should be SKIPPED during first-real-failure selection in Phase 2.
+#
+# This file starts empty. Grow it only via explicit user confirmation:
+# when the user declares a message as "noise" during debug, propose
+# appending an entry here. Never auto-add.
+#
+# Schema:
+#   benign:
+#     - regex: "..."          # Python regex, matched against the log line (after stripping sim-time prefix)
+#       why:   "..."          # one-sentence reason
+#       added_by: "..."       # user identifier (optional)
+#       date:     "YYYY-MM-DD"
+#
+# Guidelines:
+# - Prefer narrow regexes anchored on message id + component path.
+# - Avoid `.*` at both ends unless necessary.
+# - When in doubt, comment the entry rather than deleting so the reason is preserved.
+
+benign: []

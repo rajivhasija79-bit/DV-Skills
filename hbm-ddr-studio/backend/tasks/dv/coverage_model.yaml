@@ -1,0 +1,23 @@
+id: dv_coverage_model
+title: Coverage Model
+group: dv
+icon: bar-chart-3
+description: Generate functional coverage covergroups from testplan/spec
+schedulable: true
+script:
+  type: python
+  path: scripts/dv/coverage_model.py
+  arg_mode: stdin
+  timeout_s: 300
+form:
+  sections:
+    - title: Inputs
+      fields:
+        - {key: testplan_path, type: path, required: true, placeholder: "./testplan/testplan.json"}
+    - title: Targets
+      fields:
+        - {key: groups,        type: multiselect, options: [Address, Data, Control, ECC, Refresh, Training, Power, RAS]}
+        - {key: target_pct,    type: number, default: 99, min: 50, max: 100}
+    - title: Output
+      fields:
+        - {key: output_dir,    type: path, required: true, placeholder: "./cov"}

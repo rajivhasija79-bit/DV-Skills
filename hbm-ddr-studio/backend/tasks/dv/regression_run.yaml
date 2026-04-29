@@ -1,0 +1,22 @@
+id: dv_regression_run
+title: Regression Run
+group: dv
+icon: play
+description: Run a UVM regression suite (mock script demonstrates progress + mid-run prompt)
+schedulable: true
+script:
+  type: python
+  path: scripts/dv/regression_run.py
+  arg_mode: stdin
+  timeout_s: 1800
+form:
+  sections:
+    - title: Suite
+      fields:
+        - {key: suite,       type: select, options: [smoke, nightly, full], required: true}
+        - {key: seeds,       type: number, default: 4, min: 1, max: 64}
+    - title: Compute
+      fields:
+        - {key: simulator,   type: select, options: [VCS, Xcelium, Questa], required: true}
+        - {key: jobs,        type: number, default: 4, min: 1, max: 64}
+        - {key: ask_token,   type: boolean, default: false, help: "If on, the script will prompt for a queue token mid-run"}

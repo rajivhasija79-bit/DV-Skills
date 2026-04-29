@@ -1,0 +1,23 @@
+id: dv_ral_gen
+title: RAL Generation
+group: dv
+icon: coins
+description: Generate UVM Register Abstraction Layer from register spec
+schedulable: true
+script:
+  type: python
+  path: scripts/dv/ral_gen.py
+  arg_mode: stdin
+  timeout_s: 300
+form:
+  sections:
+    - title: Source
+      fields:
+        - {key: reg_spec,     type: path, required: true, placeholder: "./regs.csv"}
+        - {key: spec_format,  type: select, options: [CSV, IP-XACT, SystemRDL, JSON], required: true}
+    - title: Output
+      fields:
+        - {key: output_dir,   type: path, required: true, placeholder: "./ral"}
+        - {key: package_name, type: text, default: "ddr_reg_pkg"}
+post_run:
+  collect_artifacts: ["*.sv"]

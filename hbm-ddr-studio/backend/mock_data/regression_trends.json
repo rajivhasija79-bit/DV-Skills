@@ -1,0 +1,33 @@
+{
+  "kpis": {
+    "pass_rate": 92, "pass_rate_delta": 2,
+    "runs_week": 1284, "runs_delta": 142,
+    "longest_min": 47, "longest_delta": -3,
+    "flaky": 6, "flaky_delta": -2,
+    "seeds": 9120, "seeds_delta": 800,
+    "coverage_pct": 87, "coverage_delta": 1
+  },
+  "weekly": [
+    {"week": "W14", "passed": 612, "failed": 78, "skipped": 14, "pass_rate": 87},
+    {"week": "W15", "passed": 690, "failed": 60, "skipped": 12, "pass_rate": 91},
+    {"week": "W16", "passed": 730, "failed": 55, "skipped": 11, "pass_rate": 92},
+    {"week": "W17", "passed": 800, "failed": 70, "skipped": 18, "pass_rate": 90},
+    {"week": "W18", "passed": 880, "failed": 50, "skipped": 9,  "pass_rate": 94},
+    {"week": "W19", "passed": 950, "failed": 65, "skipped": 12, "pass_rate": 92},
+    {"week": "W20", "passed": 1100,"failed": 80, "skipped": 14, "pass_rate": 92}
+  ],
+  "heatmap": [
+    0,1,1,2,3,4,3, 2,3,4,4,5,5,4, 3,4,5,6,5,5,4,
+    5,6,7,7,8,7,6, 6,7,8,9,8,7,6, 7,8,9,9,8,8,7,
+    8,9,9,9,9,9,8, 9,9,9,10,9,9,8, 7,8,9,9,10,9,8,
+    8,9,10,10,9,9,8, 9,10,11,11,10,9,8, 10,11,12,11,10,10,9,
+    11,12,12,11,11,10,10
+  ],
+  "top_failures": [
+    {"test": "tb_ddr_phy/training_corner",  "fails": 18, "last_seen": "2026-04-27", "trend": [1,2,2,3,3,4,4]},
+    {"test": "tb_ddr_ctrl/refresh_inflight","fails": 12, "last_seen": "2026-04-27", "trend": [0,1,1,2,2,3,3]},
+    {"test": "tb_ras/double_bit_ecc",       "fails": 9,  "last_seen": "2026-04-26", "trend": [0,0,1,1,2,2,3]},
+    {"test": "tb_smmu/tlb_invalidate",      "fails": 7,  "last_seen": "2026-04-25", "trend": [1,1,1,2,2,2,2]},
+    {"test": "tb_noc/qos_arbitration",      "fails": 5,  "last_seen": "2026-04-24", "trend": [0,1,1,1,1,1,2]}
+  ]
+}

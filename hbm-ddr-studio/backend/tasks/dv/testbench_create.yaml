@@ -1,0 +1,24 @@
+id: dv_testbench_create
+title: Testbench Creation
+group: dv
+icon: layers
+description: Generate UVM testbench skeleton for IP/SS/SoC level
+schedulable: true
+script:
+  type: python
+  path: scripts/dv/testbench_create.py
+  arg_mode: stdin
+  timeout_s: 300
+form:
+  sections:
+    - title: Scope
+      fields:
+        - {key: level,       type: select, options: [IP, SS, SoC], required: true}
+        - {key: name,        type: text,   required: true, placeholder: "ddr_ss_tb"}
+    - title: Interfaces
+      fields:
+        - {key: protocols,   type: multiselect, options: [APB, AXI, AHB, AXI-Lite]}
+        - {key: clocks,      type: number, default: 2, min: 1, max: 8}
+    - title: Output
+      fields:
+        - {key: output_dir,  type: path, required: true, placeholder: "./tb_out"}

@@ -1,0 +1,32 @@
+{
+  "kpis": {
+    "total_ips": 12, "total_ips_delta": 0,
+    "integrated_pct": 75, "integrated_delta": 8,
+    "synth_pct": 67, "synth_delta": 5,
+    "open_bugs": 23, "open_bugs_delta": -3,
+    "loc_delta": 4218, "loc_delta_prev": 612,
+    "features_done_pct": 71, "features_delta": 4
+  },
+  "ip_status": [
+    {"status": "Integrated",   "count": 9},
+    {"status": "WIP",          "count": 2},
+    {"status": "Not started",  "count": 1}
+  ],
+  "per_ip": [
+    {"ip": "ddr_ctrl",   "pct": 92},
+    {"ip": "ddr_phy",    "pct": 80},
+    {"ip": "noc_bridge", "pct": 75},
+    {"ip": "ras_infra",  "pct": 60},
+    {"ip": "smmu",       "pct": 55},
+    {"ip": "refresh_ctl","pct": 88},
+    {"ip": "training_fsm","pct": 40},
+    {"ip": "ecc_engine", "pct": 70}
+  ],
+  "blockers": [
+    {"id": "DDRSS-431", "ip": "ddr_phy",     "title": "PHY training fails at 6400 MT/s", "severity": "Critical", "status": "open",        "trend": [3,4,4,5,6,6,7]},
+    {"id": "DDRSS-588", "ip": "ras_infra",   "title": "RAS interrupt missed",            "severity": "Blocker",  "status": "in_progress", "trend": [2,3,3,4,5,5,6]},
+    {"id": "DDRSS-602", "ip": "smmu",        "title": "TLB invalidation race",           "severity": "Major",    "status": "in_progress", "trend": [0,1,1,2,2,3,3]},
+    {"id": "DDRSS-655", "ip": "ddr_ctrl",    "title": "Refresh-in-flight corner",        "severity": "Major",    "status": "open",        "trend": [1,1,2,2,2,3,3]},
+    {"id": "DDRSS-672", "ip": "ecc_engine",  "title": "Double-bit not flagged",          "severity": "Critical", "status": "open",        "trend": [1,2,2,3,3,4,4]}
+  ]
+}

@@ -1,0 +1,26 @@
+id: rtl_review
+title: RTL Review
+group: rtl
+icon: book-open
+description: Compare RTL against PRD/spec checklist and emit a review report
+schedulable: false
+script:
+  type: python
+  path: scripts/rtl/review.py
+  arg_mode: stdin
+  timeout_s: 600
+form:
+  sections:
+    - title: Sources
+      fields:
+        - {key: spec_path,   type: path, required: true, placeholder: "./docs/PRD.md"}
+        - {key: rtl_path,    type: path, required: true, placeholder: "./rtl"}
+    - title: Focus
+      fields:
+        - {key: focus,       type: multiselect, options: [Functional, Lint, CDC, Power, Synthesis]}
+        - {key: severity_threshold, type: select, options: [Info, Warning, Error], default: Warning, required: true}
+    - title: Output
+      fields:
+        - {key: output_dir,  type: path, required: true, placeholder: "./review"}
+post_run:
+  collect_artifacts: ["review_report.md", "issues.json"]

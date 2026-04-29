@@ -1,0 +1,25 @@
+id: dv_test_strategy
+title: Test Strategy
+group: dv
+icon: shield-check
+description: Generate the verification strategy document (block/SS/SoC view)
+schedulable: false
+script:
+  type: python
+  path: scripts/dv/test_strategy.py
+  arg_mode: stdin
+  timeout_s: 300
+form:
+  sections:
+    - title: Scope
+      fields:
+        - {key: level,        type: select, options: [IP, SS, SoC], required: true}
+        - {key: block_name,   type: text, required: true, placeholder: "ddr_ctrl"}
+    - title: Targets
+      fields:
+        - {key: line_cov,     type: number, default: 99, min: 50, max: 100}
+        - {key: toggle_cov,   type: number, default: 95, min: 50, max: 100}
+        - {key: func_cov,     type: number, default: 99, min: 50, max: 100}
+    - title: Output
+      fields:
+        - {key: output_dir,   type: path, required: true, placeholder: "./strategy"}

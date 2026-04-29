@@ -1,0 +1,29 @@
+id: rtl_subsystem_integration
+title: Subsystem Integration
+group: rtl
+icon: cpu
+description: Generate DDR/HBM subsystem integration RTL skeleton
+schedulable: true
+script:
+  type: python
+  path: scripts/rtl/integrate_subsystem.py
+  arg_mode: stdin
+  timeout_s: 600
+form:
+  sections:
+    - title: Protocol
+      fields:
+        - {key: protocol,    type: select, options: [LPDDR5, DDR5, GDDR6, HBM3], required: true}
+        - {key: speed_mtps,  type: number, min: 1600, max: 12800, default: 6400, required: true}
+    - title: PHY
+      fields:
+        - {key: phy_vendor,  type: select, options: [Synopsys, Cadence, Rambus, In-house], required: true}
+    - title: Topology
+      fields:
+        - {key: channels,    type: number, default: 4, min: 1, max: 16}
+        - {key: density_gb,  type: number, default: 16, min: 1, max: 1024}
+        - {key: noc,         type: select, options: [Arteris, NetSpeed, Custom]}
+        - {key: ras_ip,      type: select, options: [None, ECC, ECC+Parity, RAS-Suite]}
+        - {key: smmu_ip,     type: select, options: [None, ARM-MMU-700, Custom]}
+post_run:
+  collect_artifacts: ["*.sv", "integration_report.json"]

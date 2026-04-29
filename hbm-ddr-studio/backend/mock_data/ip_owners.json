@@ -1,0 +1,33 @@
+{
+  "kpis": {
+    "total_ips":  12,
+    "rtl_owned":  11,
+    "dv_owned":   10,
+    "unassigned": 2
+  },
+  "rag": [
+    {"label": "Red",   "color": "red",   "count": 1},
+    {"label": "Amber", "color": "amber", "count": 3},
+    {"label": "Green", "color": "green", "count": 8}
+  ],
+  "vendors": [
+    {"vendor": "In-house",  "count": 7},
+    {"vendor": "Synopsys",  "count": 2},
+    {"vendor": "Cadence",   "count": 2},
+    {"vendor": "Arteris",   "count": 1}
+  ],
+  "ips": [
+    {"ip": "ddr_ctrl",      "vendor": "In-house",  "rtl_owner": "ananya.s",   "dv_owner": "vikram.k",  "rtl_pct": 92, "dv_pct": 78, "status": "in_progress", "trend": [3,4,5,6,7,7,8]},
+    {"ip": "ddr_phy",       "vendor": "Synopsys",  "rtl_owner": "ananya.s",   "dv_owner": "ling.c",    "rtl_pct": 80, "dv_pct": 65, "status": "open",        "trend": [2,3,4,4,5,5,6]},
+    {"ip": "noc_bridge",    "vendor": "Arteris",   "rtl_owner": "raj.p",      "dv_owner": "ling.c",    "rtl_pct": 75, "dv_pct": 60, "status": "in_progress", "trend": [1,2,2,3,3,4,4]},
+    {"ip": "ras_infra",     "vendor": "In-house",  "rtl_owner": "vikram.k",   "dv_owner": "priya.m",   "rtl_pct": 60, "dv_pct": 55, "status": "open",        "trend": [0,1,2,2,3,3,4]},
+    {"ip": "smmu",          "vendor": "Cadence",   "rtl_owner": "raj.p",      "dv_owner": "priya.m",   "rtl_pct": 55, "dv_pct": 48, "status": "in_progress", "trend": [0,1,1,2,2,2,3]},
+    {"ip": "refresh_ctl",   "vendor": "In-house",  "rtl_owner": "ling.c",     "dv_owner": "vikram.k",  "rtl_pct": 88, "dv_pct": 80, "status": "in_progress", "trend": [4,5,6,6,7,7,8]},
+    {"ip": "training_fsm",  "vendor": "In-house",  "rtl_owner": "priya.m",    "dv_owner": "ananya.s",  "rtl_pct": 40, "dv_pct": 30, "status": "open",        "trend": [0,1,1,2,2,2,3]},
+    {"ip": "ecc_engine",    "vendor": "In-house",  "rtl_owner": "ling.c",     "dv_owner": "raj.p",     "rtl_pct": 70, "dv_pct": 62, "status": "in_progress", "trend": [2,3,4,4,5,5,6]},
+    {"ip": "axi_lite_glue", "vendor": "In-house",  "rtl_owner": "raj.p",      "dv_owner": "vikram.k",  "rtl_pct": 95, "dv_pct": 90, "status": "done",        "trend": [6,7,7,8,8,9,9]},
+    {"ip": "perf_counters", "vendor": "In-house",  "rtl_owner": "priya.m",    "dv_owner": "—",          "rtl_pct": 65, "dv_pct": 0,  "status": "open",        "trend": [1,1,2,2,3,3,3]},
+    {"ip": "dft_wrapper",   "vendor": "Synopsys",  "rtl_owner": "—",          "dv_owner": "—",          "rtl_pct": 0,  "dv_pct": 0,  "status": "open",        "trend": [0,0,0,0,0,0,0]},
+    {"ip": "lpddr_glue",    "vendor": "Cadence",   "rtl_owner": "ananya.s",   "dv_owner": "ling.c",    "rtl_pct": 50, "dv_pct": 35, "status": "in_progress", "trend": [1,1,2,2,3,3,4]}
+  ]
+}

@@ -1,0 +1,23 @@
+id: dv_vip_integration
+title: VIP Integration
+group: dv
+icon: layers
+description: Wire selected VIPs into an existing testbench environment
+schedulable: true
+script:
+  type: python
+  path: scripts/dv/vip_integration.py
+  arg_mode: stdin
+  timeout_s: 300
+form:
+  sections:
+    - title: Target TB
+      fields:
+        - {key: tb_path,      type: path, required: true, placeholder: "./tb"}
+    - title: VIPs
+      fields:
+        - {key: vips,         type: multiselect, options: [APB, AXI, AXI-Lite, AHB, UART, I2C, JTAG, AHB-Lite]}
+        - {key: vendor,       type: select, options: [Synopsys, Cadence, Mentor, In-house], required: true}
+    - title: Options
+      fields:
+        - {key: update_makefile, type: boolean, default: true}

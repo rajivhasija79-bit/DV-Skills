@@ -1,0 +1,33 @@
+{
+  "kpis": {
+    "open_count": 87, "open_delta": -4,
+    "created_week": 23, "created_delta": 2,
+    "resolved_week": 27, "resolved_delta": 6,
+    "blockers": 5, "blockers_delta": -1,
+    "sla_breaches": 3, "sla_delta": 1,
+    "mttr_days": 4.2, "mttr_delta": -0.3
+  },
+  "trend": [
+    {"week": "W14", "created": 18, "resolved": 14},
+    {"week": "W15", "created": 21, "resolved": 19},
+    {"week": "W16", "created": 17, "resolved": 22},
+    {"week": "W17", "created": 25, "resolved": 23},
+    {"week": "W18", "created": 19, "resolved": 21},
+    {"week": "W19", "created": 22, "resolved": 25},
+    {"week": "W20", "created": 23, "resolved": 27}
+  ],
+  "severity": [
+    {"severity": "Blocker",  "count": 5},
+    {"severity": "Critical", "count": 14},
+    {"severity": "Major",    "count": 31},
+    {"severity": "Minor",    "count": 28},
+    {"severity": "Trivial",  "count": 9}
+  ],
+  "stale": [
+    {"id": "DDRSS-431", "title": "PHY training fails at 6400 MT/s on corner",        "severity": "Critical", "age_days": 42, "trend": [3,4,4,5,6,6,7]},
+    {"id": "DDRSS-512", "title": "ECC double-bit not flagged in scoreboard",         "severity": "Major",    "age_days": 31, "trend": [1,1,2,2,3,3,4]},
+    {"id": "DDRSS-588", "title": "RAS interrupt missed on back-to-back errors",      "severity": "Blocker",  "age_days": 27, "trend": [2,3,3,4,5,5,6]},
+    {"id": "DDRSS-602", "title": "SMMU TLB invalidation race in regression",         "severity": "Major",    "age_days": 19, "trend": [0,1,1,2,2,3,3]},
+    {"id": "DDRSS-617", "title": "Coverage hole on refresh-in-flight scenarios",     "severity": "Minor",    "age_days": 14, "trend": [1,1,1,2,2,2,2]}
+  ]
+}

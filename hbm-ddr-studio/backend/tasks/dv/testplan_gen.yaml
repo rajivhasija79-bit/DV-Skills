@@ -1,0 +1,26 @@
+id: dv_testplan_gen
+title: Testplan Generation
+group: dv
+icon: file-text
+description: Parse spec and emit a testplan with DV milestone coverage targets
+schedulable: true
+script:
+  type: python
+  path: scripts/dv/testplan_gen.py
+  arg_mode: stdin
+  timeout_s: 600
+form:
+  sections:
+    - title: Inputs
+      fields:
+        - {key: spec_path,    type: path, required: true, placeholder: "./docs/PRD.md"}
+    - title: Targets
+      fields:
+        - {key: milestone,    type: select, options: [DV-I, DV-C, DV-F], required: true}
+        - {key: cov_target,   type: number, default: 95, min: 50, max: 100}
+        - {key: feature_scope, type: multiselect, options: [Address, Data, Control, ECC, RAS, Power, Refresh, Training]}
+    - title: Output
+      fields:
+        - {key: output_dir,   type: path, required: true, placeholder: "./testplan"}
+post_run:
+  collect_artifacts: ["testplan.md", "testplan.json"]

@@ -1,0 +1,43 @@
+{
+  "kpis": {
+    "on_track": 7, "on_track_delta": 1,
+    "at_risk": 3,  "at_risk_delta": 0,
+    "slipped": 1,  "slipped_delta": -1,
+    "days_to_gate": 24, "days_delta": -7,
+    "confidence": 78, "confidence_delta": 4
+  },
+  "items": [
+    {"track": "RTL",       "label": "DDR Ctrl freeze",       "start": "2026-04-01", "end": "2026-04-22", "status": "on-track"},
+    {"track": "RTL",       "label": "PHY integration",       "start": "2026-04-15", "end": "2026-05-15", "status": "at-risk"},
+    {"track": "RTL",       "label": "RAS handoff",           "start": "2026-05-01", "end": "2026-05-25", "status": "on-track"},
+    {"track": "DV",        "label": "DV-I",                  "start": "2026-04-08", "end": "2026-04-30", "status": "on-track"},
+    {"track": "DV",        "label": "DV-C",                  "start": "2026-04-25", "end": "2026-05-30", "status": "at-risk"},
+    {"track": "DV",        "label": "DV-F",                  "start": "2026-05-25", "end": "2026-06-25", "status": "on-track"},
+    {"track": "Emulation", "label": "Bring-up",              "start": "2026-04-10", "end": "2026-05-05", "status": "slipped"},
+    {"track": "Emulation", "label": "DDR boot",              "start": "2026-05-05", "end": "2026-06-01", "status": "at-risk"}
+  ],
+  "rag": [
+    {"label": "Red",   "color": "red",   "count": 1},
+    {"label": "Amber", "color": "amber", "count": 3},
+    {"label": "Green", "color": "green", "count": 7}
+  ],
+  "checklists": [
+    {"name": "RTL", "items": [
+      {"label": "Top freeze",       "done": true},
+      {"label": "PHY integrated",   "done": false},
+      {"label": "RAS handoff",      "done": false},
+      {"label": "Lint clean",       "done": true}
+    ]},
+    {"name": "DV",  "items": [
+      {"label": "Testplan v1",      "done": true},
+      {"label": "Smoke regression", "done": true},
+      {"label": "DV-I gate",        "done": true},
+      {"label": "DV-C gate",        "done": false}
+    ]},
+    {"name": "Emulation", "items": [
+      {"label": "Image build",      "done": true},
+      {"label": "DDR bring-up",     "done": false},
+      {"label": "Boot to console",  "done": false}
+    ]}
+  ]
+}

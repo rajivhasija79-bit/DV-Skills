@@ -1,0 +1,21 @@
+id: dv_debug
+title: Debug
+group: dv
+icon: wrench
+description: Root-cause a failing simulation (wraps rtl-sim-debug skill)
+schedulable: false
+script:
+  type: python
+  path: scripts/dv/debug.py
+  arg_mode: stdin
+  timeout_s: 900
+form:
+  sections:
+    - title: Failing run
+      fields:
+        - {key: sim_log,      type: path, required: true, placeholder: "./sim.log"}
+        - {key: waveform,     type: path, placeholder: "./wave.fsdb"}
+    - title: Hints
+      fields:
+        - {key: subsystem,    type: select, options: [DDR, PCIe, Generic], default: DDR}
+        - {key: mode,         type: select, options: [Triage, Deep], default: Triage, required: true}

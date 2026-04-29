@@ -1,0 +1,28 @@
+id: ip_owners
+title: IP Owners
+group: pm
+icon: users
+description: All IPs in the subsystem with their RTL and DV owner names
+adapter: ip_owners
+params: {}
+refresh_s: 600
+layout:
+  - {kind: kpi_row, tiles: [
+      {label: "Total IPs",     metric: total_ips,    accent: muted},
+      {label: "Owned (RTL)",   metric: rtl_owned,    accent: primary},
+      {label: "Owned (DV)",    metric: dv_owned,     accent: success},
+      {label: "Unassigned",    metric: unassigned,   accent: destructive}
+    ]}
+  - {kind: rag, title: "IP coverage status", source: rag}
+  - {kind: donut, title: "By vendor", source: vendors, name: vendor, value: count}
+  - {kind: table, title: "IP owners", full_width: true, source: ips,
+     columns: [
+       {key: ip,         label: "IP"},
+       {key: vendor,     label: "Vendor"},
+       {key: rtl_owner,  label: "RTL owner"},
+       {key: dv_owner,   label: "DV owner"},
+       {key: rtl_pct,    label: "RTL %", align: right},
+       {key: dv_pct,     label: "DV %",  align: right},
+       {key: status,     label: "Status", kind: status},
+       {key: trend,      label: "Trend", kind: sparkline}
+     ]}

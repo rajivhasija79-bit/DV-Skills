@@ -1,0 +1,30 @@
+id: jira_trends
+title: JIRA Bug Trends
+group: pm
+icon: line-chart
+description: Open vs created vs resolved with severity breakdown
+adapter: jira
+params:
+  project: DDRSS
+  weeks: 12
+refresh_s: 300
+layout:
+  - {kind: kpi_row, tiles: [
+      {label: "Open Bugs",       metric: open_count,     delta: open_delta,     accent: destructive},
+      {label: "Created (week)",  metric: created_week,   delta: created_delta,  accent: primary},
+      {label: "Resolved (week)", metric: resolved_week,  delta: resolved_delta, accent: success},
+      {label: "Blockers",        metric: blockers,       delta: blockers_delta, accent: warning},
+      {label: "SLA Breaches",    metric: sla_breaches,   delta: sla_delta,      accent: destructive},
+      {label: "MTTR (days)",     metric: mttr_days,      delta: mttr_delta,     accent: muted}
+    ]}
+  - {kind: line,  title: "Created vs Resolved", source: trend, x: week,
+     series: [{key: created, label: "Created"}, {key: resolved, label: "Resolved"}]}
+  - {kind: pie,   title: "By Severity", source: severity, name: severity, value: count}
+  - {kind: table, title: "Top stale bugs", source: stale,
+     columns: [
+       {key: id,       label: "Key"},
+       {key: title,    label: "Title"},
+       {key: severity, label: "Severity"},
+       {key: age_days, label: "Age (d)", align: right},
+       {key: trend,    label: "Trend", kind: sparkline}
+     ]}

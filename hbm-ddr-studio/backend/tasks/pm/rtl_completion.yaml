@@ -1,0 +1,28 @@
+id: rtl_completion
+title: RTL Completion
+group: pm
+icon: cpu
+description: Per-IP RTL integration & feature completion
+adapter: rtl_completion
+params: {}
+refresh_s: 300
+layout:
+  - {kind: kpi_row, tiles: [
+      {label: "Total IPs",       metric: total_ips,         delta: total_ips_delta,    accent: muted},
+      {label: "Integrated",      metric: integrated_pct,    delta: integrated_delta,   accent: success},
+      {label: "Synthesizable",   metric: synth_pct,         delta: synth_delta,        accent: primary},
+      {label: "Open RTL Bugs",   metric: open_bugs,         delta: open_bugs_delta,    accent: destructive},
+      {label: "LOC Δ (week)",    metric: loc_delta,         delta: loc_delta_prev,     accent: muted},
+      {label: "Features done",   metric: features_done_pct, delta: features_delta,     accent: success}
+    ]}
+  - {kind: donut,  title: "IP status mix",   source: ip_status, name: status, value: count}
+  - {kind: radial, title: "Per-IP completion %", source: per_ip, name: ip, value: pct}
+  - {kind: table, title: "Top blockers", source: blockers,
+     columns: [
+       {key: id,       label: "Key"},
+       {key: ip,       label: "IP"},
+       {key: title,    label: "Blocker"},
+       {key: severity, label: "Sev"},
+       {key: status,   label: "Status", kind: status},
+       {key: trend,    label: "Trend", kind: sparkline}
+     ]}

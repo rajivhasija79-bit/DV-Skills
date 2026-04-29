@@ -1,0 +1,141 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* HBM-DDR Studio — warm espresso + orange editorial palette
+   Inspired by DV-Skills/dv-gui, mapped to shadcn-style HSL tokens. */
+
+@layer base {
+  :root {
+    /* light mode */
+    --background: 30 18% 98%;
+    --foreground: 30 14% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 30 14% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 30 14% 12%;
+    --primary: 16 72% 62%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 30 12% 94%;
+    --secondary-foreground: 30 14% 18%;
+    --muted: 30 10% 92%;
+    --muted-foreground: 30 6% 42%;
+    --accent: 16 72% 95%;
+    --accent-foreground: 16 60% 32%;
+    --destructive: 0 70% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 142 55% 48%;
+    --success-foreground: 0 0% 100%;
+    --warning: 28 78% 62%;
+    --warning-foreground: 30 60% 14%;
+    --border: 30 10% 88%;
+    --input: 30 10% 88%;
+    --ring: 16 72% 62%;
+    --radius: 0.625rem;
+
+    /* chrome = sidebar + topbar surface (slate-tinted, distinct from content) */
+    --chrome: 222 28% 14%;
+    --chrome-foreground: 220 16% 80%;
+    --chrome-strong: 220 28% 96%;
+    --chrome-border: 222 22% 22%;
+    --chrome-muted: 220 12% 65%;
+    --chrome-hover: 222 22% 19%;
+
+    --header-h: 52px;
+    --sidebar-w: 272px;
+  }
+  .dark {
+    /* warm espresso dark */
+    --background: 36 14% 6%;            /* #111009 */
+    --foreground: 30 12% 96%;
+    --card: 30 12% 8%;                  /* #161412 */
+    --card-foreground: 30 12% 96%;
+    --popover: 30 12% 9%;
+    --popover-foreground: 30 12% 96%;
+    --primary: 16 70% 64%;              /* soft coral-orange */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 30 10% 12%;            /* #1C1A15 */
+    --secondary-foreground: 30 12% 96%;
+    --muted: 30 10% 14%;                /* #222018 */
+    --muted-foreground: 30 6% 65%;
+    --accent: 16 70% 18%;
+    --accent-foreground: 16 70% 78%;
+    --destructive: 0 65% 62%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 142 50% 50%;
+    --success-foreground: 0 0% 100%;
+    --warning: 28 75% 64%;              /* soft amber */
+    --warning-foreground: 30 60% 12%;
+    --border: 30 8% 18%;
+    --input: 30 8% 18%;
+    --ring: 16 70% 64%;
+
+    /* chrome = sidebar + topbar surface (deep slate, distinct from warm content) */
+    --chrome: 222 28% 9%;
+    --chrome-foreground: 218 22% 78%;     /* cool slate, not white */
+    --chrome-strong: 220 28% 95%;         /* high-emphasis text in chrome */
+    --chrome-border: 222 22% 16%;
+    --chrome-muted: 220 12% 55%;
+    --chrome-hover: 222 22% 14%;
+  }
+
+  * { @apply border-border; }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter Tight', 'Inter', ui-sans-serif, system-ui, sans-serif;
+    font-feature-settings: "rlig" 1, "calt" 1, "ss01" 1;
+    letter-spacing: -0.005em;
+  }
+  .tabular-nums { font-variant-numeric: tabular-nums; }
+
+  /* editorial tracking on display headings */
+  h1, h2, h3 { letter-spacing: -0.025em; }
+}
+
+@layer components {
+  /* Cards: animated orange top accent on hover (DV-GUI signature motif) */
+  .hds-card-accent {
+    @apply relative overflow-hidden;
+  }
+  .hds-card-accent::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 16px;
+    right: 16px;
+    height: 2px;
+    background: hsl(var(--primary));
+    border-radius: 0 0 4px 4px;
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform 300ms cubic-bezier(.25,.46,.45,.94);
+  }
+  .hds-card-accent:hover::before { transform: scaleX(1); }
+}
+
+@layer utilities {
+  .scrollbar-thin::-webkit-scrollbar { width: 8px; height: 8px; }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground) / 0.35);
+    border-radius: 4px;
+  }
+  .glow-primary {
+    box-shadow: 0 2px 12px hsl(var(--primary) / 0.22);
+  }
+  .glow-primary-strong {
+    box-shadow: 0 0 22px hsl(var(--primary) / 0.22), 0 0 60px hsl(var(--primary) / 0.08);
+  }
+  .uppercase-eyebrow {
+    @apply text-[10px] font-bold uppercase tracking-[0.14em] text-muted-foreground;
+  }
+}
+
+/* Smooth status pulse used by StatusBadge running state */
+@keyframes hds-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.55; transform: scale(0.85); }
+}
+@keyframes hds-shimmer {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.45; }
+}

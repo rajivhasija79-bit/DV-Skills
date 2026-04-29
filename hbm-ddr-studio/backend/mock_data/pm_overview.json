@@ -1,0 +1,55 @@
+{
+  "kpis": {
+    "rtl_pct": 71, "rtl_pct_delta": 4,
+    "dv_pass": 92, "dv_pass_delta": 2,
+    "emu_pct": 38, "emu_pct_delta": 6,
+    "jira_open": 87, "jira_open_delta": -4,
+    "days_to_gate": 24, "days_delta": -7,
+    "risk": 42, "risk_delta": -3
+  },
+  "rag": [
+    {"label": "Red",   "color": "red",   "count": 1},
+    {"label": "Amber", "color": "amber", "count": 4},
+    {"label": "Green", "color": "green", "count": 9}
+  ],
+  "dv_trend": [
+    {"week": "W14", "pass_rate": 87},
+    {"week": "W15", "pass_rate": 91},
+    {"week": "W16", "pass_rate": 92},
+    {"week": "W17", "pass_rate": 90},
+    {"week": "W18", "pass_rate": 94},
+    {"week": "W19", "pass_rate": 92},
+    {"week": "W20", "pass_rate": 92}
+  ],
+  "jira_trend": [
+    {"week": "W14", "created": 18, "resolved": 14},
+    {"week": "W15", "created": 21, "resolved": 19},
+    {"week": "W16", "created": 17, "resolved": 22},
+    {"week": "W17", "created": 25, "resolved": 23},
+    {"week": "W18", "created": 19, "resolved": 21},
+    {"week": "W19", "created": 22, "resolved": 25},
+    {"week": "W20", "created": 23, "resolved": 27}
+  ],
+  "bugs_area": [
+    {"area": "DDR Ctrl",   "count": 24},
+    {"area": "PHY",        "count": 19},
+    {"area": "RAS",        "count": 12},
+    {"area": "SMMU",       "count": 9},
+    {"area": "NoC",        "count": 7},
+    {"area": "Other",      "count": 16}
+  ],
+  "feed": [
+    {"text": "PHY training corner regressed at 6400 MT/s (DDRSS-431).", "when": "Today, 09:14"},
+    {"text": "DV-I gate signed off — moving to DV-C.",                  "when": "Yesterday"},
+    {"text": "Coverage closed on refresh-in-flight.",                  "when": "Mon"},
+    {"text": "Emu DDR boot to console hit timeout.",                  "when": "Sun"},
+    {"text": "RAS interrupt fix landed in main.",                     "when": "Sat"}
+  ],
+  "blockers": [
+    {"id": "DDRSS-431", "title": "PHY training fails at 6400 MT/s",       "area": "PHY",      "severity": "Critical", "owner": "ananya",  "age_days": 42, "status": "open"},
+    {"id": "DDRSS-588", "title": "RAS interrupt missed back-to-back",     "area": "RAS",      "severity": "Blocker",  "owner": "vikram",  "age_days": 27, "status": "in_progress"},
+    {"id": "DDRSS-672", "title": "ECC double-bit not flagged",            "area": "DDR Ctrl", "severity": "Critical", "owner": "ling",    "age_days": 14, "status": "open"},
+    {"id": "DDRSS-655", "title": "Refresh-in-flight corner",              "area": "DDR Ctrl", "severity": "Major",    "owner": "ananya",  "age_days": 9,  "status": "in_progress"},
+    {"id": "DDRSS-602", "title": "SMMU TLB invalidation race",            "area": "SMMU",     "severity": "Major",    "owner": "vikram",  "age_days": 19, "status": "in_progress"}
+  ]
+}

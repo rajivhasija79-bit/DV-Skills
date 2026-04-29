@@ -1,0 +1,19 @@
+id: milestones
+title: Milestones
+group: pm
+icon: list-checks
+description: DV / RTL / Emulation milestone tracking
+adapter: milestones
+params: {}
+refresh_s: 600
+layout:
+  - {kind: kpi_row, tiles: [
+      {label: "On-track",       metric: on_track,      delta: on_track_delta,   accent: success},
+      {label: "At-risk",        metric: at_risk,       delta: at_risk_delta,    accent: warning},
+      {label: "Slipped",        metric: slipped,       delta: slipped_delta,    accent: destructive},
+      {label: "Days to gate",   metric: days_to_gate,  delta: days_delta,       accent: primary},
+      {label: "Confidence",     metric: confidence,    delta: confidence_delta, accent: success}
+    ]}
+  - {kind: gantt,     title: "Milestone tracks",       source: items}
+  - {kind: rag,       title: "Status mix",             source: rag}
+  - {kind: checklist, title: "Per-track checklists",   source: checklists}

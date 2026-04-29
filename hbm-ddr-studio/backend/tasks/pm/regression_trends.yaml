@@ -1,0 +1,33 @@
+id: regression_trends
+title: Regression Trends
+group: pm
+icon: activity
+description: Weekly DV regression health, flaky tests, coverage
+adapter: regression_trends
+params: {}
+refresh_s: 300
+layout:
+  - {kind: kpi_row, tiles: [
+      {label: "Pass rate %",     metric: pass_rate,    delta: pass_rate_delta,    accent: success},
+      {label: "Runs (week)",     metric: runs_week,    delta: runs_delta,         accent: primary},
+      {label: "Longest test (m)",metric: longest_min,  delta: longest_delta,      accent: warning},
+      {label: "Flaky tests",     metric: flaky,        delta: flaky_delta,        accent: destructive},
+      {label: "Seeds executed",  metric: seeds,        delta: seeds_delta,        accent: muted},
+      {label: "Coverage %",      metric: coverage_pct, delta: coverage_delta,     accent: success}
+    ]}
+  - {kind: bar,  title: "Weekly results", source: weekly, x: week, stacked: true,
+     series: [
+       {key: passed,  label: "Passed",  color: success},
+       {key: failed,  label: "Failed",  color: destructive},
+       {key: skipped, label: "Skipped", color: warning}
+     ]}
+  - {kind: line, title: "Pass rate trend", source: weekly, x: week,
+     series: [{key: pass_rate, label: "Pass rate %"}]}
+  - {kind: heatmap, title: "Run activity (last 12 weeks)", source: heatmap}
+  - {kind: table, title: "Top failing tests", source: top_failures,
+     columns: [
+       {key: test,     label: "Test"},
+       {key: fails,    label: "Fails", align: right},
+       {key: last_seen,label: "Last seen"},
+       {key: trend,    label: "Trend", kind: sparkline}
+     ]}

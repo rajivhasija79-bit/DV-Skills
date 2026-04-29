@@ -1,0 +1,28 @@
+id: rtl_sdc_gen
+title: SDC Generation
+group: rtl
+icon: scroll-text
+description: Generate Synopsys/Cadence SDC constraints for the DDR subsystem
+schedulable: true
+script:
+  type: python
+  path: scripts/rtl/sdc_gen.py
+  arg_mode: stdin
+  timeout_s: 300
+form:
+  sections:
+    - title: Inputs
+      fields:
+        - {key: rtl_path,    type: path,    required: true, placeholder: "./rtl"}
+        - {key: top_module,  type: text,    required: true, placeholder: "ddr_subsystem_top"}
+    - title: Clocks
+      fields:
+        - {key: clock_count, type: number,  default: 3, min: 1, max: 16}
+        - {key: max_freq_mhz, type: number, default: 1600, min: 100, max: 6400}
+    - title: Style
+      fields:
+        - {key: style,       type: select,  options: [Synopsys, Cadence], required: true}
+        - {key: include_false_paths, type: boolean, default: true}
+        - {key: output_dir,  type: path,    required: true, placeholder: "./constraints"}
+post_run:
+  collect_artifacts: ["*.sdc"]

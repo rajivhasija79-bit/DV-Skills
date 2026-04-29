@@ -1,0 +1,37 @@
+id: pm_overview
+title: PM Overview
+group: pm
+icon: pie-chart
+description: One-stop program health across RTL, DV, Emulation, JIRA & schedule
+adapter: pm_overview
+params: {}
+refresh_s: 300
+layout:
+  - {kind: kpi_row, tiles: [
+      {label: "RTL features %",   metric: rtl_pct,        delta: rtl_pct_delta,      accent: primary},
+      {label: "DV pass rate %",   metric: dv_pass,        delta: dv_pass_delta,      accent: success},
+      {label: "Emu progress %",   metric: emu_pct,        delta: emu_pct_delta,      accent: warning},
+      {label: "Open JIRA bugs",   metric: jira_open,      delta: jira_open_delta,    accent: destructive},
+      {label: "Days to gate",     metric: days_to_gate,   delta: days_delta,         accent: muted},
+      {label: "Risk score",       metric: risk,           delta: risk_delta,         accent: destructive}
+    ]}
+  - {kind: rag,   title: "Program RAG", source: rag}
+  - {kind: line,  title: "Pass rate trend", source: dv_trend, x: week,
+     series: [{key: pass_rate, label: "Pass rate %"}]}
+  - {kind: bar,   title: "Bug churn",       source: jira_trend, x: week,
+     series: [
+       {key: created,  label: "Created",  color: warning},
+       {key: resolved, label: "Resolved", color: success}
+     ]}
+  - {kind: donut, title: "Open bugs by area", source: bugs_area, name: area, value: count}
+  - {kind: feed,  title: "What changed this week", source: feed}
+  - {kind: table, title: "Open blockers", source: blockers,
+     columns: [
+       {key: id,       label: "Key"},
+       {key: title,    label: "Title"},
+       {key: area,     label: "Area"},
+       {key: severity, label: "Sev"},
+       {key: owner,    label: "Owner"},
+       {key: age_days, label: "Age (d)", align: right},
+       {key: status,   label: "Status", kind: status}
+     ]}

@@ -51,7 +51,7 @@ export function ProjectConfigPage() {
       <div className="flex items-end justify-between gap-4">
         <div className="max-w-2xl">
           <div className="uppercase-eyebrow text-primary">Project</div>
-          <h1 className="mt-2 bg-gradient-to-br from-primary/90 via-warning/85 to-primary/80 bg-clip-text text-[clamp(28px,3.5vw,44px)] font-black leading-[1.05] tracking-[-0.035em] text-transparent">
+          <h1 className="mt-2 text-primary text-[clamp(28px,3.5vw,44px)] font-black leading-[1.05] tracking-[-0.035em]">
             Project Config
           </h1>
           <p className="mt-3 text-[14px] leading-[1.55] text-muted-foreground">

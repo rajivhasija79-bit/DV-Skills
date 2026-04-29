@@ -11,21 +11,24 @@ const ICONS: Record<string, any> = {
   wrench: Wrench, activity: Activity,
 };
 
-const META: Record<string, { eyebrow: string; title: string; desc: string }> = {
+const META: Record<string, { eyebrow: string; title: string; desc: string; accent: string }> = {
   rtl: {
     eyebrow: "RTL track",
     title: "RTL Toolkit",
     desc: "Subsystem integration, SDC generation, and RTL review flows for the DDR/HBM subsystem.",
+    accent: "var(--track-rtl)", // champagne
   },
   dv: {
     eyebrow: "DV track",
     title: "DV Workbench",
     desc: "Testplan, testbench, VIP integration, RAL, coverage, debug, and regression — full functional verification suite.",
+    accent: "var(--track-dv)", // dusty rose
   },
   pm: {
     eyebrow: "Program Management",
     title: "PM Central",
     desc: "RTL completion, milestones, regression health, JIRA trends, and a combined program overview.",
+    accent: "var(--track-pm)", // sage
   },
 };
 
@@ -124,7 +127,7 @@ export function GroupPage({ group: groupProp }: { group?: "rtl" | "dv" | "pm" } 
       <div className="flex items-end justify-between gap-4">
         <div className="max-w-2xl">
           <div className="uppercase-eyebrow text-primary">{meta.eyebrow}</div>
-          <h1 className="mt-2 bg-gradient-to-br from-primary/90 via-warning/85 to-primary/80 bg-clip-text text-[clamp(28px,3.5vw,44px)] font-black leading-[1.05] tracking-[-0.035em] text-transparent">
+          <h1 className="mt-2 text-primary text-[clamp(28px,3.5vw,44px)] font-black leading-[1.05] tracking-[-0.035em]">
             {meta.title}
           </h1>
           <p className="mt-3 text-[14px] leading-[1.55] text-muted-foreground">{meta.desc}</p>

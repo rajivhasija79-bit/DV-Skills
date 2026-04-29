@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* HBM-DDR Studio — warm espresso + orange editorial palette
+/* HBM-DDR Studio — warm espresso + muted teal editorial palette
    Inspired by DV-Skills/dv-gui, mapped to shadcn-style HSL tokens. */
 
 @layer base {
@@ -14,14 +14,14 @@
     --card-foreground: 30 14% 12%;
     --popover: 0 0% 100%;
     --popover-foreground: 30 14% 12%;
-    --primary: 16 72% 62%;
+    --primary: 178 24% 48%;
     --primary-foreground: 0 0% 100%;
     --secondary: 30 12% 94%;
     --secondary-foreground: 30 14% 18%;
     --muted: 30 10% 92%;
     --muted-foreground: 30 6% 42%;
-    --accent: 16 72% 95%;
-    --accent-foreground: 16 60% 32%;
+    --accent: 178 24% 94%;
+    --accent-foreground: 178 30% 26%;
     --destructive: 0 70% 60%;
     --destructive-foreground: 0 0% 100%;
     --success: 142 55% 48%;
@@ -30,7 +30,7 @@
     --warning-foreground: 30 60% 14%;
     --border: 30 10% 88%;
     --input: 30 10% 88%;
-    --ring: 16 72% 62%;
+    --ring: 178 24% 48%;
     --radius: 0.625rem;
 
     /* chrome = sidebar + topbar surface (slate-tinted, distinct from content) */
@@ -45,38 +45,43 @@
     --sidebar-w: 272px;
   }
   .dark {
-    /* warm espresso dark */
-    --background: 36 14% 6%;            /* #111009 */
-    --foreground: 30 12% 96%;
-    --card: 30 12% 8%;                  /* #161412 */
-    --card-foreground: 30 12% 96%;
-    --popover: 30 12% 9%;
-    --popover-foreground: 30 12% 96%;
-    --primary: 16 70% 64%;              /* soft coral-orange */
-    --primary-foreground: 0 0% 100%;
-    --secondary: 30 10% 12%;            /* #1C1A15 */
-    --secondary-foreground: 30 12% 96%;
-    --muted: 30 10% 14%;                /* #222018 */
-    --muted-foreground: 30 6% 65%;
-    --accent: 16 70% 18%;
-    --accent-foreground: 16 70% 78%;
-    --destructive: 0 65% 62%;
+    /* cool slate dark — softer, neutral, less heavy than espresso */
+    --background: 220 14% 13%;          /* #1B1E22 */
+    --foreground: 220 12% 95%;
+    --card: 220 12% 16%;                /* #232730 */
+    --card-foreground: 220 12% 95%;
+    --popover: 220 12% 16%;
+    --popover-foreground: 220 12% 95%;
+    --primary: 178 26% 56%;             /* muted teal — soft, elegant */
+    --primary-foreground: 220 20% 10%;
+    --secondary: 220 10% 19%;
+    --secondary-foreground: 220 12% 95%;
+    --muted: 220 10% 21%;
+    --muted-foreground: 220 8% 66%;
+    --accent: 178 28% 20%;
+    --accent-foreground: 178 30% 80%;
+    --destructive: 0 60% 62%;
     --destructive-foreground: 0 0% 100%;
-    --success: 142 50% 50%;
+    --success: 142 45% 52%;
     --success-foreground: 0 0% 100%;
-    --warning: 28 75% 64%;              /* soft amber */
-    --warning-foreground: 30 60% 12%;
-    --border: 30 8% 18%;
-    --input: 30 8% 18%;
-    --ring: 16 70% 64%;
+    --warning: 38 60% 64%;              /* champagne */
+    --warning-foreground: 38 60% 12%;
+    --border: 220 10% 24%;
+    --input: 220 10% 24%;
+    --ring: 178 26% 56%;
 
-    /* chrome = sidebar + topbar surface (deep slate, distinct from warm content) */
-    --chrome: 222 28% 9%;
-    --chrome-foreground: 218 22% 78%;     /* cool slate, not white */
-    --chrome-strong: 220 28% 95%;         /* high-emphasis text in chrome */
-    --chrome-border: 222 22% 16%;
-    --chrome-muted: 220 12% 55%;
-    --chrome-hover: 222 22% 14%;
+    /* per-track accents (used by GroupPage heading + eyebrow) */
+    --track-rtl: 38 38% 64%;            /* soft champagne */
+    --track-dv: 350 32% 66%;            /* dusty rose */
+    --track-pm: 145 24% 58%;            /* sage */
+
+    /* chrome = sidebar + topbar surface (matches content background — solid, no contrast) */
+    --chrome: 220 14% 13%;
+    --chrome-foreground: 220 12% 88%;
+    --chrome-strong: 220 12% 96%;
+    --chrome-border: 220 10% 24%;
+    --chrome-muted: 220 8% 60%;
+    --chrome-hover: 220 12% 18%;
   }
 
   * { @apply border-border; }
@@ -93,7 +98,7 @@
 }
 
 @layer components {
-  /* Cards: animated orange top accent on hover (DV-GUI signature motif) */
+  /* Cards: animated primary top accent on hover (DV-GUI signature motif) */
   .hds-card-accent {
     @apply relative overflow-hidden;
   }

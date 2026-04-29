@@ -19,7 +19,7 @@ export default function Home() {
     <div className="flex flex-col gap-10 px-8 py-10">
       <div className="max-w-3xl">
         <div className="uppercase-eyebrow text-primary">DDR · HBM · LPDDR · GDDR</div>
-        <h1 className="mt-2 bg-gradient-to-br from-primary/90 via-warning/85 to-primary/80 bg-clip-text text-[clamp(36px,5vw,56px)] font-black leading-[1.05] tracking-[-0.04em] text-transparent">
+        <h1 className="mt-2 text-primary text-[clamp(36px,5vw,56px)] font-black leading-[1.05] tracking-[-0.04em]">
           Memory Subsystem<br />Studio
         </h1>
         <p className="mt-4 max-w-2xl text-[14px] leading-[1.55] text-muted-foreground">

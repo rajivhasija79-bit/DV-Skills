@@ -1,4 +1,5 @@
 {
+  "_note": "REPLACE: mock data. Either overwrite this JSON with real exports or wire backend/app/adapters/jira_rest.py (already wired in dispatch). See docs/INTEGRATION.md.",
   "kpis": {
     "open_count": 87, "open_delta": -4,
     "created_week": 23, "created_delta": 2,

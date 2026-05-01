@@ -12,7 +12,15 @@ import json
 from typing import Any, Callable
 
 from ..config import DATA_MODE, MOCK_DATA_DIR
-from . import jira_rest, jenkins, regression_db
+from . import (
+    jira_rest,
+    jenkins,
+    regression_db,
+    pm_overview,
+    ip_owners,
+    milestones,
+    rtl_completion,
+)
 
 
 def _mock_loader(name: str) -> Callable[[dict[str, Any]], dict]:
@@ -30,6 +38,11 @@ _LIVE: dict[str, Callable[[dict[str, Any]], dict]] = {
     "jira": jira_rest.get_data,
     "regression_trends": regression_db.get_data,
     "jenkins": jenkins.get_data,
+    # Placeholder stubs — implement get_data() in each module to go live.
+    "pm_overview": pm_overview.get_data,
+    "ip_owners": ip_owners.get_data,
+    "milestones": milestones.get_data,
+    "rtl_completion": rtl_completion.get_data,
 }
 
 

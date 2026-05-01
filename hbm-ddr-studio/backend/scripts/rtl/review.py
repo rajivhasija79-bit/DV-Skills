@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
-"""Demo RTL review against spec checklist."""
+"""Demo RTL review against spec checklist.
+
+REPLACE: this is a placeholder. Plug in your own RTL-review tool here.
+Contract: read one JSON line from stdin (form fields), print progress to
+stdout, exit 0 on success / non-zero on failure.
+See docs/INTEGRATION.md for full details.
+"""
 from __future__ import annotations
 import json
 import sys

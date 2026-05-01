@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""Demo script for DV Testbench Creation."""
+"""Demo script for DV Testbench Creation.
+
+REPLACE: placeholder. Plug in your real UVM-testbench scaffolder.
+Contract: JSON line on stdin (form fields) → progress on stdout → exit code.
+See docs/INTEGRATION.md.
+"""
 from __future__ import annotations
 import json
 import sys

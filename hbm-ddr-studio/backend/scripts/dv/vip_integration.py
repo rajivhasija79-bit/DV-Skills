@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""Demo VIP integration."""
+"""Demo VIP integration.
+
+REPLACE: placeholder. Plug in your real VIP-integration tool.
+Contract: JSON line on stdin (form fields) → progress on stdout → exit code.
+See docs/INTEGRATION.md.
+"""
 from __future__ import annotations
 import json
 import sys

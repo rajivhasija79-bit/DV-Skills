@@ -1,4 +1,5 @@
 {
+  "_note": "REPLACE: mock data. Either overwrite this JSON with real exports or implement backend/app/adapters/pm_overview.py. See docs/INTEGRATION.md.",
   "kpis": {
     "rtl_pct": 71, "rtl_pct_delta": 4,
     "dv_pass": 92, "dv_pass_delta": 2,

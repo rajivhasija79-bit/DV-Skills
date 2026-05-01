@@ -1,4 +1,5 @@
 {
+  "_note": "REPLACE: mock data. Either overwrite this JSON with real exports or wire backend/app/adapters/regression_db.py / jenkins.py. See docs/INTEGRATION.md.",
   "kpis": {
     "pass_rate": 92, "pass_rate_delta": 2,
     "runs_week": 1284, "runs_delta": 142,

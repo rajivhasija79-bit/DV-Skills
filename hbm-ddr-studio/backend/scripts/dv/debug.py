@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
-"""Demo debug task — wraps an rtl-sim-debug-style flow with mid-run prompt."""
+"""Demo debug task — wraps an rtl-sim-debug-style flow with mid-run prompt.
+
+REPLACE: placeholder. Plug in your real debug / triage tool.
+Contract: JSON line on stdin → progress on stdout → exit code. Use the
+##HDS-PROMPT## marker shown below to ask the user mid-run.
+See docs/INTEGRATION.md.
+"""
 from __future__ import annotations
 import json
 import sys

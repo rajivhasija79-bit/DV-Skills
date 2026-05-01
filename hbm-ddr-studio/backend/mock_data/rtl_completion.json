@@ -1,4 +1,5 @@
 {
+  "_note": "REPLACE: mock data. Either overwrite this JSON with real exports or implement backend/app/adapters/rtl_completion.py. See docs/INTEGRATION.md.",
   "kpis": {
     "total_ips": 12, "total_ips_delta": 0,
     "integrated_pct": 75, "integrated_delta": 8,

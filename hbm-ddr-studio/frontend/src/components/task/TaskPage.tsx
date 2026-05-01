@@ -16,9 +16,11 @@ import { StatusBadge } from "./StatusBadge";
 export function TaskPage({
   extras,
   taskId: taskIdProp,
+  overrideDefaults,
 }: {
   extras?: (cfg: Record<string, any>) => ReactNode;
   taskId?: string;
+  overrideDefaults?: Record<string, any>;
 }) {
   const params = useParams<{ taskId: string }>();
   const taskId = taskIdProp ?? params.taskId;
@@ -81,7 +83,7 @@ export function TaskPage({
             <CardDescription>Required fields are marked with *. Run is enabled once the form is valid.</CardDescription>
           </CardHeader>
           <CardContent>
-            <SchemaForm descriptor={desc} onChange={setHandle} />
+            <SchemaForm descriptor={desc} onChange={setHandle} overrideDefaults={overrideDefaults} />
             <div className="mt-4 flex items-center gap-2">
               <Tooltip>
                 <TooltipTrigger asChild>

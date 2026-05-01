@@ -62,12 +62,17 @@ export type SchemaFormHandle = {
 export function SchemaForm({
   descriptor,
   onChange,
+  overrideDefaults,
 }: {
   descriptor: TaskDescriptor;
   onChange?: (handle: SchemaFormHandle) => void;
+  overrideDefaults?: Record<string, any>;
 }) {
   const schema = useMemo(() => descriptorToZod(descriptor), [descriptor]);
-  const defaults = useMemo(() => defaultsFor(descriptor), [descriptor]);
+  const defaults = useMemo(
+    () => ({ ...defaultsFor(descriptor), ...(overrideDefaults || {}) }),
+    [descriptor, overrideDefaults],
+  );
   const { control, watch, formState } = useForm({
     resolver: zodResolver(schema),
     defaultValues: defaults,

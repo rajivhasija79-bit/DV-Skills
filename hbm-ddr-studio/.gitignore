@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+backend/.venv/
+
+# Node / Vite
+node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/tsconfig.tsbuildinfo
+
+# tsc emit (we ship .ts/.tsx; .js are build artifacts)
+frontend/src/**/*.js
+
+# Runtime state
+backend/runs/
+backend/jobstore.sqlite
+backend/jobstore.sqlite-*
+
+# OS / editor
+.DS_Store
+*.swp
+.idea/
+.vscode/

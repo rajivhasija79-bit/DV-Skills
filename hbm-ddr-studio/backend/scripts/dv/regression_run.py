@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
 """Mock regression runner. Demonstrates progress + mid-run prompt.
 
+REPLACE: placeholder. Plug in your real LSF/Slurm/Jenkins kicker.
+Contract: JSON line on stdin → progress on stdout → exit code. Use the
+##HDS-PROMPT## marker (see prompt() below) to ask the user mid-run.
+See docs/INTEGRATION.md.
+
 If config['ask_token'] is true, the script prints a HDS-PROMPT marker and waits
 for a JSON line on stdin with the response, then continues.
 """

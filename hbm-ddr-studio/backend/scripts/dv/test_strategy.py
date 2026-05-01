@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""Demo test strategy doc generator."""
+"""Demo test strategy doc generator.
+
+REPLACE: placeholder. Plug in your real strategy-doc generator.
+Contract: JSON line on stdin (form fields) → progress on stdout → exit code.
+See docs/INTEGRATION.md.
+"""
 from __future__ import annotations
 import json
 import sys

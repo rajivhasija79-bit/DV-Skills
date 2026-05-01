@@ -1,4 +1,5 @@
 {
+  "_note": "REPLACE: mock data. Either overwrite this JSON with real exports or implement backend/app/adapters/ip_owners.py. See docs/INTEGRATION.md.",
   "kpis": {
     "total_ips":  12,
     "rtl_owned":  11,

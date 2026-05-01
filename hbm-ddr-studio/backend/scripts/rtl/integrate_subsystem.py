@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""Demo script for RTL Subsystem Integration. Reads JSON config from stdin."""
+"""Demo script for RTL Subsystem Integration. Reads JSON config from stdin.
+
+REPLACE: placeholder. Plug in your real subsystem-integration generator.
+Contract: JSON line on stdin (form fields) → progress on stdout → exit code.
+See docs/INTEGRATION.md.
+"""
 from __future__ import annotations
 import json
 import sys
